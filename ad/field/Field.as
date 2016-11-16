@@ -1,17 +1,13 @@
 package ad.field 
 {
-	/**
-	 * ...
-	 * @author Stefan Dimitrov
-	 */
-	public class Field 
-	{
-		
+	import flash.display.MovieClip;
+	
+	public class Field extends MovieClip
+	{		
 		public function Field() 
 		{
 			
-		}
-		
+		}		
 	}
 
 }
