@@ -10,6 +10,15 @@ package ad.deck
 			
 		}
 		
+		
+		public function addCard(card:Card):Hand
+		{
+			if (card != null)
+				m_cards.push(card);
+			return this;
+		}
+		
+		
 		private var m_cards:Vector.<Card> = null;
 	}
 
