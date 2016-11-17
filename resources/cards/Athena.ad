@@ -1,7 +1,0 @@
-name = "Athena";
-description = "Athena's description.";
-race = Aryan;
-type = Character;
-
-base_health = 15;
-base_attack = 10;
