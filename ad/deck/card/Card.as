@@ -2,21 +2,44 @@ package ad.deck.card
 {
 	import flash.display.MovieClip;
 	import ad.deck.card.Ability;
+	import ad.file.StatementProcessor;
+	import ad.file.Statement;
 	
 	public class Card extends MovieClip
 	{		
-		public static function loadFromFile(path:String):Card
-		{
-			
-			return this;
-		}
-		
 		public static const ACTIVE:uint = 0, PASSIVE:uint = 1, ON_SUMMON:uint = 2;
+		private static var cards:Object = new Object();
 		
 		
-		public function Card() 
+		public function Card() {}
+		
+		public function loadFromFile(path:String):void
 		{
-			
+			var file:StatementProcessor = new StatementProcessor(path, function():void 
+				{
+					for each (var statement:Statement in file.getStatements())
+						switch (statement.left)
+						{
+						case "name":
+							m_name = statement.right;
+							break;
+						case "description":
+							m_description = statement.right;
+							break;
+						case "race":
+							m_race = statement.right;
+							break;
+						case "type":
+							m_type = statement.right;
+							break;
+						case "base_health":
+							m_baseHealth = statement.right;
+							break;
+						case "base_attaack":
+							m_baseAttack = statement.right;
+							break;
+						}
+				});
 		}
 		
 		
