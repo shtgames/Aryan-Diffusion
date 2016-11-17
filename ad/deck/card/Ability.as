@@ -22,7 +22,7 @@ package ad.deck.card
 			return this;
 		}
 		
-		public function getName():const String
+		public function getName():String
 		{
 			return m_name;
 		}
