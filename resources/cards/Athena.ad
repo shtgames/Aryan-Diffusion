@@ -1,7 +1,8 @@
-name = "Athena";
-description = "Athena's description.";
-race = Aryan;
-type = Character;
+Athena = 
+{
+	description = "Athena's description.";
+	race = Aryan;
+	type = Character;
 
-base_health = 15;
-base_attack = 10;
+	base = { 15; 10; }
+}

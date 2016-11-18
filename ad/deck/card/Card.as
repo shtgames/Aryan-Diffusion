@@ -17,26 +17,23 @@ package ad.deck.card
 		{
 			var file:StatementProcessor = new StatementProcessor(path, function():void 
 				{
-					for each (var statement:Statement in file.getStatements())
+					m_name = file.getStatements()[0].left;
+					
+					for each (var statement:Statement in file.getStatements()[0].statements)
 						switch (statement.left)
 						{
-						case "name":
-							m_name = statement.right;
-							break;
 						case "description":
-							m_description = statement.right;
+							m_description = statement.strings[0];
 							break;
 						case "race":
-							m_race = statement.right;
+							m_race = statement.strings[0];
 							break;
 						case "type":
-							m_type = statement.right;
+							m_type = statement.strings[0];
 							break;
-						case "base_health":
-							m_baseHealth = statement.right;
-							break;
-						case "base_attaack":
-							m_baseAttack = statement.right;
+						case "base":
+							m_baseHealth = statement.strings[0];
+							m_baseAttack = statement.strings[1];
 							break;
 						}
 				});
