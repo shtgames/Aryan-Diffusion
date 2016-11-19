@@ -29,6 +29,8 @@ package ad.deck.card
 		
 		
 		private var m_parent:Card = null;
-		private var m_name:String = new String(), m_description = new String();
+		private var m_name:String = new String(), m_description:String = new String();
+		
+		public static const ACTIVE:uint = 0, PASSIVE:uint = 1, ON_SUMMON:uint = 2;
 	}
 }

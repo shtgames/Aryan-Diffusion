@@ -1,5 +1,6 @@
-Athena = 
+0 = 
 {
+	name = "Athena";
 	description = "Athena's description.";
 	race = Aryan;
 	type = Character;

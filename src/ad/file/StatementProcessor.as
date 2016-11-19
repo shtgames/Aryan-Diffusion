@@ -5,17 +5,11 @@ package ad.file
 	import flash.net.URLRequest;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	
 	import ad.file.Statement;
 	
 	public class StatementProcessor 
-	{
-		public static function getDirectoryContents(path:String):Vector.<String>
-		{
-			// Need to use Adobe AIR for this to work.
-			return new Vector.<String>();
-		}
-		
-		
+	{		
 		public function StatementProcessor(path:String = null, onLoad:Function = null)
 		{
 			if (path != null) loadFromFile(path, onLoad);
@@ -97,17 +91,58 @@ package ad.file
 						const statement:Statement = getNextStatement(value);
 						if (statement != null) returnValue.statements.push(statement);
 					}
-					else if (value.search('"') != -1)
-						returnValue.strings.push(String(value.split('"')[1]).replace(/[\r\n,]+/gim, ''));
-					else returnValue.strings.push(value.replace(/[ \s\r\n,]+/gim, ''));
+					else returnValue.strings.push( value.search('"') != -1 ? getContentWithinQuotations(value) :
+						removeWhitespace(value).replace().replace(';', '') );
 			}
-			else if (nextChar == '"')
-				returnValue.strings.push( String(source.split('"')[1])
-					.replace(/[\r\n]+/gim, ''));
-			else returnValue.strings.push( source.replace(/[ \t\r\n,]+/gim, '') );
+			else returnValue.strings.push( nextChar == '"' ? getContentWithinQuotations(source) :
+				removeWhitespace(source).replace(';', '') );
 			
 			return returnValue;
 		}
+		
+		
+		private function splitStatements(source:String):Vector.<String>
+		{
+			if (source == null) return null;
+			
+			var statements:Vector.<String> = new Vector.<String>();
+			var brackets:uint = 0;
+			
+			for (var i:uint = 0, start:uint = 0;  i < source.length; ++i)
+			{
+				const char:String = source.charAt(i);
+				if (char == '{') brackets++;
+				else if (char == '}') 
+				{
+					if (brackets == 0)
+					{
+						trace("Syntax error in file \"" + m_path + "\".\nError while reading block: \n\"" + source + "\".");
+						return null;
+					}
+					brackets--;
+					
+					if (brackets == 0)					
+					{
+						statements.push( removeNewLines(source.substring(start, i + 1)) );
+						start = i + 1;
+						
+						if (statements[statements.length - 1].length == 0)
+							statements.pop();
+					}
+				}
+				else if (char == ';' && brackets == 0)
+				{
+					statements.push( removeNewLines(source.substring(start, i + 1)) );
+					start = i + 1;
+					
+					if (statements[statements.length - 1].length == 0)
+						statements.pop();
+				}
+			}
+			
+			return statements;
+		}
+		
 		
 		private function getNextChar(source:String):String
 		{
@@ -134,47 +169,10 @@ package ad.file
 			return [ returnValue, end ];
 		}
 		
-		private function splitStatements(source:String):Vector.<String>
-		{
-			var statements:Vector.<String> = new Vector.<String>();
-			var brackets:uint = 0;
-			
-			for (var i:uint = 0, start:uint = 0;  i < source.length; ++i)
-			{
-				const char:String = source.charAt(i);
-				if (char == '{') brackets++;
-				else if (char == '}') 
-				{
-					if (brackets == 0)
-					{
-						trace("Syntax error in file \"" + m_path + "\".\nError while reading block: \"" + source + "\".");
-						return null;
-					}
-					brackets--;
-					if (brackets == 0)					
-					{
-						statements.push( source.substring(start, i + 1).replace(/[\r\n]+/gim, '') );
-						start = i + 1;
-						
-						if (statements[statements.length - 1].length == 0)
-							statements.pop();
-					}
-				}
-				else if (char == ';' && brackets == 0)
-				{
-					statements.push( source.substring(start, i + 1).replace(/[\r\n]+/gim, '') );
-					start = i + 1;
-					
-					if (statements[statements.length - 1].length == 0)
-						statements.pop();
-				}
-			}
-			
-			return statements;
-		}
-		
 		private function getContentWithinBrackets(source:String):String
 		{
+			if (source == null) return null;
+			
 			var brackets:uint = 0;
 			
 			for (var i:uint = 0, start:uint = 0;  i < source.length; ++i)
@@ -200,6 +198,38 @@ package ad.file
 			}
 			
 			return null;
+		}
+		
+		private function getContentWithinQuotations(source:String):String
+		{
+			if (source == null) return null;
+			
+			var foundQuote:Boolean = false;
+			for (var i:uint = 0, start:uint = 0; i != source.length; ++i)
+				if (source.charAt(i) == '"')
+				{
+					if (!foundQuote)
+					{
+						foundQuote = true;
+						start = i + 1;
+					}
+					else return removeNewLines(source.substring(start, i));
+				}
+			
+			return null;
+		}
+		
+		
+		private function removeWhitespace(source:String):String
+		{
+			if (source == null) return null;
+			return source.replace(/[ \t\r\n,]+/gim, '');
+		}
+		
+		private function removeNewLines(source:String, replacement:String = ''):String
+		{
+			if (source == null) return null;
+			return source.replace(/[\r\n]+/gim, replacement);
 		}
 		
 		
