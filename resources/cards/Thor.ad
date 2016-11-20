@@ -1,0 +1,9 @@
+2 = 
+{
+	name = "Thor";
+	description = "Thor's description.";
+	race = Aryan;
+	type = Character;
+
+	base = { 20; 15; }	
+}

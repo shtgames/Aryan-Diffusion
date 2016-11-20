@@ -5,6 +5,8 @@ package ad.file
 	import flash.net.URLRequest;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	import ad.file.Statement;
 	
@@ -16,22 +18,23 @@ package ad.file
 		}
 		
 		
-		public function loadFromFile(path:String, onLoad:Function = null ):Boolean
+		public function loadFromFile(path:String, onLoad:Function = null):Boolean
 		{
 			if (path == null)
 			{
 				m_path = null;
 				return false;				
 			}
+			m_loading = true;
 			m_path = path;
 			
 			var loader:URLLoader = new URLLoader();
 			loader.load(new URLRequest(m_path));
 			
-			
 			loader.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent) : void
 				{
 					m_statements = null;
+					m_loading = false;
 					trace("Failed to load file \"" + m_path + "\".");
 				});
 			
@@ -50,8 +53,9 @@ package ad.file
 							m_statements.push(statement);
 					}
 					
-					if (onLoad != null)
-						onLoad();
+					m_loading = false;
+					
+					if (onLoad != null)	onLoad(getStatements());
 				} );
 			
 			return true;
@@ -60,6 +64,11 @@ package ad.file
 		public function getStatements():Vector.<Statement>
 		{
 			return m_statements;
+		}
+		
+		public function isLoading():Boolean
+		{
+			return m_loading.valueOf();
 		}
 		
 		
@@ -235,5 +244,6 @@ package ad.file
 		
 		private var m_statements:Vector.<Statement> = null;
 		private var m_path:String = "";
+		private var m_loading:Boolean = false;
 	}
 }
