@@ -7,7 +7,6 @@ package ad.field
 		public function Field() 
 		{
 			
-		}		
+		}
 	}
-
 }

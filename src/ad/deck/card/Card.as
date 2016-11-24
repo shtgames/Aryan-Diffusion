@@ -1,5 +1,6 @@
 package ad.deck.card 
 {
+	import ad.player.Player;
 	import flash.display.MovieClip;
 	
 	import ad.deck.card.Ability;
@@ -8,21 +9,48 @@ package ad.deck.card
 	import ad.map.HashMap;
 	
 	public class Card extends MovieClip
-	{		
+	{
 		public function Card(source:Statement = null)
 		{
 			loadFromFile(source);
 		}
 		
 		
+		public function getID():String
+		{
+			return m_id;
+		}
+		
 		public function getName():String
 		{
 			return m_name;
 		}
 		
+		public function getDescription():String
+		{
+			return m_description;
+		}
+		
 		public function getType():uint
 		{
 			return m_type;
+		}
+		
+		public function getRace():String
+		{
+			return m_race;
+		}
+		
+		
+		public function parent():Player
+		{
+			return m_parent;
+		}
+		
+		public function parent(newParent:Player):Card
+		{
+			m_parent = newParent;
+			return this;
 		}
 		
 		
@@ -71,25 +99,13 @@ package ad.deck.card
 			return this;
 		}
 		
-		private function parseType(type:String):uint
-		{
-			switch (type.toLowerCase())
-			{
-			case "character":
-				return CHARACTER;
-			case "support":
-				return SUPPORT;
-			case "habitat":
-				return HABITAT;
-			}
-			return CHARACTER;
-		}
 		
-		
-		private var m_background:MovieClip = null, m_portrait:MovieClip = null;
+		private var m_id:String = null
+		private var m_name:String = null, m_description:String = null;
+		private var m_parent:Player = null;
 		
 		private var m_type:uint = CHARACTER;
-		private var m_id:String = null, m_name:String = null, m_description:String = null, m_race:String = null;
+		private var m_race:String = null;
 		private var m_health:int = 0, m_baseHealth:uint = 0, m_attack:uint = 0, m_baseAttack:uint = 0;
 		
 		private var m_onSummon:Vector.<uint> = new Vector.<uint>(),
@@ -123,6 +139,21 @@ package ad.deck.card
 		{
 			return cards.contains(id);
 		}
+		
+		
+		private static function parseType(type:String):uint
+		{
+			switch (type.toLowerCase())
+			{
+			case "character":
+				return CHARACTER;
+			case "support":
+				return SUPPORT;
+			case "habitat":
+				return HABITAT;
+			}
+			return CHARACTER;
+		}		
 		
 		
 		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
