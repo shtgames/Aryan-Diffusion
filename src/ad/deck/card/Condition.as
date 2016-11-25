@@ -1,7 +1,7 @@
 package ad.deck.card 
 {
 	import ad.file.Statement;
-	import ad.deck.card.Card;
+	import ad.deck.card.CardState;
 	
 	public class Condition 
 	{
@@ -15,7 +15,7 @@ package ad.deck.card
 			if (source == null) return;
 		}
 		
-		public function isFulfilled(card:Card):Boolean
+		public function isFulfilled(card:CardState):Boolean
 		{
 			return true;
 		}

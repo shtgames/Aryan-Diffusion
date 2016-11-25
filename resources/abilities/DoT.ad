@@ -1,0 +1,44 @@
+dot_1 = 
+{
+	name = "DoT";
+	description = "Damage-over-Time effect.";
+	type = passive;
+
+	source_condition = 
+	{
+		type = habitat;
+		race = !aryan;
+		attack = !0;
+	}
+
+	target = 
+	{
+		case_0 = 
+		{
+			condition = 
+			{
+				type = character;
+				this = !target;
+				parent = !me;
+			}
+			effect = 
+			{
+				health = health - 1;
+			}
+		}
+		
+		case_1 = 
+		{
+			condition = 
+			{
+				type = character;
+				this = target;
+				parent = !me;
+			}
+			effect = 
+			{
+				health = health - 2;
+			}
+		}
+	}
+}

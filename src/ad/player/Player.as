@@ -5,10 +5,7 @@ package ad.player
 	
 	public class Player 
 	{		
-		public function Player() 
-		{
-			
-		}
+		public function Player() {}
 		
 		private var m_hand:Hand = null;
 		private var m_deck:Deck = null;

@@ -1,7 +1,7 @@
 package ad.deck.card 
 {
 	import ad.file.Statement;
-	import ad.deck.card.Card;
+	import ad.deck.card.CardState;
 	
 	public class Effect 
 	{
@@ -10,14 +10,14 @@ package ad.deck.card
 			loadFromFile(source);
 		}
 		
-		public function loadFromFile(souce:Statement)
+		public function loadFromFile(source:Statement):void
 		{
 			if (source == null) return;
 		}
 		
-		public function applyTo(target:Card, source:Card)
+		public function applyTo(target:CardState, source:CardState):CardState
 		{
-			
+			return target;
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package ad.deck.card 
 {
-	import ad.player.Player;
 	import flash.display.MovieClip;
 	
 	import ad.deck.card.Ability;
@@ -41,16 +40,28 @@ package ad.deck.card
 			return m_race;
 		}
 		
-		
-		public function parent():Player
+		public function getAbilities(type:uint):Vector.<String>
 		{
-			return m_parent;
+			switch (type)
+			{
+			case Ability.ACTIVE:
+				return m_active;
+			case Ability.PASSIVE:
+				return m_passive;
+			case Ability.ON_SUMMON:
+				return m_onSummon;
+			}
+			return null;
 		}
 		
-		public function parent(newParent:Player):Card
+		public function getHealth():uint
 		{
-			m_parent = newParent;
-			return this;
+			return m_baseHealth;
+		}
+		
+		public function getAttack():uint
+		{
+			return m_baseAttack;
 		}
 		
 		
@@ -79,6 +90,10 @@ package ad.deck.card
 					m_baseHealth = parseInt(statement.strings[0], 10);
 					m_baseAttack = parseInt(statement.strings[1], 10);
 					break;
+				case "abilities":
+					for (var ability:String in statement.strings)
+						addAbility(ability);
+					break;
 				}
 		}		
 		
@@ -102,14 +117,12 @@ package ad.deck.card
 		
 		private var m_id:String = null
 		private var m_name:String = null, m_description:String = null;
-		private var m_parent:Player = null;
 		
 		private var m_type:uint = CHARACTER;
 		private var m_race:String = null;
-		private var m_health:int = 0, m_baseHealth:uint = 0, m_attack:uint = 0, m_baseAttack:uint = 0;
+		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
 		
-		private var m_onSummon:Vector.<uint> = new Vector.<uint>(),
-			m_passive:Vector.<uint> = new Vector.<uint>(), m_active:Vector.<uint> = new Vector.<uint>();
+		private var m_onSummon:Vector.<String> = new Vector.<String>(), m_passive:Vector.<String> = new Vector.<String>(), m_active:Vector.<String> = new Vector.<String>();
 		
 		
 		public static function loadResources(path:String):void

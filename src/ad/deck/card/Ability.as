@@ -38,19 +38,33 @@ package ad.deck.card
 		}
 		
 		
-		public function canApply(target:Card, source:Card):Boolean
-		{			
-			if (target == null || source == null || m_effect == null ||
-				(m_sourceCondition != null && !m_sourceCondition.isFulfilled(source)) ||
-				(m_targetCondition != null && !m_targetCondition.isFulfilled(target))) return false;
-			return true;
+		public function canApply(target:CardState, source:CardState):Boolean
+		{
+			if (target == null || source == null ||
+				(m_sourceCondition != null && !m_sourceCondition.isFulfilled(source)))
+					return false;
+			
+			for each (var condition:Condition in m_targetConditions)
+				if (condition.isFulfilled(target)) return true;
+			
+			return false;
 		}
 		
-		public function applyTo(target:Card, source:Card):Boolean
+		public function applyTo(target:CardState, source:CardState):Boolean
 		{
-			if (!canApply(target, source)) return false;
-			m_effect.applyTo(target, source);
-			return true;
+			if (target == null || source == null ||
+				(m_sourceCondition != null && !m_sourceCondition.isFulfilled(source)))
+				return false;
+			
+			var returnValue:Boolean = false;
+			for (var i:uint = 0; i != m_targetConditions.length; ++i)
+				if (m_targetConditions[i].isFulfilled(target))
+				{
+					m_targetEffects[i].applyTo(target, source);
+					returnValue = true;
+				}
+			
+			return returnValue;
 		}
 		
 		
@@ -75,11 +89,28 @@ package ad.deck.card
 				case "source_condition":
 					m_sourceCondition = new Condition(statement);
 					break;
-				case "target_condition":
-					m_targetCondition = new Condition(statement);
-					break;
-				case "effect":
-					m_effect = new Effect(statement);
+				case "target":
+					for each (var tarCase:Statement in statement.statements)
+						for each (var tarStatement:Statement in tarCase.statements)
+							switch (tarStatement.left.toLowerCase())
+							{
+							case "condition":
+								m_targetConditions.push(new Condition(tarStatement));
+								break;
+							case "effect":
+								m_targetEffects.push(new Effect(tarStatement));
+								break;
+							}
+					
+					if (m_targetConditions.length != m_targetEffects.length) 
+					{
+						trace("Logic error in definition of Ability(ID: " + m_id + ", Name: " + m_name + "):\n" +
+							"Inequal amounts of target Conditions and corresponding Effects - will remove excess items.");
+						
+						while (m_targetConditions.length > m_targetEffects.length) m_targetConditions.pop();
+						while (m_targetConditions.length < m_targetEffects.length) m_targetEffects.pop();
+					}
+					
 					break;
 				}
 		}
@@ -88,8 +119,8 @@ package ad.deck.card
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
 		private var m_type:uint = ACTIVE;
-		private var m_sourceCondition:Condition = null, m_targetCondition:Condition = null;
-		private var m_effect:Effect = null;
+		private var m_sourceCondition:Condition = null;
+		private var m_targetConditions:Vector.<Condition> = new Vector.<Condition>(), m_targetEffects:Vector.<Effect> = new Vector.<Effect>();
 		
 		
 		public static function loadResources(path:String):void
