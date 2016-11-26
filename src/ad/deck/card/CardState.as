@@ -10,22 +10,29 @@ package ad.deck.card
 			if (!Card.exists(card)) return;
 			
 			const buffer:Card = Card.getCard(card);
-			m_health = buffer.getHealth();
-			m_attack = buffer.getAttack();
+			m_health = buffer.health;
+			m_attack = buffer.attack;
 		}
 		
 		
-		public function getCardKey():String
+		public function get cardKey():String
 		{
 			return m_key;
 		}
 		
-		public function getHealth():uint
+		public function setCardKey(key:String):CardState
+		{
+			if (Card.exists(key)) m_key = key;
+			return this;
+		}
+		
+		
+		public function get health():uint
 		{
 			return m_health;
 		}
 		
-		public function getAttack():uint
+		public function get attack():uint
 		{
 			return m_attack;
 		}
@@ -43,7 +50,7 @@ package ad.deck.card
 		}
 		
 		
-		public function getParent():Player
+		public function get parent():Player
 		{
 			return m_parent;
 		}
@@ -52,6 +59,14 @@ package ad.deck.card
 		{
 			m_parent = newParent;
 			return this;
+		}
+		
+		
+		public function useAbility(id:String, target:CardState):Boolean
+		{
+			if (!Card.exists(m_key) || !Card.getCard(m_key).hasAbility(id))	return false;
+			
+			return Ability.getAbility(id).applyTo(target, this);
 		}
 		
 		

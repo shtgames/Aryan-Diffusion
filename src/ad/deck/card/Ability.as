@@ -1,7 +1,5 @@
 package ad.deck.card 
 {
-	import flash.display.MovieClip;
-	
 	import ad.deck.card.Card;
 	import ad.deck.card.Condition;
 	import ad.deck.card.Effect;
@@ -9,7 +7,7 @@ package ad.deck.card
 	import ad.file.Statement;
 	import ad.map.HashMap;
 	
-	public class Ability extends MovieClip
+	public class Ability
 	{
 		public function Ability(source:Statement = null) 
 		{
@@ -17,22 +15,22 @@ package ad.deck.card
 		}
 		
 		
-		public function getID():String
+		public function get ID():String
 		{
 			return m_id;
 		}
 		
-		public function getName():String
+		public function get name():String
 		{
 			return m_name;
 		}
 		
-		public function getDescription():String
+		public function get description():String
 		{
 			return m_description;
 		}
 		
-		public function getType():uint
+		public function get type():uint
 		{
 			return m_type;
 		}

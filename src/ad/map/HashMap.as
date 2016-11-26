@@ -10,10 +10,10 @@
 	{
 		public function HashMap(copy:HashMap = null)
 		{
-			assignmentOperator(copy);
+			assign(copy);
 		}
 		
-		public function assignmentOperator(copy:HashMap):HashMap
+		public function assign(copy:HashMap):HashMap
 		{
 			if (copy == null) return this;
 			
@@ -42,9 +42,9 @@
 		}
 		
 		
-		public function insert(key:String, value:*):*
+		public function insert(key:*, value:*):HashMap
 		{
-			if (key == null) return null;
+			if (key == null) return this;
 			
 			m_mutex.lock();
 			if (!m_keyToIndex.hasOwnProperty(key))
@@ -55,10 +55,10 @@
 			else m_array[m_keyToIndex[key]] = value;
 			m_mutex.unlock();
 			
-			return value;
+			return this;
 		}
 		
-		public function at(key:String):*
+		public function at(key:*):*
 		{
 			if (key == null) return null;
 			
@@ -108,8 +108,8 @@
 		public function clear():HashMap
 		{
 			m_mutex.lock();
-			m_keyToIndex = new Object();
-			m_array = new Vector.<Object>();
+			m_keyToIndex = [];
+			m_array.length = 0;
 			m_mutex.unlock();
 			
 			return this;
@@ -120,8 +120,8 @@
 			if (other == null) return this;
 			
 			const buffer:HashMap = new HashMap(this);			
-			assignmentOperator(other);
-			other.assignmentOperator(buffer);
+			assign(other);
+			other.assign(buffer);
 			
 			return this;
 		}

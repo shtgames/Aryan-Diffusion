@@ -1,17 +1,11 @@
 package ad.deck 
-{
-	import flash.display.MovieClip;
-	import ad.deck.card.Card;
-	
-	public class Deck extends MovieClip
+{	
+	public class Deck
 	{
-		public function Deck() 
-		{
-			
-		}
+		public function Deck() {}
 		
 		
-		public function addCard(card:Card):Deck
+		public function addCard(card:String):Deck
 		{
 			if (card != null)
 				m_cards.push(card);
@@ -19,16 +13,16 @@ package ad.deck
 		}
 		
 		
-		public function getNextCard():Card
+		public function get nextCard():String
 		{
 			if (m_cards.length != 0)
 				return m_cards[m_cards.length - 1];
 			return null;
 		}
 		
-		public function popNextCard():Card
+		public function drawNextCard():String
 		{
-			var returnValue:Card = null;
+			var returnValue:String = null;
 			
 			if (m_cards.length != 0)
 			{
@@ -39,9 +33,9 @@ package ad.deck
 			return returnValue;
 		}
 		
-		public function getNextCards(count:uint):Vector.<Card>
+		public function peekNextCards(count:uint):Vector.<String>
 		{
-			var returnValue:Vector.<Card> = new Vector.<Card>();
+			var returnValue:Vector.<String> = new Vector.<String>();
 			
 			if (m_cards.length != 0)
 				for (var i:uint = m_cards.length - 1; i >= 0 && i >= m_cards.length - count; --i)
@@ -50,13 +44,13 @@ package ad.deck
 			return returnValue;
 		}
 		
-		public function popNextCards(count:uint):Vector.<Card>
+		public function drawNextCards(count:uint):Vector.<String>
 		{
-			var returnValue:Vector.<Card> = new Vector.<Card>();
+			var returnValue:Vector.<String> = new Vector.<String>();
 			
 			while (count != 0 && m_cards.length != 0)
 			{
-				returnValue.push(popNextCard());
+				returnValue.push(drawNextCard());
 				count--;
 			}
 			
@@ -72,7 +66,7 @@ package ad.deck
 		
 		public function shuffle():Deck
 		{
-			var shuffledDeck:Vector.<Card> = new Vector.<Card>();
+			var shuffledDeck:Vector.<String> = new Vector.<String>();
 			
 			var randomPos:Number = 0;
 			for (var i:uint = 0; i < shuffledDeck.length; i++)
@@ -86,7 +80,13 @@ package ad.deck
 			return this;
 		}
 		
+		public function clear():Deck
+		{
+			m_cards.length = 0;
+			return this;
+		}
 		
-		private var m_cards:Vector.<Card> = new Vector.<Card>();
+		
+		private var m_cards:Vector.<String> = new Vector.<String>();
 	}	
 }

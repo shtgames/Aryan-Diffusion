@@ -1,13 +1,11 @@
 package ad.deck.card 
 {
-	import flash.display.MovieClip;
-	
 	import ad.deck.card.Ability;
 	import ad.file.StatementProcessor;
 	import ad.file.Statement;
 	import ad.map.HashMap;
 	
-	public class Card extends MovieClip
+	public class Card
 	{
 		public function Card(source:Statement = null)
 		{
@@ -15,27 +13,27 @@ package ad.deck.card
 		}
 		
 		
-		public function getID():String
+		public function get ID():String
 		{
 			return m_id;
 		}
 		
-		public function getName():String
+		public function get name():String
 		{
 			return m_name;
 		}
 		
-		public function getDescription():String
+		public function get description():String
 		{
 			return m_description;
 		}
 		
-		public function getType():uint
+		public function get type():uint
 		{
 			return m_type;
 		}
 		
-		public function getRace():String
+		public function get race():String
 		{
 			return m_race;
 		}
@@ -54,12 +52,29 @@ package ad.deck.card
 			return null;
 		}
 		
-		public function getHealth():uint
+		public function hasAbility(id:String):Boolean
+		{
+			if (!Ability.exists(id)) return false;
+			
+			switch (type)
+			{
+			case Ability.ACTIVE:
+				return m_active.indexOf(id) != -1;
+			case Ability.PASSIVE:
+				return m_passive.indexOf(id) != -1;
+			case Ability.ON_SUMMON:
+				return m_onSummon.indexOf(id) != -1;
+			}
+			
+			return false;
+		}
+		
+		public function get health():uint
 		{
 			return m_baseHealth;
 		}
 		
-		public function getAttack():uint
+		public function get attack():uint
 		{
 			return m_baseAttack;
 		}
@@ -101,7 +116,7 @@ package ad.deck.card
 		{
 			if (!Ability.exists(id)) return this;
 			
-			switch (Ability.getAbility(id).getType())
+			switch (Ability.getAbility(id).type)
 			{
 			case Ability.ACTIVE:
 				m_active.push(id);
@@ -151,6 +166,12 @@ package ad.deck.card
 		public static function exists(id:String):Boolean
 		{
 			return cards.contains(id);
+		}
+		
+		public static function isValidType(type:uint):Boolean
+		{
+			if (type == CHARACTER || type == SUPPORT || type == HABITAT) return true;
+			return false;
 		}
 		
 		

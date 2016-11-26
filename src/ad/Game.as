@@ -1,15 +1,10 @@
 package ad 
-{
-	import flash.display.MovieClip;
-	
-	public class Game extends MovieClip 
+{	
+	public class Game
 	{
 		public function Game() 
 		{
-			super();
 			
-		}
-		
-		
+		}		
 	}
 }
