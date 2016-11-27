@@ -1,4 +1,5 @@
 directories = 
 {
-	../resources/abilities/DoT.ad;
+	../resources/abilities/Poison Gas.ad;
+	../resources/abilities/Attack.ad;
 }

@@ -5,5 +5,7 @@
 	race = Aryan;
 	type = Character;
 
-	base = { 20; 15; }	
+	base = { 20; 15; }
+	
+	abilities = { attack; }
 }

@@ -6,6 +6,8 @@
 	type = Character;
 
 	base = { 15; 10; }
+	
+	abilities = { attack; }
 }
 
 1 = 
@@ -16,4 +18,6 @@
 	type = Character;
 
 	base = { 10; 10; }
+	
+	abilities = { attack; }
 }

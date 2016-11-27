@@ -1,0 +1,26 @@
+attack = 
+{
+	name = "Attack";
+	description = "Attack's the target card, dealing damage equal to this card's Attack Points.";
+	type = active;
+	
+	source_condition = 
+	{
+		type = !habitat;
+		attack = !0;
+	}
+	
+	target = 
+	{
+		case_0 = 
+		{
+			type = !habitat;
+			owner = !source_owner;
+			this = target;
+		}
+		effect = 
+		{
+			health = health - source_attack;
+		}
+	}
+}

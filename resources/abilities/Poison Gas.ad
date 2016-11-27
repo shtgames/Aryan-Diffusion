@@ -1,7 +1,7 @@
-dot_1 = 
+poison_gas = 
 {
-	name = "DoT";
-	description = "Damage-over-Time effect.";
+	name = "Poison Gas";
+	description = "Damage-over-time effect that deals 2 Damage to the Primary Target, and 1 Damage to all other non-Habitat enemy Cards.";
 	type = passive;
 
 	source_condition = 
@@ -17,9 +17,9 @@ dot_1 =
 		{
 			condition = 
 			{
-				type = character;
-				this = !target;
-				parent = !me;
+				type = !habitat;
+				owner = !source_owner;
+				this = "!target && !source";
 			}
 			effect = 
 			{
@@ -31,9 +31,9 @@ dot_1 =
 		{
 			condition = 
 			{
-				type = character;
+				type = !habitat;
+				owner = !source_owner;
 				this = target;
-				parent = !me;
 			}
 			effect = 
 			{
