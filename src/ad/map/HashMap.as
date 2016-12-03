@@ -8,9 +8,9 @@
 	
 	public class HashMap extends Proxy
 	{
-		public function HashMap(copy:HashMap = null)
+		public function HashMap(other:HashMap = null)
 		{
-			assign(copy);
+			assign(other);
 		}
 		
 		public function assign(copy:HashMap):HashMap

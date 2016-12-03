@@ -1,183 +1,77 @@
-package ad.expression;
-
-
-/**
- * Specifies the type of a token.
- */
-public enum TokenType
+package ad.expression
 {
-	/**
-	 * Indicates the formula prefix token '='.
-	 */
-	Special,
-
-	/**
-	 * Indicates a whitespace token.
-	 */
-	Ws,
-
-	/**
-	 * Indicates an opening bracket '('.
-	 */
-	Ob,
-
-	/**
-	 * Indicates a closing bracket ')'.
-	 */
-	Cb,
-
-	/**
-	 * Indicates an opening curly bracket '{'.
-	 */
-	Ocb,
-
-	/**
-	 * Indicates a closing curly bracket '}'.
-	 */
-	Ccb,
-
-	/**
-	 * Indicates a vertical line '|'.
-	 */
-	Vline,
-
-	/**
-	 * Indicates a matrix node in a parse tree.
-	 */
-	Matrix,
-
-	/**
-	 * Indicates a matrix row node in a parse tree.
-	 */
-	MatrixRow,
-
-	/**
-	 * Indicates an identifier.
-	 */
-	Identifier,
-
-	/**
-	 * Indicates an error literal.
-	 */
-	Error,
-
-	/**
-	 * Indicates a cell reference.
-	 */
-	CellIndex,
-
-	/**
-	 * Indicates a sheet reference.
-	 */
-	SheetRef,
-
-	/**
-	 * Indicates a function identifier.
-	 */
-	FunctionCall,
-
-	/**
-	 * Indicates a floating point number.
-	 */
-	FloatNumber,
-
-	/**
-	 * Indicates an integer number.
-	 */
-	IntNumber,
-
-	/**
-	 * Indicates a string literal.
-	 */
-	String,
-
-	/**
-	 * Indicates a string concatenation sign '&amp;'.
-	 */
-	OpConcat,
-
-	/**
-	 * Indicates the exponent sign '^'.
-	 */
-	OpExponent,
-
-	/**
-	 * Indicates a plus sign '+'.
-	 */
-	OpPlus,
-
-	/**
-	 * Indicates a minus sign '-'.
-	 */
-	OpMinus,
-
-	/**
-	 * Indicates a multiplication operator '*'.
-	 */
-	OpMultiply,
-
-	/**
-	 * Indicates a division operator '/'.
-	 */
-	OpDivide,
-
-	/**
-	 * Indicates a percent operator '%'.
-	 */
-	OpPercent,
-
-	/**
-	 * Indicates a less than comparison operator '&lt;'.
-	 */
-	OpLess,
-
-	/**
-	 * Indicates a greater than comparison operator '&gt;'.
-	 */
-	OpGreater,
-
-	/**
-	 * Indicates an equal comparison operator '='.
-	 */
-	OpEqual,
-
-	/**
-	 * Indicates a not equal comparison operator '&lt;&gt;'.
-	 */
-	OpNotEqual,
-
-	/**
-	 * Indicates a less than or equal comparison operator '&lt;='.
-	 */
-	OpLessOrEqual,
-
-	/**
-	 * Indicates a greater than or equal comparison operator '&gt;='.
-	 */
-	OpGreaterOrEqual,
-
-	/**
-	 * Indicates a member access operator '.'.
-	 */
-	OpDot,
-
-	/**
-	 * Indicates a cell reference on another sheet operator '!'.
-	 */
-	OpSheetRef,
-
-	/**
-	 * Indicates a cell range operator ':'.
-	 */
-	OpCellRange,
-
-	/**
-	 * Indicates a semicolon ';'.
-	 */
-	Semicolon,
-
-	/**
-	 * Indicates a comma ','.
-	 */
-	Comma,
+	public class TokenType
+	{		
+		public function TokenType(pattern:RegExp, value:int) 
+		{
+			m_pattern = pattern;
+			m_value = value;
+		}
+		
+		
+		public function get pattern():String { return m_pattern.source; }
+		
+		public function get ordinal():int { return m_value; }
+		
+		
+		public function equals(other:TokenType):Boolean
+		{
+			return other != null && m_value == other.m_value;
+		}
+		
+		public function matches(input:String):Object
+		{
+			if (m_pattern == null) return null;
+			return m_pattern.exec(input);
+		}		
+		
+		
+		private var m_pattern:RegExp;
+		private var m_value:int;
+		
+		
+		public static const Whitespace:TokenType = new TokenType(/[ \t\r\n]+/, 0);
+		
+		public static const Terminator:TokenType = new TokenType(/;/, 1);
+		public static const Delimiter:TokenType = new TokenType(/,/, 2);
+		
+		public static const OperatorBeginArguments:TokenType = new TokenType(/\(/, 3);
+		public static const OperatorEndArguments:TokenType = new TokenType(/\)/, 4);
+		public static const OperatorBeginData:TokenType = new TokenType(/{/, 5);
+		public static const OperatorEndData:TokenType = new TokenType(/}/, 6);
+		public static const OperatorBeginArrayAccess:TokenType = new TokenType(/\[/, 7);
+		public static const OperatorEndArrayAccess:TokenType = new TokenType(/\]/, 8);
+		
+		public static const ExponentOperator:TokenType = new TokenType(/\^/, 9);
+		public static const AdditionOperator:TokenType = new TokenType(/\+/, 10);
+		public static const SubtractionOperator:TokenType = new TokenType(/\-/, 11);
+		public static const MultiplicationOperator:TokenType = new TokenType(/\*/, 12);
+		public static const DivisionOperator:TokenType = new TokenType(/\//, 13);
+		public static const ModuloOperator:TokenType = new TokenType(/%/, 14);
+		
+		public static const StrictLessOperator:TokenType = new TokenType(/</, 15);
+		public static const StrictGreaterOperator:TokenType = new TokenType(/>/, 16);
+		public static const EqualityOperator:TokenType = new TokenType(/==/, 17);
+		public static const InequalityOperator:TokenType = new TokenType(/!=/, 18);
+		public static const LessOperator:TokenType = new TokenType(/<=/, 19);
+		public static const GreaterOperator:TokenType = new TokenType(/>=/, 20);
+		
+		public static const IntegralNumber:TokenType = new TokenType(/([+-]?[0-9]+)/, 21);
+		public static const FloatingPointNumber:TokenType = new TokenType(/[+-]?(?:[0-9]+)?[.][0-9]+/, 22);
+		public static const StringLiteral:TokenType = new TokenType(/"[^"\\]*(?:\\.[^"\\]*)*"/, 23);
+		
+		public static const Identifier:TokenType = new TokenType(/[_a-zA-Z][a-zA-Z0-9_]*/, 24);
+		
+		private static const optionalWS:String = "[ \t\r\n]*";
+		private static const paramList:String = "((?:" + Identifier.pattern + "|" + IntegralNumber.pattern + "|" +
+			FloatingPointNumber.pattern + "|" + StringLiteral.pattern + ")(?:" + optionalWS + Delimiter.pattern +
+			optionalWS + "(?:" + Identifier.pattern + "|" + IntegralNumber.pattern + "|" +	FloatingPointNumber.pattern + "|" +
+			StringLiteral.pattern + "))*)";
+			
+		public static const FunctionCall:TokenType = new TokenType(new RegExp(Identifier.pattern + optionalWS + OperatorBeginArguments.pattern +
+				optionalWS + paramList + "?" + optionalWS + OperatorEndArguments.pattern), 25);
+		public static const ArrayAccess:TokenType = new TokenType(new RegExp(Identifier.pattern + optionalWS + OperatorBeginArrayAccess.pattern + 
+				optionalWS + paramList + optionalWS + OperatorEndArrayAccess.pattern), 26);
+		
+	}
 }
