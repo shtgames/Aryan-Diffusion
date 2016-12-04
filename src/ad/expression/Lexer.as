@@ -5,16 +5,27 @@ package ad.expression
 
 	public class Lexer
 	{
-		public function Lexer(input:String)
+		public function Lexer(input:String = null)
 		{
-			this.m_input = input;
+			setInput(input);
 		}
 		
+		
+		public function setInput(input:String):Lexer
+		{
+			if (input == null) return this;
+			
+			m_input = input;
+			m_current = 0;
+			m_tokens = null
+			return this;
+		}
 		
 		public function process():Boolean
 		{
 			if (m_input == null) return false;
 			
+			m_tokens = new Vector.<Token>();
 			while (!done())
 				if (!next()) return false;			
 			return true;
@@ -28,7 +39,7 @@ package ad.expression
 		
 		public function done():Boolean
 		{
-			return m_current >= m_input.length;
+			return m_input != null && m_current >= m_input.length;
 		}
 		
 		
@@ -39,7 +50,7 @@ package ad.expression
 			
 			var result:Object = null;
 			var i:uint = 0;
-			for (end:uint = TokenType.size(); i != end && result == null; ++i)
+			for (var end:uint = TokenType.size(); i != end && result == null; ++i)
 				result = TokenType.at(i).matches(source);
 			
 			if (result == null)
@@ -49,6 +60,7 @@ package ad.expression
 				return false;
 			}
 			
+			i--;
 			const token:Token = new Token(result[0], TokenType.at(i), m_current);
 			m_current += (token.length == 0 ? 1 : token.length);
 			

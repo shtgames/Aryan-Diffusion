@@ -41,7 +41,7 @@ package ad.expression
 		
 		public function get length():uint
 		{
-			return m_text.length();
+			return m_text.length;
 		}
 		
 		

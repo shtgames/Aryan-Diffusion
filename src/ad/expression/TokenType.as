@@ -59,15 +59,15 @@ package ad.expression
 			case 22: return FloatingPointNumber;
 			case 23: return StringLiteral;
 			case 24: return Identifier;
-			case 25: return FunctionCall;
-			case 26: return ArrayAccess;
+			/*case 25: return FunctionCall;
+			case 26: return ArrayAccess;*/
 			}
 			return null;
 		}
 		
 		public static function size():uint
 		{
-			return 27;
+			return 25;
 		}
 		
 		
@@ -92,7 +92,7 @@ package ad.expression
 		
 		public static const StrictLessOperator:TokenType = new TokenType(/^</, 15);
 		public static const StrictGreaterOperator:TokenType = new TokenType(/^>/, 16);
-		public static const EqualityOperator:TokenType = new TokenType(/^==/, 17);
+		public static const EqualityOperator:TokenType = new TokenType(/^=/, 17);
 		public static const InequalityOperator:TokenType = new TokenType(/^!=/, 18);
 		public static const LessOperator:TokenType = new TokenType(/^<=/, 19);
 		public static const GreaterOperator:TokenType = new TokenType(/^>=/, 20);
@@ -101,12 +101,12 @@ package ad.expression
 		public static const FloatingPointNumber:TokenType = new TokenType(/^[+-]?(?:[0-9]+)?[.][0-9]+/, 22);
 		public static const StringLiteral:TokenType = new TokenType(/^"[^"\\]*(?:\\.[^"\\]*)*"/, 23);
 		
-		private static const optionalWS:String = "[ \t\r\n]*";
+		//private static const optionalWS:String = "[ \t\r\n]*";
 		private static const identifierName:String = "[_a-zA-Z][a-zA-Z0-9_]*";
 		
-		public static const Identifier:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=(?:" + optionalWS + "(?:[^ ([a-zA-Z0-9_]|$)))"), 24);
+		public static const Identifier:TokenType = new TokenType(new RegExp("^" + identifierName/* + "(?=(?:" + optionalWS + "(?:[^ ([a-zA-Z0-9_]|$)))"*/), 24);
 		
-		private static const paramList:String = "(?:(?:" + identifierName + "|" + IntegralNumber.pattern.substring(1) + "|" +
+		/*private static const paramList:String = "(?:(?:" + identifierName + "|" + IntegralNumber.pattern.substring(1) + "|" +
 			FloatingPointNumber.pattern.substring(1) + "|" + StringLiteral.pattern.substring(1) + ")(?:" + optionalWS + Delimiter.pattern.substring(1) +
 			optionalWS + "(?:" + identifierName + "|" + IntegralNumber.pattern.substring(1) + "|" +	FloatingPointNumber.pattern.substring(1) + "|" +
 			StringLiteral.pattern.substring(1) + "))*)";
@@ -114,6 +114,6 @@ package ad.expression
 		public static const FunctionCall:TokenType = new TokenType(new RegExp("^" + identifierName + optionalWS + OperatorBeginArguments.pattern.substring(1) + 
 				optionalWS + paramList + "?" + optionalWS + OperatorEndArguments.pattern.substring(1)), 25);
 		public static const ArrayAccess:TokenType = new TokenType(new RegExp("^" + identifierName + optionalWS + OperatorBeginArrayAccess.pattern.substring(1) + 
-				optionalWS + paramList + optionalWS + OperatorEndArrayAccess.pattern.substring(1)), 26);
+				optionalWS + paramList + optionalWS + OperatorEndArrayAccess.pattern.substring(1)), 26);*/
 	}
 }
