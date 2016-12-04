@@ -10,7 +10,7 @@
 	import ad.expression.TokenType;
 	
 	public class Main extends MovieClip
-	{		
+	{
 		public function Main()
 		{
 			/*Card.loadResources("../resources/cards/definitions.dir");

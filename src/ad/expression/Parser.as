@@ -3,15 +3,14 @@ package ad.expression
 	import ad.expression.Lexer;
 	import ad.expression.ParseTreeNode;
 	import ad.expression.TokenType;
-	import ad.expression.Token;
-	import ad.expression.TokenList;
-	
+	import ad.expression.Token;	
 	
 	public class Parser
 	{
 		public function Parser(lexer:Lexer)
 		{
-			m_tokens = lexer.getTokens();
+			if (lexer == null) return;
+			m_tokens = lexer.tokens;
 		}
 		
 		
@@ -21,7 +20,7 @@ package ad.expression
 			return expression();
 		}		
 		
-		public function getDone():Boolean
+		public function done():Boolean
 		{
 			return m_tokens.getDone() && getCurrentToken() == null;
 		}
@@ -469,7 +468,7 @@ package ad.expression
 		}
 		
 		
-		private var m_tokens:Lexer.TokenList;		
 		private var m_current:int;
+		private var m_tokens:Vector.<Token>;
 	}
 }
