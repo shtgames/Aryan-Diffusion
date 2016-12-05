@@ -9,9 +9,15 @@ package ad.expression
 		}
 		
 		
-		public function get pattern():String { return m_pattern.source; }
+		public function get pattern():String 
+		{ 
+			return m_pattern.source;
+		}
 		
-		public function get ordinal():int { return m_value; }
+		public function get ordinal():int
+		{
+			return m_value;
+		}
 		
 		
 		public function equals(other:TokenType):Boolean
@@ -24,6 +30,13 @@ package ad.expression
 			if (m_pattern == null) return null;
 			return m_pattern.exec(input);
 		}		
+		
+		
+		private function get _pattern():String 
+		{
+			return m_pattern == null || m_pattern.source == null || m_pattern.source.length <= 1 ?
+				null : m_pattern.source.substring(1);
+		}
 		
 		
 		private var m_pattern:RegExp;
@@ -59,15 +72,16 @@ package ad.expression
 			case 22: return FloatingPointNumber;
 			case 23: return StringLiteral;
 			case 24: return Identifier;
-			/*case 25: return FunctionCall;
-			case 26: return ArrayAccess;*/
+			case 25: return FunctionCall;
+			case 26: return ArrayAccess;
+			case 27: return ArrayInitialization;
 			}
 			return null;
 		}
 		
 		public static function size():uint
 		{
-			return 25;
+			return 28;
 		}
 		
 		
@@ -97,23 +111,19 @@ package ad.expression
 		public static const LessOperator:TokenType = new TokenType(/^<=/, 19);
 		public static const GreaterOperator:TokenType = new TokenType(/^>=/, 20);
 		
-		public static const IntegralNumber:TokenType = new TokenType(/^[+-]?[0-9]+/, 21);
-		public static const FloatingPointNumber:TokenType = new TokenType(/^[+-]?(?:[0-9]+)?[.][0-9]+/, 22);
+		public static const IntegralNumber:TokenType = new TokenType(/^[+-]?[0-9]+(?=[^\.])/, 21);
+		public static const FloatingPointNumber:TokenType = new TokenType(/^[+-]?(?:[0-9]+)?[\.][0-9]+/, 22);
 		public static const StringLiteral:TokenType = new TokenType(/^"[^"\\]*(?:\\.[^"\\]*)*"/, 23);
 		
-		//private static const optionalWS:String = "[ \t\r\n]*";
+		private static const optionalWS:String = "[ \t\r\n]*";
 		private static const identifierName:String = "[_a-zA-Z][a-zA-Z0-9_]*";
 		
-		public static const Identifier:TokenType = new TokenType(new RegExp("^" + identifierName/* + "(?=(?:" + optionalWS + "(?:[^ ([a-zA-Z0-9_]|$)))"*/), 24);
+		public static const Identifier:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=(?:" + optionalWS + "(?:[^" +
+			OperatorBeginArguments._pattern + OperatorBeginArrayAccess._pattern + OperatorBeginData._pattern +
+			OperatorEndData._pattern + " a-zA-Z0-9_]|$)))"), 24);
 		
-		/*private static const paramList:String = "(?:(?:" + identifierName + "|" + IntegralNumber.pattern.substring(1) + "|" +
-			FloatingPointNumber.pattern.substring(1) + "|" + StringLiteral.pattern.substring(1) + ")(?:" + optionalWS + Delimiter.pattern.substring(1) +
-			optionalWS + "(?:" + identifierName + "|" + IntegralNumber.pattern.substring(1) + "|" +	FloatingPointNumber.pattern.substring(1) + "|" +
-			StringLiteral.pattern.substring(1) + "))*)";
-		
-		public static const FunctionCall:TokenType = new TokenType(new RegExp("^" + identifierName + optionalWS + OperatorBeginArguments.pattern.substring(1) + 
-				optionalWS + paramList + "?" + optionalWS + OperatorEndArguments.pattern.substring(1)), 25);
-		public static const ArrayAccess:TokenType = new TokenType(new RegExp("^" + identifierName + optionalWS + OperatorBeginArrayAccess.pattern.substring(1) + 
-				optionalWS + paramList + optionalWS + OperatorEndArrayAccess.pattern.substring(1)), 26);*/
+		public static const FunctionCall:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginArguments._pattern + ")"), 25);
+		public static const ArrayAccess:TokenType = new TokenType(new RegExp("^" + identifierName  + "(?=" + optionalWS + OperatorBeginArrayAccess._pattern + ")"), 26);
+		public static const ArrayInitialization:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginData._pattern + ")"), 27);
 	}
 }
