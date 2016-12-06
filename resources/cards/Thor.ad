@@ -1,11 +1,12 @@
-2 = 
+Thor_1 = 
 {
 	name = "Thor";
 	description = "Thor's description.";
 	race = Aryan;
 	type = Character;
 
-	base = { 20; 15; }
+	health = 20;
+	attack = 15;
 	
-	abilities = { attack; }
+	abilities = { attack, rule_thrace }
 }

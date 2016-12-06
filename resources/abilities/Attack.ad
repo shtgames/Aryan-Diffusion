@@ -6,21 +6,21 @@ attack =
 	
 	source_condition = 
 	{
-		type = !habitat;
-		attack = !0;
+		type != habitat;
+		attack != 0;
 	}
 	
 	target = 
 	{
 		case_0 = 
 		{
-			type = !habitat;
-			owner = !source_owner;
+			type != habitat;
+			owner != source_owner;
 			this = target;
 		}
 		effect = 
 		{
-			health = health - source_attack;
+			health -= source_attack;
 		}
 	}
 }

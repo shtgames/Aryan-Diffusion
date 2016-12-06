@@ -1,23 +1,25 @@
-0 = 
+Athena_1st_Encounter = 
 {
 	name = "Athena";
 	description = "Athena's description.";
 	race = Aryan;
 	type = Character;
 
-	base = { 15; 10; }
+	health = 15;
+	attack = 10;
 	
-	abilities = { attack; }
+	abilities = { attack, someotherability }
 }
 
-1 = 
+Enceladus = 
 {
 	name = "Enceladus";
 	description = "Enceladus' description.";
 	race = Turanian;
 	type = Character;
 
-	base = { 10; 10; }
+	health = 10;
+	attack = 7.5;
 	
-	abilities = { attack; }
+	abilities = { attack, lose }
 }
