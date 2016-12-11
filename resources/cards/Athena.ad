@@ -15,7 +15,7 @@ Enceladus =
 {
 	name = "Enceladus";
 	description = "Enceladus' description.";
-	race = Turanian;
+	race = Giant;
 	type = Character;
 
 	health = 10;

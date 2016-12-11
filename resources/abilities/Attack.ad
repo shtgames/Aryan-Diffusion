@@ -20,7 +20,7 @@ attack =
 		}
 		effect = 
 		{
-			health -= source_attack;
+			health = health - source_attack;
 		}
 	}
 }

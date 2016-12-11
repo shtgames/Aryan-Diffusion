@@ -17,12 +17,8 @@
 	{
 		public function Main()
 		{
-			/*Card.loadResources("../resources/cards/definitions.dir");
-			Ability.loadResources("../resources/abilities/definitions.dir");*/
-			
-			var parser:Parser = new Parser(new Lexer("this = 3 - constant + (sin (3.14 * cos(30), _secondArg) / (3 * (5 + that)) - 1) ^ 2;"));			
-			const tree:ParseTreeNode = parser.parse();
-			trace(tree.getChildren()[1].getChildren()[1].getChildren()[1].getToken().text);
+			Ability.loadResources("../resources/abilities/definitions.dir");
+			Card.loadResources("../resources/cards/definitions.dir");
 		}
 	}	
 }

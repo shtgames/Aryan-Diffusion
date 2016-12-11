@@ -3,13 +3,14 @@ package ad.deck.card
 	import ad.deck.card.Card;
 	import ad.deck.card.Condition;
 	import ad.deck.card.Effect;
+	import ad.expression.ParseTreeNode;
+	import ad.expression.TokenType;
 	import ad.file.StatementProcessor;
-	import ad.file.Statement;
 	import ad.map.HashMap;
 	
 	public class Ability
 	{
-		public function Ability(source:Statement = null) 
+		public function Ability(source:ParseTreeNode = null) 
 		{
 			loadFromFile(source);
 		}
@@ -66,31 +67,33 @@ package ad.deck.card
 		}
 		
 		
-		private function loadFromFile(source:Statement):void
+		private function loadFromFile(source:ParseTreeNode):void
 		{
-			if (source == null) return;
+			if (source == null || !source.getToken().type.equals(TokenType.EqualityOperator) ||
+				!source.getChildren()[0].getToken().type.equals(TokenType.Identifier)) 
+				return;
 			
-			m_id = source.left;
+			m_id = source.getChildren()[0].getToken().text;
 			
-			for each (var statement:Statement in source.statements)
-				switch (statement.left.toLowerCase())
+			for each (var statement:ParseTreeNode in source.getChildren()[1].getChildren())
+				switch (statement.getChildren()[0].getToken().text.toLowerCase())
 				{
 				case "name":
-					m_name = statement.strings[0];
+					m_name = statement.getChildren()[1].getToken().text;
 					break;
 				case "description":
-					m_description = statement.strings[0];
+					m_description = statement.getChildren()[1].getToken().text;
 					break;
 				case "type":
-					m_type = parseType(statement.strings[0]);
+					m_type = parseType(statement.getChildren()[1].getToken().text);
 					break;
 				case "source_condition":
 					m_sourceCondition = new Condition(statement);
 					break;
 				case "target":
-					for each (var tarCase:Statement in statement.statements)
-						for each (var tarStatement:Statement in tarCase.statements)
-							switch (tarStatement.left.toLowerCase())
+					for each (var tarCase:ParseTreeNode in statement.getChildren()[1].getChildren())
+						for each (var tarStatement:ParseTreeNode in tarCase.getChildren()[1].getChildren())
+							switch (tarStatement.getChildren()[0].getToken().text.toLowerCase())
 							{
 							case "condition":
 								m_targetConditions.push(new Condition(tarStatement));
@@ -125,12 +128,13 @@ package ad.deck.card
 		{			
 			var file:StatementProcessor = new StatementProcessor(path, function():void
 				{
-					if (file.getStatements()[0].left != "directories") return;
+					if (file.getStatements()[0].getChildren()[0].getToken().text != "directories") return;
 					
-					for each (var dir:String in file.getStatements()[0].strings)
-						var definitions:StatementProcessor = new StatementProcessor(dir, function(statements:Vector.<Statement>):void
+					for each (var dir:ParseTreeNode in file.getStatements()[0].getChildren()[1].getChildren())
+						var definitions:StatementProcessor = new StatementProcessor(dir.getToken().text.substring(1, dir.getToken().text.length - 1),
+							function(statements:Vector.<ParseTreeNode>):void
 							{
-								for each (var statement:Statement in statements)
+								for each (var statement:ParseTreeNode in statements)
 								{
 									const ability:Ability = new Ability(statement);
 									abilities.insert(ability.m_id, ability);

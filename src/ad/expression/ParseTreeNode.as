@@ -27,9 +27,22 @@ package ad.expression
 		}
 		
 		
-		public function setEnclosed(value:Boolean):void
+		public function setChildren(children:Vector.<ParseTreeNode>):ParseTreeNode
+		{
+			m_children = children;
+			return this;
+		}
+		
+		public function setToken(token:Token):ParseTreeNode
+		{
+			m_token = token;
+			return this;
+		}
+		
+		public function setEnclosed(value:Boolean):ParseTreeNode
 		{
 			m_enclosed = value;
+			return this;
 		}
 		
 		

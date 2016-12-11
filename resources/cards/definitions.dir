@@ -1,5 +1,5 @@
 directories = 
 {
-	../resources/cards/Athena.ad;
-	../resources/cards/Thor.ad;
+	"../resources/cards/Athena.ad",
+	"../resources/cards/Thor.ad"
 }

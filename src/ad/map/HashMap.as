@@ -75,7 +75,7 @@
 			return returnValue;
 		}
 		
-		public function contains(key:String):Boolean
+		public function contains(key:*):Boolean
 		{
 			if (key == null) return false;
 			
@@ -86,12 +86,25 @@
 			return returnValue;
 		}
 		
+		public function keyOf(value:*):*
+		{			
+			m_mutex.lock();
+			for (var key:String in m_keyToIndex)
+				if (at(key) == value)
+				{
+					m_mutex.unlock();
+					return key;
+				}
+			m_mutex.unlock();
+			return null;
+		}
+		
 		
 		public function erase(key:String):Boolean
 		{
 			if (!contains(key)) return false;
 			
-			m_mutex.lock();			
+			m_mutex.lock();
 			const affectedIndex:int = m_keyToIndex[key];
 			
 			m_array.removeAt(affectedIndex);

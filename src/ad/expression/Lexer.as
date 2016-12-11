@@ -17,18 +17,21 @@ package ad.expression
 			
 			m_input = input;
 			m_current = 0;
-			m_tokens = null
+			m_tokens = null;
 			return this;
 		}
 		
-		public function process():Boolean
+		public function process():Vector.<Token>
 		{
-			if (m_input == null) return false;
+			if (m_input == null) return null;
 			
-			m_tokens = new Vector.<Token>();
+			m_tokens = new <Token> [ new Token("^", TokenType.StartOfInput) ];			
 			while (!done())
-				if (!next()) return false;			
-			return true;
+				if (!next()) return m_tokens = null;
+			
+			m_tokens.push(new Token("$", TokenType.EndOfInput));
+			
+			return m_tokens;
 		}
 		
 		
@@ -55,13 +58,13 @@ package ad.expression
 			
 			if (result == null)
 			{
-				trace("Failed to recognize character '" + source.charAt(0) + "' at position " + m_current +
-					" within the input string \"" + m_input + "\".");
+				trace("Error: Unrecognized token '" + source.charAt(0) + "' at position " + m_current +
+					" in \"" + m_input + "\".");
 				return false;
 			}
 			
 			i--;
-			const token:Token = new Token(result[0], TokenType.at(i), m_current);
+			const token:Token = new Token(result[0], TokenType.at(i));
 			m_current += (token.length == 0 ? 1 : token.length);
 			
 			if (token.type != TokenType.Whitespace)	m_tokens.push(token);

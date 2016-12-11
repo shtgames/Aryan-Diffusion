@@ -23,7 +23,7 @@ poison_gas =
 			}
 			effect = 
 			{
-				health -= 1;
+				health = health - 1;
 			}
 		}
 		

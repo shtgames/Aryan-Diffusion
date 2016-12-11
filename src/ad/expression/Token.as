@@ -4,11 +4,10 @@ package ad.expression
 	
 	public class Token
 	{
-		public function Token(text:String, tokenType:TokenType, index:uint = 0)
+		public function Token(text:String, tokenType:TokenType)
 		{
 			m_text = text;
 			m_type = tokenType;
-			m_index = index;
 		}		
 		
 		
@@ -18,7 +17,6 @@ package ad.expression
 			
 			m_text = other.m_text;
 			m_type = other.m_type;
-			m_index = other.m_index;
 			
 			return this;
 		}
@@ -34,11 +32,6 @@ package ad.expression
 			return m_type;
 		}
 		
-		public function get index():uint
-		{
-			return m_index;
-		}
-		
 		public function get length():uint
 		{
 			return m_text.length;
@@ -47,6 +40,5 @@ package ad.expression
 		
 		private var m_text:String;
 		private var m_type:TokenType;
-		private var m_index:int;
 	}
 }
