@@ -1,6 +1,7 @@
 package ad.deck.card 
 {
 	import ad.deck.card.Ability;
+	
 	import ad.expression.ParseTreeNode;
 	import ad.expression.TokenType;
 	import ad.file.StatementProcessor;
@@ -14,7 +15,7 @@ package ad.deck.card
 		}
 		
 		
-		public function get ID():String
+		public function get id():String
 		{
 			return m_id;
 		}
@@ -90,31 +91,32 @@ package ad.deck.card
 			m_id = source.getChildren()[0].getToken().text;
 			
 			for each (var statement:ParseTreeNode in source.getChildren()[1].getChildren())
-				switch (statement.getChildren()[0].getToken().text.toLowerCase())
-				{
-				case "name":
-					m_name = statement.getChildren()[1].getToken().text;
-					break;
-				case "description":
-					m_description = statement.getChildren()[1].getToken().text;
-					break;
-				case "race":
-					m_race = statement.getChildren()[1].getToken().text;
-					break;
-				case "type":
-					m_type = parseType(statement.getChildren()[1].getToken().text);
-					break;
-				case "health":
-					m_baseAttack = parseInt(statement.getChildren()[1].getToken().text, 10);
-					break;
-				case "attack":
-					m_baseHealth = parseInt(statement.getChildren()[1].getToken().text, 10);
-					break;
-				case "abilities":
-					for each (var ability:ParseTreeNode in statement.getChildren()[1].getChildren())
-						addAbility(ability.getToken().text);
-					break;
-				}
+				if (statement.getToken().type == TokenType.EqualityOperator)
+					switch (statement.getChildren()[0].getToken().text.toLowerCase())
+					{
+					case "name":
+						m_name = statement.getChildren()[1].getToken().text;
+						break;
+					case "description":
+						m_description = statement.getChildren()[1].getToken().text;
+						break;
+					case "race":
+						m_race = statement.getChildren()[1].getToken().text;
+						break;
+					case "type":
+						m_type = parseType(statement.getChildren()[1].getToken().text);
+						break;
+					case "health":
+						m_baseAttack = parseInt(statement.getChildren()[1].getToken().text, 10);
+						break;
+					case "attack":
+						m_baseHealth = parseInt(statement.getChildren()[1].getToken().text, 10);
+						break;
+					case "abilities":
+						for each (var ability:ParseTreeNode in statement.getChildren()[1].getChildren())
+							addAbility(ability.getToken().text);
+						break;
+					}
 		}		
 		
 		private function addAbility(id:String):Card
@@ -151,7 +153,7 @@ package ad.deck.card
 				{
 					if (file.getStatements()[0].getChildren()[0].getToken().text != "directories") return;
 					for each (var dir:ParseTreeNode in file.getStatements()[0].getChildren()[1].getChildren())
-						var definitions:StatementProcessor = new StatementProcessor(dir.getToken().text.substring(1, dir.getToken().text.length - 1),
+						var definitions:StatementProcessor = new StatementProcessor(dir.getToken().text,
 							function(statements:Vector.<ParseTreeNode>):void
 							{
 								for each (var statement:ParseTreeNode in statements)

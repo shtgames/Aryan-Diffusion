@@ -1,19 +1,25 @@
 poison_gas = 
 {
 	name = "Poison Gas";
-	description = "Damage-over-time effect that kills the Primary Target, and deals 1 Damage to all other non-Habitat enemy Cards.";
-	type = passive;
-
-	source_condition = 
+	description = "Damage-over-time effect that kills the Primary Target, and deals 1 Damage to all other non-Habitat enemy Cards each turn.";
+	type = active;
+	
+	source = 
 	{
-		type = habitat;
-		race != aryan;
-		attack != 0;
+		case = 
+		{
+			condition = 
+			{
+				type = habitat;
+				race != aryan;
+				attack != 0;
+			}
+		}
 	}
-
+	
 	target = 
 	{
-		case_0 = 
+		case = 
 		{
 			condition = 
 			{
@@ -23,11 +29,11 @@ poison_gas =
 			}
 			effect = 
 			{
-				health = health - 1;
+				applyStatusEffect("poison");
 			}
 		}
 		
-		case_1 = 
+		case = 
 		{
 			condition = 
 			{

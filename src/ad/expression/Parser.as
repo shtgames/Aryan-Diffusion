@@ -38,8 +38,7 @@ package ad.expression
 			m_max = m_tokens.length;
 			m_bracketEvaluator.reset();
 			
-			return parameterList(TokenType.StartOfInput,
-				TokenType.EndOfInput, TokenType.Terminator, TokenType.OperatorEndData, false);
+			return parameterList(TokenType.StartOfInput, TokenType.EndOfInput, TokenType.Terminator, TokenType.OperatorEndData, false);
 		}
 		
 		public function parseExpression(start:uint = 0, end:uint = 0):ParseTreeNode

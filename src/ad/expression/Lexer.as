@@ -48,11 +48,12 @@ package ad.expression
 		
 		private function next():Boolean
 		{
-			const source:String = m_input.substring(m_current);
-			if (source == null) return false;
+			if (done()) return false;
 			
+			const source:String = m_input.substring(m_current);
 			var result:Object = null;
 			var i:uint = 0;
+			
 			for (var end:uint = TokenType.size(); i != end && result == null; ++i)
 				result = TokenType.at(i).matches(source);
 			

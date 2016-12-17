@@ -1,5 +1,6 @@
 package ad.deck.card 
 {
+	import ad.map.HashMap;
 	import ad.player.Player;
 	import ad.deck.card.Card;
 	
@@ -62,6 +63,13 @@ package ad.deck.card
 		}
 		
 		
+		public function applyStatusEffect(id:String):Boolean
+		{
+			if (!StatusEffect.exists(id)) return false;
+			
+			m_statusEffects.insert(id, StatusEffect.getEffect(id).duration);
+		}
+		
 		public function useAbility(id:String, target:CardState):Boolean
 		{
 			if (!Card.exists(m_key) || !Card.getCard(m_key).hasAbility(id))	return false;
@@ -73,5 +81,6 @@ package ad.deck.card
 		private var m_key:String = null;
 		private var m_parent:Player = null;
 		private var m_health:int = 0, m_attack:uint = 0;
+		private var m_statusEffects:HashMap = new HashMap();
 	}
 }

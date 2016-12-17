@@ -11,6 +11,11 @@ package ad.expression
 		}		
 		
 		
+		public function toString():String
+		{
+			return (m_type == null ? "<Undefined>" : m_type) + (m_text == null ? "" : ": \"" + m_text + "\"");
+		}
+		
 		public function assign(other:Token):Token
 		{
 			if (other == null) return this;
@@ -34,7 +39,7 @@ package ad.expression
 		
 		public function get length():uint
 		{
-			return m_text.length;
+			return m_text.length + (m_type != null && m_type.equals(TokenType.StringLiteral) ? 2 : 0);
 		}
 		
 		
