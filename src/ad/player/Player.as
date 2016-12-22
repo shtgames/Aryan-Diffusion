@@ -1,19 +1,22 @@
 package ad.player 
 {
+	import ad.deck.Deck;
+	import ad.deck.Hand;
 	import ad.deck.card.Card;
 	import ad.deck.card.CardState;
-	import ad.deck.Hand;
-	import ad.deck.Deck;
-	import ad.map.HashMap;
+	import ad.event.Event;
+	import ad.event.EventType;
+	import ad.event.EventDispatcher;
 	import ad.field.Field;
+	import ad.map.Map;
 	
 	public class Player 
 	{		
 		public function Player()
 		{
-			m_playedCards.insert(Card.CHARACTER, new Vector.<CardState>())
-				.insert(Card.SUPPORT, new Vector.<CardState>())
-				.insert(Card.HABITAT, new Vector.<CardState>());
+			m_playedCards.push(Card.CHARACTER, new Vector.<CardState>())
+				.push(Card.SUPPORT, new Vector.<CardState>())
+				.push(Card.HABITAT, new Vector.<CardState>());
 		}
 		
 		
@@ -53,7 +56,15 @@ package ad.player
 		public function addCardToBattlefield(card:String):Player
 		{
 			if (!Card.exists(card)) return this;
-			m_playedCards.at(Card.getCard(card).type).push(new CardState(card));
+			
+			const instance:CardState = new CardState(card);
+			m_playedCards.at(Card.getCard(card).type).push(instance);
+			
+			EventDispatcher.pollEvent(new Event(EventType.BattlefieldEvent, new Map()
+				.push("card", instance)
+				.push("player", this)
+				.push("added", true)));
+			
 			return this;
 		}
 		
@@ -64,7 +75,7 @@ package ad.player
 		}
 		
 		
-		private var m_playedCards:HashMap = new HashMap();
+		private var m_playedCards:Map = new Map();
 		private var m_hand:Hand = new Hand();
 		private var m_deck:Deck = new Deck();
 		private var m_parent:Field = null;

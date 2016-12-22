@@ -2,14 +2,13 @@ package ad.deck.card
 {
 	import ad.deck.card.Card;
 	import ad.deck.card.Condition;
-	import ad.deck.card.Effect;
-	
+	import ad.deck.card.DynamicEffect;	
 	import ad.expression.ParseTreeNode;
 	import ad.expression.TokenType;	
 	import ad.file.StatementProcessor;
-	import ad.map.HashMap;
+	import ad.map.Map;
 	
-	public class Ability
+	public final class Ability
 	{
 		public function Ability(source:ParseTreeNode = null) 
 		{
@@ -67,7 +66,7 @@ package ad.deck.card
 			for (var i:uint = 0; i != m_sourceConditions.length; ++i)
 				if (m_sourceConditions[i].isFulfilled(target))
 				{
-					m_sourceEffects[i].applyTo(target, source);
+					m_sourceEffects[i].applyTo( new Map().push("target", target).push("source", source) );
 					returnValue = true;
 				}
 			if (!returnValue) return false;
@@ -75,7 +74,7 @@ package ad.deck.card
 			for (var i:uint = 0; i != m_targetConditions.length; ++i)
 				if (m_targetConditions[i].isFulfilled(target))
 				{
-					m_targetEffects[i].applyTo(target, source);
+					m_targetEffects[i].applyTo( new Map().push("target", target).push("source", source) );
 					returnValue = true;
 				}
 			
@@ -105,38 +104,50 @@ package ad.deck.card
 						m_type = parseType(statement.getChildren()[1].getToken().text);
 						break;
 					case "source":
-						for each (var tarCase:ParseTreeNode in statement.getChildren()[1].getChildren())
-							for each (var tarStatement:ParseTreeNode in tarCase.getChildren()[1].getChildren())
-							{
-								switch (tarStatement.getChildren()[0].getToken().text.toLowerCase())
+						for each (var currentCase:ParseTreeNode in statement.getChildren()[1].getChildren())
+						{
+							var condition:Condition = null;
+							var effect:DynamicEffect = null;
+							for each (var currentStatement:ParseTreeNode in currentCase.getChildren()[1].getChildren())
+								switch (currentStatement.getChildren()[0].getToken().text.toLowerCase())
 								{
 								case "condition":
-									m_sourceConditions.push(new Condition(tarStatement));
+									condition = new Condition(currentStatement);
 									break;
 								case "effect":
-									m_sourceEffects.push(new Effect(tarStatement));
+									effect = new DynamicEffect(currentStatement);
 									break;
 								}
-								if (m_sourceEffects < m_sourceConditions)
-									m_sourceEffects.push(new Effect());
-							}						
+							
+							if (condition != null)
+							{
+								m_sourceConditions.push(condition);
+								m_sourceEffects.push(effect == null ? new DynamicEffect() : effect);
+							}
+						}
 						break;
 					case "target":
-						for each (var tarCase:ParseTreeNode in statement.getChildren()[1].getChildren())
-							for each (var tarStatement:ParseTreeNode in tarCase.getChildren()[1].getChildren())
-							{
-								switch (tarStatement.getChildren()[0].getToken().text.toLowerCase())
+						for each (var currentCase:ParseTreeNode in statement.getChildren()[1].getChildren())
+						{
+							var condition:Condition = null;
+							var effect:DynamicEffect = null;
+							for each (var currentStatement:ParseTreeNode in currentCase.getChildren()[1].getChildren())
+								switch (currentStatement.getChildren()[0].getToken().text.toLowerCase())
 								{
 								case "condition":
-									m_targetConditions.push(new Condition(tarStatement));
+									condition = new Condition(currentStatement);
 									break;
 								case "effect":
-									m_targetEffects.push(new Effect(tarStatement));
+									effect = new DynamicEffect(currentStatement);
 									break;
 								}
-								if (m_targetEffects < m_targetConditions)
-									m_targetEffects.push(new Effect());
-							}						
+							
+							if (condition != null)
+							{
+								m_targetConditions.push(condition);
+								m_targetEffects.push(effect == null ? new DynamicEffect() : effect);
+							}
+						}					
 						break;
 					}
 		}
@@ -145,8 +156,8 @@ package ad.deck.card
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
 		private var m_type:uint = ACTIVE;
-		private var m_sourceConditions:Vector.<Condition> = new Vector.<Condition>(), m_sourceEffects:Vector.<Effect> = new Vector.<Effect>();
-		private var m_targetConditions:Vector.<Condition> = new Vector.<Condition>(), m_targetEffects:Vector.<Effect> = new Vector.<Effect>();
+		private var m_sourceConditions:Vector.<Condition> = new Vector.<Condition>(), m_sourceEffects:Vector.<DynamicEffect> = new Vector.<DynamicEffect>();
+		private var m_targetConditions:Vector.<Condition> = new Vector.<Condition>(), m_targetEffects:Vector.<DynamicEffect> = new Vector.<DynamicEffect>();
 		
 		
 		public static function loadResources(path:String):void
@@ -162,7 +173,7 @@ package ad.deck.card
 								for each (var statement:ParseTreeNode in statements)
 								{
 									const ability:Ability = new Ability(statement);
-									abilities.insert(ability.m_id, ability);
+									abilities.push(ability.m_id, ability);
 								}
 							});
 				});
@@ -197,6 +208,6 @@ package ad.deck.card
 		
 		
 		public static const ACTIVE:uint = 0, PASSIVE:uint = 1, ON_SUMMON:uint = 2;
-		private static var abilities:HashMap = new HashMap();
+		private static var abilities:Map = new Map();
 	}
 }

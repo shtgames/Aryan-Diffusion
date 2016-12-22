@@ -4,7 +4,7 @@ package ad.expression
 	import ad.expression.ParseTreeNode;
 	import ad.expression.TokenType;
 	import ad.expression.Token;	
-	import ad.map.HashMap;
+	import ad.map.Map;
 	
 	public class Parser
 	{
@@ -133,7 +133,12 @@ package ad.expression
 		
 		private function exponentExpression():ParseTreeNode
 		{
-			return nextExpression(unaryExpression, new <TokenType> [ TokenType.ExponentOperator ]);
+			return nextExpression(memberAccessExpression, new <TokenType> [ TokenType.ExponentOperator ]);
+		}
+		
+		private function memberAccessExpression():ParseTreeNode
+		{
+			return nextExpression(unaryExpression, new <TokenType> [ TokenType.MemberAccessOperator ]);
 		}
 		
 		private function unaryExpression():ParseTreeNode

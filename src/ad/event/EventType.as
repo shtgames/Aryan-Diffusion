@@ -9,7 +9,7 @@ package ad.event
 		}
 		
 		
-		public function equals(other:EventType)
+		public function equals(other:EventType):Boolean
 		{
 			return other != null && m_id == other.m_id;
 		}
@@ -35,11 +35,10 @@ package ad.event
 		private var m_name:String;
 		
 		
-		public static const TurnBegan:EventType = new EventType(0, "<Turn Began>");
-		public static const TurnEnded:EventType = new EventType(1, "<Turn Ended>");
-		public static const CardDrawn:EventType = new EventType(2, "<Card Drawn>");
-		public static const CardPlayed:EventType = new EventType(3, "<Card Played>");
-		public static const CardAttacked:EventType = new EventType(4, "<Card Attacked>");
-		public static const AbilityUsed:EventType = new EventType(5, "<Ability Used>");
+		public static const TurnEvent:EventType = new EventType(0, "<Turn Event>");
+		public static const DeckEvent:EventType = new EventType(1, "<Deck Event>");
+		public static const HandEvent:EventType = new EventType(2, "<Hand Event>");
+		public static const BattlefieldEvent:EventType = new EventType(3, "<Battlefield Event>");
+		public static const CardEvent:EventType = new EventType(4, "<Card Event>");
 	}
 }

@@ -1,6 +1,6 @@
 package ad.expression 
 {
-	import ad.map.HashMap;
+	import ad.map.Map;
 	
 	public class BracketSyntaxEvaluator 
 	{
@@ -14,7 +14,7 @@ package ad.expression
 			if (m_pairs.contains(token.ordinal))
 			{
 				m_brackets.push(token.ordinal);
-				m_unclosedCount.insert(token.ordinal, m_unclosedCount.at(token.ordinal) + 1);
+				m_unclosedCount.push(token.ordinal, m_unclosedCount.at(token.ordinal) + 1);
 			}
 			else if (m_pairs.keyOf(token.ordinal) != null)
 			{
@@ -22,7 +22,7 @@ package ad.expression
 				if (m_brackets.length == 0 || token.ordinal != m_pairs.at(key))
 					return false;
 				
-				m_unclosedCount.insert(key, m_unclosedCount.at(key) - 1);
+				m_unclosedCount.push(key, m_unclosedCount.at(key) - 1);
 				m_brackets.pop();
 			}
 			
@@ -33,8 +33,8 @@ package ad.expression
 		{
 			if (opening != null && closing != null && opening != closing && !m_unclosedCount.contains(opening.ordinal))
 			{
-				m_pairs.insert(opening.ordinal, closing.ordinal);
-				m_unclosedCount.insert(opening.ordinal, 0);
+				m_pairs.push(opening.ordinal, closing.ordinal);
+				m_unclosedCount.push(opening.ordinal, 0);
 			}
 			return this;
 		}
@@ -43,7 +43,7 @@ package ad.expression
 		{
 			m_brackets = new Vector.<uint>();
 			for (var key:String in m_unclosedCount)
-				m_unclosedCount.insert(key, 0);
+				m_unclosedCount.push(key, 0);
 			return this;
 		}
 		
@@ -73,6 +73,6 @@ package ad.expression
 		
 		
 		private var m_brackets:Vector.<uint> = new Vector.<uint>();
-		private const m_pairs:HashMap = new HashMap(), m_unclosedCount:HashMap = new HashMap();
+		private const m_pairs:Map = new Map(), m_unclosedCount:Map = new Map();
 	}
 }

@@ -1,9 +1,19 @@
 package ad.deck 
-{	
+{
+	import ad.event.Event;
+	import ad.event.EventType;
+	import ad.event.EventDispatcher;
+	import ad.player.Player;
+	import ad.deck.card.Card;
+	import ad.map.Map;
+	
 	public class Deck
-	{
-		public function Deck() {}
-		
+	{		
+		public function setParent(parent:Player):Deck
+		{
+			m_parent = parent;
+			return this;
+		}
 		
 		public function addCard(card:String):Deck
 		{
@@ -28,6 +38,10 @@ package ad.deck
 			{
 				returnValue = m_cards[m_cards.length - 1];
 				m_cards.pop();
+				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
+					.push("card", Card.getCard(returnValue))
+					.push("player", m_parent)
+					.push("drawn", true)));
 			}
 			
 			return returnValue;
@@ -52,13 +66,22 @@ package ad.deck
 			{
 				returnValue.push(drawNextCard());
 				count--;
+				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
+					.push("card", Card.getCard(returnValue[returnValue.length - 1]))
+					.push("player", m_parent)
+					.push("drawn", true)));
 			}
 			
 			return returnValue;
 		}
 		
 		
-		public function getCardCount():uint
+		public function get parent():Player
+		{
+			return m_parent;
+		}
+		
+		public function get cardCount():uint
 		{
 			return m_cards.length;
 		}
@@ -88,5 +111,6 @@ package ad.deck
 		
 		
 		private var m_cards:Vector.<String> = new Vector.<String>();
+		private var m_parent:Player = null;
 	}	
 }

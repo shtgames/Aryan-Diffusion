@@ -5,7 +5,7 @@ package ad.deck.card
 	import ad.expression.ParseTreeNode;
 	import ad.expression.TokenType;
 	import ad.file.StatementProcessor;
-	import ad.map.HashMap;
+	import ad.map.Map;
 	
 	public class Card
 	{
@@ -159,7 +159,7 @@ package ad.deck.card
 								for each (var statement:ParseTreeNode in statements)
 								{
 									const card:Card = new Card(statement);
-									cards.insert(card.m_id, card);
+									cards.push(card.m_id, card);
 								}
 							});
 				});
@@ -198,6 +198,6 @@ package ad.deck.card
 		
 		
 		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
-		private static var cards:HashMap = new HashMap();
+		private static var cards:Map = new Map();
 	}
 }

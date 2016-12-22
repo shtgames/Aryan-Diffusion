@@ -2,10 +2,11 @@ package ad.deck.card
 {
 	import ad.expression.ParseTreeNode;
 	import ad.deck.card.CardState;
+	import ad.map.Map;
 	
-	public class Effect 
+	public class DynamicEffect 
 	{
-		public function Effect(source:ParseTreeNode = null)
+		public function DynamicEffect(source:ParseTreeNode = null)
 		{
 			loadFromFile(source);
 		}
@@ -15,9 +16,9 @@ package ad.deck.card
 			if (source == null) return;
 		}
 		
-		public function applyTo(target:CardState, source:CardState):CardState
+		public function applyTo(data:Map):void
 		{
-			return target;
+			
 		}
 	}
 }

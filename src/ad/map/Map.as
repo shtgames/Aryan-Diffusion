@@ -6,21 +6,21 @@
 	
 	use namespace flash_proxy;
 	
-	public class HashMap extends Proxy
+	public class Map extends Proxy
 	{
-		public function HashMap(other:HashMap = null)
+		public function Map(other:Map = null)
 		{
 			assign(other);
 		}
 		
-		public function assign(copy:HashMap):HashMap
+		public function assign(copy:Map):Map
 		{
 			if (copy == null) return this;
 			
 			clear();
 			copy.m_mutex.lock();
 			for (var key:String in copy.m_keyToIndex)
-				insert(key, copy.at(key));
+				push(key, copy.at(key));
 			copy.m_mutex.unlock();
 			
 			return this;
@@ -42,7 +42,7 @@
 		}
 		
 		
-		public function insert(key:*, value:*):HashMap
+		public function push(key:*, value:*):Map
 		{
 			if (key == null) return this;
 			
@@ -118,7 +118,7 @@
 			return true;
 		}
 		
-		public function clear():HashMap
+		public function clear():Map
 		{
 			m_mutex.lock();
 			m_keyToIndex = [];
@@ -128,11 +128,11 @@
 			return this;
 		}		
 		
-		public function swap(other:HashMap):HashMap
+		public function swap(other:Map):Map
 		{
 			if (other == null) return this;
 			
-			const buffer:HashMap = new HashMap(this);			
+			const buffer:Map = new Map(this);			
 			assign(other);
 			other.assign(buffer);
 			

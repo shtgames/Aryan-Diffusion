@@ -80,22 +80,23 @@ package ad.expression
 			case 18: return InequalityOperator;
 			case 19: return NonStrictLessOperator;
 			case 20: return NonStrictGreaterOperator;
-			case 21: return IntegralNumber;
-			case 22: return FloatingPointNumber;
-			case 23: return StringLiteral;
-			case 24: return Identifier;
-			case 25: return FunctionCall;
-			case 26: return ArrayAccess;
-			case 27: return ArrayInitialization;
-			case 28: return StartOfInput;
-			case 29: return EndOfInput;
+			case 21: return MemberAccessOperator;
+			case 22: return IntegralNumber;
+			case 23: return FloatingPointNumber;
+			case 24: return StringLiteral;
+			case 25: return Identifier;
+			case 26: return FunctionCall;
+			case 27: return ArrayAccess;
+			case 28: return ArrayInitialization;
+			case 29: return StartOfInput;
+			case 30: return EndOfInput;
 			}
 			return null;
 		}
 		
 		public static function size():uint
 		{
-			return 30;
+			return 31;
 		}
 		
 		
@@ -124,24 +125,25 @@ package ad.expression
 		public static const InequalityOperator:TokenType = new TokenType(/^!=/, 18, "<Inequality Operator>");
 		public static const NonStrictLessOperator:TokenType = new TokenType(/^<=/, 19, "<Less-Than-Or-Equal Operator>");
 		public static const NonStrictGreaterOperator:TokenType = new TokenType(/^>=/, 20, "<Greater-Than-Or-Equal Operator>");
+		public static const MemberAccessOperator:TokenType = new TokenType(/^\.[^0-9]/, 21, "<Member-Access Operator>");
 		
 		private static const forbiddenNumberPostfix:String = "(?![_a-zA-Z0-9\.])";
 		
-		public static const IntegralNumber:TokenType = new TokenType(new RegExp("^[+-]?[0-9]+" + forbiddenNumberPostfix), 21, "<Integral Number>");
-		public static const FloatingPointNumber:TokenType = new TokenType(new RegExp("^[+-]?(?:(?:[0-9]*[\.][0-9]+)|(?:[0-9]+[\.][0-9]*))" + forbiddenNumberPostfix), 22, "<Floating-Point Number>");
-		public static const StringLiteral:TokenType = new TokenType(/(?<=^")[^"\\]*(?:\\.[^"\\]*)*(?=")/, 23, "<String Literal>");
+		public static const IntegralNumber:TokenType = new TokenType(new RegExp("^[+-]?[0-9]+" + forbiddenNumberPostfix), 22, "<Integral Number>");
+		public static const FloatingPointNumber:TokenType = new TokenType(new RegExp("^[+-]?(?:(?:[0-9]*[\.][0-9]+)|(?:[0-9]+[\.][0-9]*))" + forbiddenNumberPostfix), 23, "<Floating-Point Number>");
+		public static const StringLiteral:TokenType = new TokenType(/(?<=^")[^"\\]*(?:\\.[^"\\]*)*(?=")/, 24, "<String Literal>");
 		
 		private static const optionalWS:String = "[ \t\r\n]*";
 		private static const identifierName:String = "[_a-zA-Z][a-zA-Z0-9_]*";
 		
 		public static const Identifier:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + "[^" + OperatorBeginArguments._pattern + OperatorBeginArrayAccess._pattern +
-			OperatorBeginData._pattern + "a-zA-Z0-9_])"), 24, "<Identifier>");
+			OperatorBeginData._pattern + "a-zA-Z0-9_])"), 25, "<Identifier>");
 		
-		public static const FunctionCall:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginArguments._pattern + ")"), 25, "<Function Call>");
-		public static const ArrayAccess:TokenType = new TokenType(new RegExp("^" + identifierName  + "(?=" + optionalWS + OperatorBeginArrayAccess._pattern + ")"), 26, "<Array Access>");
-		public static const ArrayInitialization:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginData._pattern + ")"), 27, "<Array Initialization>");
+		public static const FunctionCall:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginArguments._pattern + ")"), 26, "<Function Call>");
+		public static const ArrayAccess:TokenType = new TokenType(new RegExp("^" + identifierName  + "(?=" + optionalWS + OperatorBeginArrayAccess._pattern + ")"), 27, "<Array Access>");
+		public static const ArrayInitialization:TokenType = new TokenType(new RegExp("^" + identifierName + "(?=" + optionalWS + OperatorBeginData._pattern + ")"), 28, "<Array Initialization>");
 		
-		public static const StartOfInput:TokenType = new TokenType(null, 28, "<Start of Input>");
-		public static const EndOfInput:TokenType = new TokenType(null, 29, "<End of Input>");
+		public static const StartOfInput:TokenType = new TokenType(null, 29, "<Start of Input>");
+		public static const EndOfInput:TokenType = new TokenType(null, 30, "<End of Input>");
 	}
 }
