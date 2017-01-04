@@ -1,16 +1,15 @@
 package ad.deck.card 
 {
 	import ad.deck.card.Card;
-	import ad.deck.card.Condition;
-	import ad.deck.card.DynamicEffect;	
-	import ad.expression.ParseTreeNode;
+	import ad.deck.effect.DynamicEffect;	
+	import ad.expression.ParseNode;
 	import ad.expression.TokenType;	
 	import ad.file.StatementProcessor;
 	import ad.map.Map;
 	
 	public final class Ability
 	{
-		public function Ability(source:ParseTreeNode = null) 
+		public function Ability(source:ParseNode = null) 
 		{
 			loadFromFile(source);
 		}
@@ -37,26 +36,6 @@ package ad.deck.card
 		}
 		
 		
-		public function canApply(target:CardState, source:CardState):Boolean
-		{
-			if (target == null || source == null)
-					return false;
-			
-			var returnValue:Boolean = false;
-			for each (var condition:Condition in m_sourceConditions)
-				if (condition.isFulfilled(target))
-				{
-					returnValue = true;
-					break;
-				}
-			if (!returnValue) return false;
-			
-			for each (var condition:Condition in m_targetConditions)
-				if (condition.isFulfilled(target)) return true;
-			
-			return false;
-		}
-		
 		public function applyTo(target:CardState, source:CardState):Boolean
 		{
 			if (target == null || source == null)
@@ -82,34 +61,34 @@ package ad.deck.card
 		}
 		
 		
-		private function loadFromFile(source:ParseTreeNode):void
+		private function loadFromFile(source:ParseNode):void
 		{
-			if (source == null || !source.getToken().type.equals(TokenType.EqualityOperator) ||
-				!source.getChildren()[0].getToken().type.equals(TokenType.Identifier)) 
+			if (source == null || !source.token.type.equals(TokenType.AssignmentOperator) ||
+				!source.getChildren()[0].token.type.equals(TokenType.Identifier)) 
 				return;
 			
-			m_id = source.getChildren()[0].getToken().text;
+			m_id = source.getChildren()[0].token.token.text;
 			
-			for each (var statement:ParseTreeNode in source.getChildren()[1].getChildren())
-				if (statement.getToken().type == TokenType.EqualityOperator)
-					switch (statement.getChildren()[0].getToken().text.toLowerCase())
+			for each (var statement:ParseNode in source.getChildren()[1].getChildren())
+				if (statement.token.type == TokenType.AssignmentOperator)
+					switch (statement.getChildren()[0].token.token.text.toLowerCase())
 					{
 					case "name":
-						m_name = statement.getChildren()[1].getToken().text;
+						m_name = statement.getChildren()[1].token.token.text;
 						break;
 					case "description":
-						m_description = statement.getChildren()[1].getToken().text;
+						m_description = statement.getChildren()[1].token.token.text;
 						break;
 					case "type":
-						m_type = parseType(statement.getChildren()[1].getToken().text);
+						m_type = parseType(statement.getChildren()[1].token.token.text);
 						break;
 					case "source":
-						for each (var currentCase:ParseTreeNode in statement.getChildren()[1].getChildren())
+						for each (var currentCase:ParseNode in statement.getChildren()[1].getChildren())
 						{
 							var condition:Condition = null;
 							var effect:DynamicEffect = null;
-							for each (var currentStatement:ParseTreeNode in currentCase.getChildren()[1].getChildren())
-								switch (currentStatement.getChildren()[0].getToken().text.toLowerCase())
+							for each (var currentStatement:ParseNode in currentCase.getChildren()[1].getChildren())
+								switch (currentStatement.getChildren()[0].token.token.text.toLowerCase())
 								{
 								case "condition":
 									condition = new Condition(currentStatement);
@@ -127,12 +106,12 @@ package ad.deck.card
 						}
 						break;
 					case "target":
-						for each (var currentCase:ParseTreeNode in statement.getChildren()[1].getChildren())
+						for each (var currentCase:ParseNode in statement.getChildren()[1].getChildren())
 						{
 							var condition:Condition = null;
 							var effect:DynamicEffect = null;
-							for each (var currentStatement:ParseTreeNode in currentCase.getChildren()[1].getChildren())
-								switch (currentStatement.getChildren()[0].getToken().text.toLowerCase())
+							for each (var currentStatement:ParseNode in currentCase.getChildren()[1].getChildren())
+								switch (currentStatement.getChildren()[0].token.token.text.toLowerCase())
 								{
 								case "condition":
 									condition = new Condition(currentStatement);
@@ -164,13 +143,13 @@ package ad.deck.card
 		{			
 			var file:StatementProcessor = new StatementProcessor(path, function():void
 				{
-					if (file.getStatements()[0].getChildren()[0].getToken().text != "directories") return;
+					if (file.getStatements()[0].getChildren()[0].token.token.text != "directories") return;
 					
-					for each (var dir:ParseTreeNode in file.getStatements()[0].getChildren()[1].getChildren())
-						var definitions:StatementProcessor = new StatementProcessor(dir.getToken().text,
-							function(statements:Vector.<ParseTreeNode>):void
+					for each (var dir:ParseNode in file.getStatements()[0].getChildren()[1].getChildren())
+						var definitions:StatementProcessor = new StatementProcessor(dir.token.token.text,
+							function(statements:Vector.<ParseNode>):void
 							{
-								for each (var statement:ParseTreeNode in statements)
+								for each (var statement:ParseNode in statements)
 								{
 									const ability:Ability = new Ability(statement);
 									abilities.push(ability.m_id, ability);
@@ -198,8 +177,6 @@ package ad.deck.card
 			{
 			case "active":
 				return ACTIVE;
-			case "passive":
-				return PASSIVE;
 			case "on_summon":
 				return ON_SUMMON;
 			}
@@ -207,7 +184,7 @@ package ad.deck.card
 		}
 		
 		
-		public static const ACTIVE:uint = 0, PASSIVE:uint = 1, ON_SUMMON:uint = 2;
+		public static const ACTIVE:uint = 0, ON_SUMMON:uint = 1;
 		private static var abilities:Map = new Map();
 	}
 }

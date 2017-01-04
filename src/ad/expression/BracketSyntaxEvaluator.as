@@ -4,8 +4,10 @@ package ad.expression
 	
 	public class BracketSyntaxEvaluator 
 	{
-		public function BracketSyntaxEvaluator() {}
-		
+		public function toString():String
+		{
+			return hasUnclosed() ? "<Unclosed>" : "<Closed>";
+		}
 		
 		public function next(token:TokenType):Boolean
 		{

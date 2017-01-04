@@ -38,7 +38,7 @@ package ad.event
 		public static const TurnEvent:EventType = new EventType(0, "<Turn Event>");
 		public static const DeckEvent:EventType = new EventType(1, "<Deck Event>");
 		public static const HandEvent:EventType = new EventType(2, "<Hand Event>");
-		public static const BattlefieldEvent:EventType = new EventType(3, "<Battlefield Event>");
+		public static const FieldEvent:EventType = new EventType(3, "<Field Event>");
 		public static const CardEvent:EventType = new EventType(4, "<Card Event>");
 	}
 }

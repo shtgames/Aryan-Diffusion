@@ -1,16 +1,16 @@
-package ad.deck.card 
+package ad.deck.effect 
 {
-	import ad.expression.ParseTreeNode;
+	import ad.expression.ParseNode;
 	import ad.deck.card.CardState;
 	
 	public class Condition 
 	{
-		public function Condition(source:ParseTreeNode = null)
+		public function Condition(source:ParseNode = null)
 		{
 			loadFromFile(source);
 		}
 		
-		public function loadFromFile(source:ParseTreeNode):void
+		public function loadFromFile(source:ParseNode):void
 		{
 			if (source == null) return;
 		}

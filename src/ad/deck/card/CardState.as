@@ -1,5 +1,7 @@
 package ad.deck.card 
 {
+	import ad.deck.effect.StatusEffect;
+	import ad.deck.effect.StatusEffectState;
 	import ad.event.Event;
 	import ad.event.EventListener;
 	import ad.map.Map;
@@ -89,6 +91,6 @@ package ad.deck.card
 		private var m_key:String = null;
 		private var m_parent:Player = null;
 		private var m_health:int = 0, m_attack:uint = 0;
-		private var m_statusEffects:Map = new Map();
+		private var m_statusEffects:Vector.<StatusEffectState> = new Vector.<StatusEffectState>();
 	}
 }

@@ -2,7 +2,7 @@ package ad.file
 {
 	import ad.expression.Lexer;
 	import ad.expression.Parser;
-	import ad.expression.ParseTreeNode;
+	import ad.expression.ParseNode;
 	
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -47,7 +47,7 @@ package ad.file
 			return true;
 		}
 		
-		public function getStatements():Vector.<ParseTreeNode>
+		public function getStatements():Vector.<ParseNode>
 		{
 			return m_statements;
 		}
@@ -58,7 +58,7 @@ package ad.file
 		}
 		
 		
-		private var m_statements:Vector.<ParseTreeNode> = null;
+		private var m_statements:Vector.<ParseNode> = null;
 		private var m_path:String = "";
 		private var m_loading:Boolean = false;
 	}

@@ -11,6 +11,11 @@ package ad.expression
 		}
 		
 		
+		public function toString():String
+		{
+			return done() ? "<Done>" : "<Working>";
+		}
+		
 		public function setInput(input:String):Lexer
 		{
 			if (input == null) return this;

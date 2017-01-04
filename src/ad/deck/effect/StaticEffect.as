@@ -1,4 +1,4 @@
-package ad.deck.card 
+package ad.deck.effect 
 {
 	public class StaticEffect 
 	{

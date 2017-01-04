@@ -1,10 +1,8 @@
 package ad.expression
 {
-	import ad.expression.Lexer;
-	import ad.expression.ParseTreeNode;
+	import ad.expression.ParseNode;
 	import ad.expression.TokenType;
-	import ad.expression.Token;	
-	import ad.map.Map;
+	import ad.expression.Token;
 	
 	public class Parser
 	{
@@ -18,19 +16,23 @@ package ad.expression
 		}
 		
 		
+		public function toString():String
+		{
+			return done() ? "<Done>" : "<Working>";
+		}
+		
 		public function setTokens(tokens:Vector.<Token>):Parser
 		{
 			m_tokens = tokens;
 			return this;
 		}
 		
-		
 		public function getTokens():Vector.<Token>
 		{
 			return m_tokens;
 		}
 		
-		public function parse():Vector.<ParseTreeNode>
+		public function parse():Vector.<ParseNode>
 		{
 			if (m_tokens == null || m_tokens.length == 0) return null;
 			
@@ -41,7 +43,13 @@ package ad.expression
 			return parameterList(TokenType.StartOfInput, TokenType.EndOfInput, TokenType.Terminator, TokenType.OperatorEndData, false);
 		}
 		
-		public function parseExpression(start:uint = 0, end:uint = 0):ParseTreeNode
+		public function done():Boolean
+		{
+			return getCurrentToken() == null;
+		}
+		
+		
+		private function parseExpression(start:uint = 0, end:uint = 0):ParseNode
 		{
 			if (m_tokens == null || m_tokens.length == 0 || start >= m_tokens.length) return null;
 			
@@ -52,44 +60,38 @@ package ad.expression
 			return expression();
 		}
 		
-		public function done():Boolean
-		{
-			return getCurrentToken() == null;
-		}
-		
-		
-		private function expression():ParseTreeNode
+		private function expression():ParseNode
 		{
 			const saved:uint = m_current;
-			var node:ParseTreeNode = relationalExpression();
+			var node:ParseNode = relationalExpression();
 			
 			if (node == null) return reset(saved);			
 			return node;
 		}
 		
-		private function nextExpression(next:Function, tokens:Vector.<TokenType>):ParseTreeNode
+		private function binaryExpression(next:Function, tokens:Vector.<TokenType>):ParseNode
 		{
 			if (m_tokens == null) return null;
 			
 			const saved:uint = m_current;
 			
-			var node:ParseTreeNode = next();
+			var node:ParseNode = next();
 			if (node == null) 
 				return reset(saved);
 			
 			for (var it:TokenType = getCurrentTokenType(); it != null; it = getCurrentTokenType())
 			{
 				var verdict:Boolean = false;
-				
 				for each (var it1:TokenType in tokens)
 					if (it.equals(it1))
 					{
 						verdict = true;
 						break;
 					}
+				
 				if (!verdict) break;
 				
-				var node2:ParseTreeNode = new ParseTreeNode(getCurrentToken());
+				var node2:ParseNode = new ParseNode(getCurrentToken());
 				
 				verdict = false;
 				for each (var it1:TokenType in tokens)
@@ -102,12 +104,12 @@ package ad.expression
 				if (!verdict)
 					return reset(saved);
 				
-				var node3:ParseTreeNode = next();
+				const node3:ParseNode = next();
 				if (node3 == null)
 					return reset(saved);
 				
-				node2.getChildren().push(node);
-				node2.getChildren().push(node3);
+				node2.addChild(node);
+				node2.addChild(node3);
 				
 				node = node2;
 			}
@@ -115,53 +117,78 @@ package ad.expression
 			return node;
 		}
 		
-		private function relationalExpression():ParseTreeNode
+		private function relationalExpression():ParseNode
 		{
-			return nextExpression(additiveExpression, new <TokenType> [ TokenType.EqualityOperator, TokenType.InequalityOperator,
+			return binaryExpression(additiveExpression, new <TokenType> [ TokenType.AssignmentOperator, TokenType.InequalityOperator,
 				TokenType.StrictLessOperator, TokenType.NonStrictLessOperator, TokenType.StrictGreaterOperator, TokenType.NonStrictGreaterOperator ]);
 		}
 		
-		private function additiveExpression():ParseTreeNode
+		private function additiveExpression():ParseNode
 		{
-			return nextExpression(multiplicativeExpression, new <TokenType> [ TokenType.AdditionOperator, TokenType.SubtractionOperator ]);
+			return binaryExpression(multiplicativeExpression, new <TokenType> [ TokenType.AdditionOperator, TokenType.SubtractionOperator ]);
 		}
 		
-		private function multiplicativeExpression():ParseTreeNode
+		private function multiplicativeExpression():ParseNode
 		{
-			return nextExpression(exponentExpression, new <TokenType> [ TokenType.MultiplicationOperator, TokenType.DivisionOperator, TokenType.ModuloOperator ]);
+			return binaryExpression(exponentExpression, new <TokenType> [ TokenType.MultiplicationOperator, TokenType.DivisionOperator, TokenType.ModuloOperator ]);
 		}
 		
-		private function exponentExpression():ParseTreeNode
+		private function exponentExpression():ParseNode
 		{
-			return nextExpression(memberAccessExpression, new <TokenType> [ TokenType.ExponentOperator ]);
+			return binaryExpression(objectAccessExpression, new <TokenType> [ TokenType.ExponentOperator ]);
 		}
 		
-		private function memberAccessExpression():ParseTreeNode
+		private function objectAccessExpression():ParseNode
 		{
-			return nextExpression(unaryExpression, new <TokenType> [ TokenType.MemberAccessOperator ]);
+			var node:ParseNode = unaryExpression();
+			
+			if (node == null)
+				return null;
+			
+			const saved:uint = m_current;
+			
+			for (var it:TokenType = getCurrentTokenType(); it != null; it = getCurrentTokenType())
+			{
+				var node2:ParseNode;
+				if ((node2 = parseCurrent(TokenType.MemberAccessOperator)) == null)
+				{
+					if (it.equals(TokenType.OperatorBeginArguments) || it.equals(TokenType.OperatorBeginArrayAccess))
+					{
+						var parameters:Vector.<ParseNode>;						
+						
+						if (it.equals(TokenType.OperatorBeginArguments) &&
+								(parameters = parameterList(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter)) != null)
+							node = new ParseNode(new Token("()", TokenType.FunctionCall)) .addChild(node).addChildren(parameters);
+						else if (it.equals(TokenType.OperatorBeginArrayAccess) &&
+								(parameters = parameterList(TokenType.OperatorBeginArrayAccess, TokenType.OperatorEndArrayAccess, TokenType.Delimiter)) != null)
+							node = new ParseNode(new Token("[]", TokenType.ArrayAccess)) .addChild(node).addChildren(parameters);
+						
+						continue;
+					}
+					else return node;
+				}
+				
+				var node3:ParseNode = unaryExpression();
+				if (node3 == null)
+					return reset(saved);
+				
+				node2.addChild(node);
+				node2.addChild(node3);
+				
+				node = node2;
+			}
+			
+			return node;
 		}
 		
-		private function unaryExpression():ParseTreeNode
+		private function unaryExpression():ParseNode
 		{
-			const saved:uint = m_current;			
-			var node:ParseTreeNode = null;
+			const saved:uint = m_current;
+			var node:ParseNode = null;
 			
 			if ((node = parseCurrent(TokenType.IntegralNumber)) != null || (node = parseCurrent(TokenType.FloatingPointNumber)) != null ||
 				(node = parseCurrent(TokenType.StringLiteral)) != null || (node = parseCurrent(TokenType.Identifier)) != null)
 				return node;
-			
-			if ((node = parseCurrent(TokenType.FunctionCall)) != null)
-				return parseComplexIdentifier(node, TokenType.OperatorBeginArguments,
-					TokenType.OperatorEndArguments, saved);		
-			
-			if ((node = parseCurrent(TokenType.ArrayAccess)) != null)
-				return parseComplexIdentifier(node, TokenType.OperatorBeginArrayAccess,
-					TokenType.OperatorEndArrayAccess, saved);			
-			
-			if ((node = parseCurrent(TokenType.ArrayInitialization)) != null)
-				return parseComplexIdentifier(node, TokenType.OperatorBeginData,
-					TokenType.OperatorEndData, saved);
-			
 			
 			const currentToken:TokenType = getCurrentTokenType();
 			if (currentToken == null)
@@ -172,64 +199,47 @@ package ad.expression
 				if ((node = parseCurrent(currentToken)) == null)
 					return reset(saved);
 				
-				const node2:ParseTreeNode = unaryExpression();
+				const node2:ParseNode = objectAccessExpression();
 				if (node2 == null)
 					return reset(saved);
 				
-				node.getChildren().push(node2);
-				
-				return node;
+				return node.addChild(node2);
 			}
 			
 			if (currentToken.equals(TokenType.OperatorBeginArguments))
 			{
-				if (parseCurrent(TokenType.OperatorBeginArguments) == null || (node = expression()) == null || 
-					parseCurrent(TokenType.OperatorEndArguments) == null)
+				const value:Vector.<ParseNode> = parameterList(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments);
+				if (value == null || value.length == 0 || (node = value[0]) == null)
 					return reset(saved);
-				
-				node.setEnclosed(true);
 				
 				return node;
 			}
 			
 			if (currentToken.equals(TokenType.OperatorBeginData))
-			{	
-				node = new ParseTreeNode(getCurrentToken());
+			{
+				node = new ParseNode(getCurrentToken());
 				
-				if (node.setChildren( parameterList(TokenType.OperatorBeginData, TokenType.OperatorEndData, null, TokenType.OperatorEndData, false) )
-					.getChildren() == null) return reset(saved);
+				const parameters:Vector.<ParseNode> = parameterList(TokenType.OperatorBeginData, TokenType.OperatorEndData, null, TokenType.OperatorEndData, false);
+				if (parameters == null)
+					return reset(saved);
 				
-				return node.setEnclosed(true);
+				return node.addChildren(parameters);
 			}
 			
 			return reset(saved);
 		}
 		
-		private function parseComplexIdentifier(node:ParseTreeNode, openingToken:TokenType,
-			closingToken:TokenType, saved:uint):ParseTreeNode
-		{
-			if (node == null) return null;
-			
-			const parameters:Vector.<ParseTreeNode> =
-				parameterList(openingToken, closingToken, TokenType.Delimiter);
-			if (parameters == null)
-				return reset(saved);
-			
-			return node.setChildren(parameters);
-		}
-		
 		private function parameterList(openingToken:TokenType, closingToken:TokenType, delimiter:TokenType = null,
-			secondaryDelimiter:TokenType = null,
-			functionSyntax:Boolean = true):Vector.<ParseTreeNode>
+			secondaryDelimiter:TokenType = null, functionSyntax:Boolean = true):Vector.<ParseNode>
 		{
 			if (openingToken == null || closingToken == null) return null;
 			m_bracketEvaluator.addPair(openingToken, closingToken);
 			
-			var returnValue:Vector.<ParseTreeNode> = new Vector.<ParseTreeNode>();
+			var returnValue:Vector.<ParseNode> = new Vector.<ParseNode>();
 			
 			const parameterParser:Parser = new Parser(m_tokens);
-			var buffer:ParseTreeNode;
-			var start:uint;
+			var buffer:ParseNode;
+			var start:uint = m_current;
 			
 			do
 			{
@@ -240,10 +250,10 @@ package ad.expression
 				{
 					if (functionSyntax)
 					{
-						if (m_current - 1 > start)
+						if (start < m_current - 1)
 						{
 							buffer = parameterParser.parseExpression(start, m_current - 1);
-							if (buffer == null) return null;
+							if (buffer == null)	return null;
 							
 							returnValue.push(buffer);
 							start = m_current;
@@ -268,15 +278,16 @@ package ad.expression
 					if (delimiter == null)
 						functionSyntax = (delimiter = current.type).equals(TokenType.Delimiter);
 					else if (!current.type.equals(delimiter))
-						return error("Error: Syntax error on token " + current.type.name + ": expected token " + delimiter.name + ".");
+						return error("Error: Syntax error on token " + current.type.name + ": expected " + delimiter.name + ".");
 				}
 				
 				if (current.type.equals(delimiter))
 				{
-					if (m_current - 1 > start)
+					if (start < m_current - 1)
 					{
 						buffer = parameterParser.parseExpression(start, m_current - 1);
-						if (buffer == null) return null;
+						if (buffer == null)
+							return null;
 						
 						returnValue.push(buffer);
 						start = m_current;
@@ -290,7 +301,7 @@ package ad.expression
 					if (buffer == null) return null;
 					
 					returnValue.push(buffer);
-					start = m_current;
+					start = m_current + 1;
 				}
 			} while (!done() && m_bracketEvaluator.hasUnclosed());
 			
@@ -325,15 +336,15 @@ package ad.expression
 			return current.type;
 		}
 		
-		private function parseCurrent(type:TokenType):ParseTreeNode
+		private function parseCurrent(type:TokenType):ParseNode
 		{
 			if (getCurrentTokenType() == type)
 			{
-				const node:ParseTreeNode = new ParseTreeNode(getCurrentToken());
+				const node:ParseNode = new ParseNode(getCurrentToken());
 				m_current++;
 				
-				if (!m_bracketEvaluator.next(node.getToken().type))
-					return error("Error: Syntax error on token " + node.getToken().type.name + ".");
+				if (!m_bracketEvaluator.next(node.token.type))
+					return error("Error: Syntax error on token " + node.token.type.name + ".");
 				
 				return node;
 			}

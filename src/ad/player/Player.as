@@ -1,5 +1,5 @@
 package ad.player 
-{
+{	
 	import ad.deck.Deck;
 	import ad.deck.Hand;
 	import ad.deck.card.Card;
@@ -10,8 +10,8 @@ package ad.player
 	import ad.field.Field;
 	import ad.map.Map;
 	
-	public class Player 
-	{		
+	public class Player
+	{
 		public function Player()
 		{
 			m_playedCards.push(Card.CHARACTER, new Vector.<CardState>())
@@ -60,7 +60,7 @@ package ad.player
 			const instance:CardState = new CardState(card);
 			m_playedCards.at(Card.getCard(card).type).push(instance);
 			
-			EventDispatcher.pollEvent(new Event(EventType.BattlefieldEvent, new Map()
+			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 				.push("card", instance)
 				.push("player", this)
 				.push("added", true)));
