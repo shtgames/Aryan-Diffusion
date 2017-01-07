@@ -63,7 +63,7 @@ package ad.expression
 		private function expression():ParseNode
 		{
 			const saved:uint = m_current;
-			var node:ParseNode = relationalExpression();
+			var node:ParseNode = assignmentExpression();
 			
 			if (node == null) return reset(saved);			
 			return node;
@@ -117,10 +117,32 @@ package ad.expression
 			return node;
 		}
 		
+		public function assignmentExpression():ParseNode
+		{
+			return binaryExpression(logicalOrExpression, new <TokenType> [ TokenType.AssignmentOperator, TokenType.AdditiveAssignmentOperator,
+				TokenType.SubtractiveAssignmentOperator, TokenType.MultiplicativeAssignmentOperator, TokenType.DivisiveAssignmentOperator,
+				TokenType.ModuloAssignmentOperator, TokenType.ExponentialAssignmentOperator ]);
+		}
+		
+		private function logicalOrExpression():ParseNode
+		{
+			return binaryExpression(logicalAndExpression, new <TokenType> [ TokenType.LogicalOrOperator ]);
+		}
+		
+		private function logicalAndExpression():ParseNode
+		{
+			return binaryExpression(equalityExpression, new <TokenType> [ TokenType.LogicalAndOperator ]);
+		}
+		
+		private function equalityExpression():ParseNode
+		{
+			return binaryExpression(relationalExpression, new <TokenType> [ TokenType.EqualityOperator, TokenType.InequalityOperator ]);
+		}
+		
 		private function relationalExpression():ParseNode
 		{
-			return binaryExpression(additiveExpression, new <TokenType> [ TokenType.AssignmentOperator, TokenType.InequalityOperator,
-				TokenType.StrictLessOperator, TokenType.NonStrictLessOperator, TokenType.StrictGreaterOperator, TokenType.NonStrictGreaterOperator ]);
+			return binaryExpression(additiveExpression, new <TokenType> [ TokenType.StrictLessOperator, TokenType.NonStrictLessOperator,
+				TokenType.StrictGreaterOperator, TokenType.NonStrictGreaterOperator ]);
 		}
 		
 		private function additiveExpression():ParseNode
@@ -135,10 +157,10 @@ package ad.expression
 		
 		private function exponentExpression():ParseNode
 		{
-			return binaryExpression(objectAccessExpression, new <TokenType> [ TokenType.ExponentOperator ]);
+			return binaryExpression(objectExpression, new <TokenType> [ TokenType.ExponentOperator ]);
 		}
 		
-		private function objectAccessExpression():ParseNode
+		private function objectExpression():ParseNode
 		{
 			var node:ParseNode = unaryExpression();
 			
@@ -184,22 +206,24 @@ package ad.expression
 		private function unaryExpression():ParseNode
 		{
 			const saved:uint = m_current;
-			var node:ParseNode = null;
-			
-			if ((node = parseCurrent(TokenType.IntegralNumber)) != null || (node = parseCurrent(TokenType.FloatingPointNumber)) != null ||
-				(node = parseCurrent(TokenType.StringLiteral)) != null || (node = parseCurrent(TokenType.Identifier)) != null)
-				return node;
 			
 			const currentToken:TokenType = getCurrentTokenType();
 			if (currentToken == null)
 				return reset(saved);
 			
-			if (currentToken.equals(TokenType.SubtractionOperator) || currentToken.equals(TokenType.AdditionOperator))
+			if (currentToken.equals(TokenType.IntegralNumber) || currentToken.equals(TokenType.FloatingPointNumber) ||
+					currentToken.equals(TokenType.StringLiteral) || currentToken.equals(TokenType.Identifier))
+				return parseCurrent(currentToken);
+			
+			var node:ParseNode = null;
+			
+			if (currentToken.equals(TokenType.LogicalNegationOperator) ||
+				currentToken.equals(TokenType.AdditionOperator) || currentToken.equals(TokenType.SubtractionOperator))
 			{
 				if ((node = parseCurrent(currentToken)) == null)
 					return reset(saved);
 				
-				const node2:ParseNode = objectAccessExpression();
+				const node2:ParseNode = objectExpression();
 				if (node2 == null)
 					return reset(saved);
 				
@@ -217,7 +241,7 @@ package ad.expression
 			
 			if (currentToken.equals(TokenType.OperatorBeginData))
 			{
-				node = new ParseNode(getCurrentToken());
+				node = new ParseNode(new Token("{}", TokenType.DataBlock));
 				
 				const parameters:Vector.<ParseNode> = parameterList(TokenType.OperatorBeginData, TokenType.OperatorEndData, null, TokenType.OperatorEndData, false);
 				if (parameters == null)
