@@ -102,24 +102,34 @@ package ad.expression
 			
 			case 31: return MemberAccessOperator;
 			
-			case 32: return IntegralNumber;
-			case 33: return FloatingPointNumber;
-			case 34: return StringLiteral;
+			case 32: return IfStatement;
+			case 33: return ElseStatement;
 			
-			case 35: return Identifier;
-			case 36: return FunctionCall;
-			case 37: return ArrayAccess;
-			case 38: return DataBlock;
+			case 34: return WhileLoopStatement;
+			case 35: return ForLoopStatement;
 			
-			case 39: return StartOfInput;
-			case 40: return EndOfInput;
+			case 36: return BreakStatement;
+			case 37: return ContinueStatement;
+			
+			case 38: return IntegralNumber;
+			case 39: return FloatingPointNumber;
+			case 40: return StringLiteral;
+			
+			case 41: return Identifier;
+			case 42: return FunctionCall;
+			case 43: return ArrayAccess;
+			case 44: return DataBlock;
+			case 45: return CodeBlock;
+			
+			case 46: return StartOfInput;
+			case 47: return EndOfInput;
 			}
 			return null;
 		}
 		
 		public static function size():uint
 		{
-			return 41;
+			return 48;
 		}
 		
 		
@@ -268,32 +278,94 @@ package ad.expression
 				return this.getChildCount() != 2 ? null : this.getChild(1).evaluate(scope, this.getChild(0).evaluate(scope, context));
 			} );
 		
+		public static const IfStatement:TokenType = new TokenType(/^if(?![A-Za-z0-9_])/, 32, "<If Statement>", 
+			function(scope:Object, context:Object) : Object 
+			{
+				if (this.getChildCount() < 2)
+					return null;
+				
+				if (Boolean(this.getChild(0).evaluate(scope, context)))
+					return this.getChild(1).evaluate(scope, context);
+				else if (this.getChild(2) != null)
+					return this.getChild(2).evaluate(scope, context);
+				else return null;
+			} );
+		public static const ElseStatement:TokenType = new TokenType(/^else(?![A-Za-z0-9_])/, 33, "<Else Statement>");
+		
+		public static const WhileLoopStatement:TokenType = new TokenType(/^while(?![A-Za-z0-9_])/, 34, "<While-Loop Statement>", 
+			function(scope:Object, context:Object) : Object 
+			{
+				if (this.getChildCount() < 2)
+					return null;
+				
+				var controlStatement:Object;
+				while (Boolean(this.getChild(0).evaluate(scope, context)))
+					if ((controlStatement = this.getChild(1).evaluate(scope, context)) != null)
+					{
+						if (controlStatement.hasOwnProperty("break") && controlStatement["break"] === true) break;
+						if (controlStatement.hasOwnProperty("continue") && controlStatement["continue"] === true) continue;
+					}
+				
+				return context;
+			} );
+		public static const ForLoopStatement:TokenType = new TokenType(/^for(?![A-Za-z0-9_])/, 35, "<For-Loop Statement>", 
+			function(scope:Object, context:Object) : Object 
+			{
+				if (this.getChildCount() < 4)
+					return null;
+				
+				var controlStatement:Object;
+				for (this.getChild(0).evaluate(scope, context); Boolean(this.getChild(1).evaluate(scope, context)); this.getChild(2).evaluate(scope, context))
+					if ((controlStatement = this.getChild(3).evaluate(scope, context)) != null)
+					{
+						if (controlStatement.hasOwnProperty("break") && controlStatement["break"] === true) break;
+						if (controlStatement.hasOwnProperty("continue") && controlStatement["continue"] === true) continue;
+					}
+				
+				return context;
+			} );
+		
+		public static const BreakStatement:TokenType = new TokenType(/^break(?![A-Za-z0-9_])/, 36, "<Break Statement>", 
+			function (scope:Object, context:Object): Object
+			{
+				const returnValue:Object = new Object();
+				returnValue["break"] = true;
+				return returnValue;
+			} );
+		public static const ContinueStatement:TokenType = new TokenType(/^continue(?![A-Za-z0-9_])/, 37, "<Continue Statement>", 
+			function (scope:Object, context:Object): Object
+			{
+				const returnValue:Object = new Object();
+				returnValue["continue"] = true;
+				return returnValue;
+			} );
+		
 		private static const forbiddenNumberPostfix:String = "(?![_a-zA-Z0-9\.])";
 		
-		public static const IntegralNumber:TokenType = new TokenType(new RegExp("^[0-9]+" + forbiddenNumberPostfix), 32, "<Integral Number>", 
+		public static const IntegralNumber:TokenType = new TokenType(new RegExp("^[0-9]+" + forbiddenNumberPostfix), 38, "<Integral Number>", 
 			function(scope:Object, context:Object) : int 
 			{
 				return this.token == null ? 0 : parseInt(this.token.text);
 			} );
-		public static const FloatingPointNumber:TokenType = new TokenType(new RegExp("^(?:(?:[0-9]*[\.][0-9]+)|(?:[0-9]+[\.][0-9]*))" + forbiddenNumberPostfix), 33, "<Floating-Point Number>", 
+		public static const FloatingPointNumber:TokenType = new TokenType(new RegExp("^(?:(?:[0-9]*[\.][0-9]+)|(?:[0-9]+[\.][0-9]*))" + forbiddenNumberPostfix), 39, "<Floating-Point Number>", 
 			function(scope:Object, context:Object) : Number 
 			{
 				return this.token == null ? 0 : parseFloat(this.token.text);
 			} );
-		public static const StringLiteral:TokenType = new TokenType(/(?<=^")[^"\\]*(?:\\.[^"\\]*)*(?=")/, 34, "<String Literal>", 
+		public static const StringLiteral:TokenType = new TokenType(/(?<=^")[^"\\]*(?:\\.[^"\\]*)*(?=")/, 40, "<String Literal>", 
 			function(scope:Object, context:Object) : String 
 			{
 				return this.token == null ? null : this.token.text;
 			} );
 		
-		public static const Identifier:TokenType = new TokenType(/^[_a-zA-Z][a-zA-Z0-9_]*/, 35, "<Identifier>", 
+		public static const Identifier:TokenType = new TokenType(/^[_a-zA-Z][a-zA-Z0-9_]*/, 41, "<Identifier>", 
 			function(scope:Object, context:Object) : Object 
 			{
 				var returnValue:Object;
 				return context == null || (returnValue = context[this.token.text]) == null ? (scope == null ? null : scope[this.token.text]) : returnValue;
 			} );
 		
-		public static const FunctionCall:TokenType = new TokenType(null, 36, "<Function Call>", 
+		public static const FunctionCall:TokenType = new TokenType(null, 42, "<Function Call>", 
 			function(scope:Object, context:Object) : Object 
 			{
 				if (scope == null || this.getChildCount() == 0) return null;
@@ -308,7 +380,7 @@ package ad.expression
 				
 				return method.apply(null, methodArguments);
 			} );
-		public static const ArrayAccess:TokenType = new TokenType(null, 37, "<Array Access>", 
+		public static const ArrayAccess:TokenType = new TokenType(null, 43, "<Array Access>", 
 			function(scope:Object, context:Object) : Object 
 			{
 				if (scope == null || this.getChildCount() == 0) return null;
@@ -323,7 +395,7 @@ package ad.expression
 				
 				return array[arrayAccessArguments];
 			} );
-		public static const DataBlock:TokenType = new TokenType(null, 38, "<Data Block>", 
+		public static const DataBlock:TokenType = new TokenType(null, 44, "<Data Block>", 
 			function(scope:Object, context:Object) : Object 
 			{
 				const object:Object = new Object();
@@ -333,8 +405,20 @@ package ad.expression
 				return object;
 			} );
 		
+		public static const CodeBlock:TokenType = new TokenType(null, 45, "<Code Block>", 
+			function(scope:Object, context:Object) : Object 
+			{
+				var controlStatement:Object;
+				for (var index:uint = 0, end:uint = this.getChildCount(); index != end; ++index)
+					if ((controlStatement = this.getChild(index).evaluate(scope, context)) != null &&
+						( (controlStatement.hasOwnProperty("break") && controlStatement["break"] === true) || 
+							(controlStatement.hasOwnProperty("continue") && controlStatement["continue"] === true)) )
+						return controlStatement;
+				
+				return context;
+			} );
 		
-		public static const StartOfInput:TokenType = new TokenType(null, 39, "<Start of Input>");
-		public static const EndOfInput:TokenType = new TokenType(null, 40, "<End of Input>");
+		public static const StartOfInput:TokenType = new TokenType(null, 46, "<Start of Input>");
+		public static const EndOfInput:TokenType = new TokenType(null, 47, "<Start of Input>");
 	}
 }

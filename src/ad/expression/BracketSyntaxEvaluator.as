@@ -62,10 +62,10 @@ package ad.expression
 			return m_unclosedCount.at(token.ordinal);
 		}
 		
-		public function isTopLevel(token:TokenType):Boolean
+		public function isTopLevel(token:TokenType, count:uint = 1):Boolean
 		{
 			return token != null && m_brackets.length != 0 &&
-				m_brackets[m_brackets.length - 1] == token.ordinal && m_unclosedCount.at(token.ordinal) == 1;
+				m_brackets[m_brackets.length - 1] == token.ordinal && m_unclosedCount.at(token.ordinal) == count;
 		}
 		
 		public function getCurrent():TokenType

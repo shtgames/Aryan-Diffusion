@@ -40,7 +40,7 @@ package ad.expression
 			m_max = m_tokens.length;
 			m_bracketEvaluator.reset();
 			
-			return parameterList(TokenType.StartOfInput, TokenType.EndOfInput, TokenType.Terminator, TokenType.OperatorEndData, false);
+			return list(TokenType.StartOfInput, TokenType.EndOfInput, TokenType.Terminator);
 		}
 		
 		public function done():Boolean
@@ -49,23 +49,100 @@ package ad.expression
 		}
 		
 		
-		private function parseExpression(start:uint = 0, end:uint = 0):ParseNode
-		{
-			if (m_tokens == null || m_tokens.length == 0 || start >= m_tokens.length) return null;
-			
-			m_current = start;
-			m_max = (end <= start ? m_tokens.length : end);
-			m_bracketEvaluator.reset();
-			
-			return expression();
-		}
-		
 		private function expression():ParseNode
 		{
 			const saved:uint = m_current;
-			var node:ParseNode = assignmentExpression();
+			var node:ParseNode = controlStatementExpression();
 			
 			if (node == null) return reset(saved);			
+			return node;
+		}
+		
+		private function parseCodeBlock():ParseNode
+		{
+			const statements:Vector.<ParseNode> = list(TokenType.OperatorBeginData, TokenType.OperatorEndData, TokenType.Terminator);
+			if (statements == null)
+				return null;
+			
+			return new ParseNode(new Token("{}", TokenType.CodeBlock)).addChildren(statements);
+		}
+		
+		private function controlStatementExpression():ParseNode
+		{
+			var node:ParseNode, statement:ParseNode;
+			if ((node = parseCurrent(TokenType.IfStatement)) != null)
+			{
+				if (parseCurrent(TokenType.OperatorBeginArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorBeginArguments + " after token " + TokenType.IfStatement + "."), null;
+				
+				if ((statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorBeginArguments + "."), null;
+				node.addChild(statement);
+				
+				if (parseCurrent(TokenType.OperatorEndArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorEndArguments + " after expression."), null;
+				
+				if ((statement = parseCodeBlock()) == null && (statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorEndArguments + "."), null;
+				node.addChild(statement);
+				
+				parseCurrent(TokenType.Terminator);
+				if (parseCurrent(TokenType.ElseStatement) == null)
+					return node;
+				
+				if ((statement = parseCodeBlock()) == null && (statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorEndArguments + "."), null;
+				node.addChild(statement);
+			}
+			else if ((node = parseCurrent(TokenType.WhileLoopStatement)) != null)
+			{
+				if (parseCurrent(TokenType.OperatorBeginArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorBeginArguments + " after token " + TokenType.WhileLoopStatement + "."), null;
+				
+				if ((statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorBeginArguments + "."), null;
+				node.addChild(statement);
+				
+				if (parseCurrent(TokenType.OperatorEndArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorEndArguments + " after expression."), null;
+				
+				if ((statement = parseCodeBlock()) == null && (statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorEndArguments + "."), null;
+				node.addChild(statement);
+			}
+			else if ((node = parseCurrent(TokenType.ForLoopStatement)) != null)
+			{
+				if (parseCurrent(TokenType.OperatorBeginArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorBeginArguments + " after token " + TokenType.ForLoopStatement + "."), null;
+				
+				if ((statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorBeginArguments + "."), null;
+				node.addChild(statement);
+				
+				if (parseCurrent(TokenType.Terminator) == null)
+					return trace("Error: Expected " + TokenType.Terminator + " after expression."), null;
+				
+				if ((statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.Terminator + "."), null;
+				node.addChild(statement);
+				
+				if (parseCurrent(TokenType.Terminator) == null)
+					return trace("Error: Expected " + TokenType.Terminator + " after expression."), null;
+				
+				if ((statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.Terminator + "."), null;
+				node.addChild(statement);
+				
+				if (parseCurrent(TokenType.OperatorEndArguments) == null)
+					return trace("Error: Expected " + TokenType.OperatorEndArguments + " after expression."), null;
+				
+				if ((statement = parseCodeBlock()) == null && (statement = expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.OperatorEndArguments + "."), null;
+				node.addChild(statement);
+			}
+			else if ((node = parseCurrent(TokenType.BreakStatement)) == null && (node = parseCurrent(TokenType.ContinueStatement)) == null)
+				return assignmentExpression();
+			
 			return node;
 		}
 		
@@ -89,7 +166,8 @@ package ad.expression
 						break;
 					}
 				
-				if (!verdict) break;
+				if (!verdict)
+					break;
 				
 				var node2:ParseNode = new ParseNode(getCurrentToken());
 				
@@ -106,7 +184,7 @@ package ad.expression
 				
 				const node3:ParseNode = next();
 				if (node3 == null)
-					return reset(saved);
+					return trace("Error: Expected expression after token " + it + "."), reset(saved);
 				
 				node2.addChild(node);
 				node2.addChild(node3);
@@ -179,10 +257,10 @@ package ad.expression
 						var parameters:Vector.<ParseNode>;						
 						
 						if (it.equals(TokenType.OperatorBeginArguments) &&
-								(parameters = parameterList(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter)) != null)
+								(parameters = list(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter)) != null)
 							node = new ParseNode(new Token("()", TokenType.FunctionCall)) .addChild(node).addChildren(parameters);
 						else if (it.equals(TokenType.OperatorBeginArrayAccess) &&
-								(parameters = parameterList(TokenType.OperatorBeginArrayAccess, TokenType.OperatorEndArrayAccess, TokenType.Delimiter)) != null)
+								(parameters = list(TokenType.OperatorBeginArrayAccess, TokenType.OperatorEndArrayAccess, TokenType.Delimiter)) != null)
 							node = new ParseNode(new Token("[]", TokenType.ArrayAccess)) .addChild(node).addChildren(parameters);
 						
 						continue;
@@ -225,14 +303,14 @@ package ad.expression
 				
 				const node2:ParseNode = objectExpression();
 				if (node2 == null)
-					return reset(saved);
+					return trace("Error: Expected expression after token " + currentToken + "."), reset(saved);
 				
 				return node.addChild(node2);
 			}
 			
 			if (currentToken.equals(TokenType.OperatorBeginArguments))
 			{
-				const value:Vector.<ParseNode> = parameterList(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments);
+				const value:Vector.<ParseNode> = list(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter);
 				if (value == null || value.length == 0 || (node = value[0]) == null)
 					return reset(saved);
 				
@@ -243,94 +321,38 @@ package ad.expression
 			{
 				node = new ParseNode(new Token("{}", TokenType.DataBlock));
 				
-				const parameters:Vector.<ParseNode> = parameterList(TokenType.OperatorBeginData, TokenType.OperatorEndData, null, TokenType.OperatorEndData, false);
+				const parameters:Vector.<ParseNode> = list(TokenType.OperatorBeginData, TokenType.OperatorEndData, TokenType.Delimiter);
 				if (parameters == null)
 					return reset(saved);
 				
 				return node.addChildren(parameters);
 			}
 			
+			trace("Error: Unexpected token " + m_tokens[m_current] + (m_current > 0 ? " after token " + m_tokens[m_current - 1] : "") + ".");
 			return reset(saved);
 		}
 		
-		private function parameterList(openingToken:TokenType, closingToken:TokenType, delimiter:TokenType = null,
-			secondaryDelimiter:TokenType = null, functionSyntax:Boolean = true):Vector.<ParseNode>
+		private function list(openingToken:TokenType, closingToken:TokenType, delimiter:TokenType):Vector.<ParseNode>
 		{
-			if (openingToken == null || closingToken == null) return null;
+			if (openingToken == null || closingToken == null || delimiter == null) return null;
 			m_bracketEvaluator.addPair(openingToken, closingToken);
+			
+			if (parseCurrent(openingToken) == null) return null;
 			
 			var returnValue:Vector.<ParseNode> = new Vector.<ParseNode>();
 			
-			const parameterParser:Parser = new Parser(m_tokens);
-			var buffer:ParseNode;
-			var start:uint = m_current;
-			
-			do
+			while (!done())
 			{
-				const current:Token = getCurrentToken();
-				if (current == null || current.type == null || parseCurrent(current.type) == null) break;
+				if (parseCurrent(closingToken) != null)
+					break;
 				
-				if (current.type.equals(closingToken) && m_bracketEvaluator.getUnclosedCount(openingToken) == 0)
-				{
-					if (functionSyntax)
-					{
-						if (start < m_current - 1)
-						{
-							buffer = parameterParser.parseExpression(start, m_current - 1);
-							if (buffer == null)	return null;
-							
-							returnValue.push(buffer);
-							start = m_current;
-						}
-						else if (returnValue.length != 0)
-							return error("Error: Syntax error on token " + current.type.name + ": expected an expression.");
-					}
-					else if (start < m_current - 1 && returnValue.length != 0)
-						return error("Error: Syntax error on token " + current.type.name + ": expected " + delimiter.name + ".");
-				}
+				const node:ParseNode = expression();
+				if (node != null)
+					returnValue.push(node);
+				else break;
 				
-				if (!m_bracketEvaluator.isTopLevel(openingToken)) continue;
-				
-				if (current.type.equals(openingToken))
-				{
-					start = m_current;
-					continue;
-				}
-				
-				if (current.type.equals(TokenType.Delimiter) || current.type.equals(TokenType.Terminator))
-				{
-					if (delimiter == null)
-						functionSyntax = (delimiter = current.type).equals(TokenType.Delimiter);
-					else if (!current.type.equals(delimiter))
-						return error("Error: Syntax error on token " + current.type.name + ": expected " + delimiter.name + ".");
-				}
-				
-				if (current.type.equals(delimiter))
-				{
-					if (start < m_current - 1)
-					{
-						buffer = parameterParser.parseExpression(start, m_current - 1);
-						if (buffer == null)
-							return null;
-						
-						returnValue.push(buffer);
-						start = m_current;
-					}
-					else if (functionSyntax)
-						return error("Error: Syntax error on token " + delimiter.name + ": expected an expression." + start + " " + m_current);
-				}
-				else if (!functionSyntax && current.type.equals(secondaryDelimiter) && m_current > start)
-				{
-					buffer = parameterParser.parseExpression(start, m_current);
-					if (buffer == null) return null;
-					
-					returnValue.push(buffer);
-					start = m_current + 1;
-				}
-			} while (!done() && m_bracketEvaluator.hasUnclosed());
-			
-			if (m_bracketEvaluator.hasUnclosed())
-				return error("Error: The opening token " + m_bracketEvaluator.getCurrent().name + " was unmatched at end of expression.");
+				parseCurrent(delimiter);
+			}
 			
 			return returnValue;
 		}
@@ -339,12 +361,6 @@ package ad.expression
 		private function reset(saved:uint):*
 		{
 			m_current = saved;
-			return null;
-		}
-		
-		private function error(message:String):*
-		{
-			trace (message);
 			return null;
 		}
 		
@@ -368,7 +384,9 @@ package ad.expression
 				m_current++;
 				
 				if (!m_bracketEvaluator.next(node.token.type))
-					return error("Error: Syntax error on token " + node.token.type.name + ".");
+					return trace ("Error: Syntax error on token " + node.token.type.name + "."), null;
+				if (done() && m_bracketEvaluator.hasUnclosed())
+					return trace("Error: The opening token " + m_bracketEvaluator.getCurrent() + " was unmatched at end of expression."), null;
 				
 				return node;
 			}
