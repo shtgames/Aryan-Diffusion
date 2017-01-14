@@ -140,6 +140,11 @@ package ad.expression
 					return trace("Error: Expected expression after token " + TokenType.OperatorEndArguments + "."), null;
 				node.addChild(statement);
 			}
+			else if ((node = parseCurrent(TokenType.ReturnStatement)) != null)
+			{
+				if ((node = expression()) != null)
+					return new ParseNode(new Token("return", TokenType.ReturnStatement)).addChild(node);
+			}
 			else if ((node = parseCurrent(TokenType.BreakStatement)) == null && (node = parseCurrent(TokenType.ContinueStatement)) == null)
 				return assignmentExpression();
 			
@@ -290,10 +295,11 @@ package ad.expression
 				return reset(saved);
 			
 			if (currentToken.equals(TokenType.IntegralNumber) || currentToken.equals(TokenType.FloatingPointNumber) ||
-					currentToken.equals(TokenType.StringLiteral) || currentToken.equals(TokenType.Identifier))
+					currentToken.equals(TokenType.StringLiteral) || currentToken.equals(TokenType.Identifier) ||
+					currentToken.equals(TokenType.Null) || currentToken.equals(TokenType.True) || currentToken.equals(TokenType.False))
 				return parseCurrent(currentToken);
 			
-			var node:ParseNode = null;
+			var node:ParseNode;
 			
 			if (currentToken.equals(TokenType.LogicalNegationOperator) ||
 				currentToken.equals(TokenType.AdditionOperator) || currentToken.equals(TokenType.SubtractionOperator))
@@ -310,11 +316,17 @@ package ad.expression
 			
 			if (currentToken.equals(TokenType.OperatorBeginArguments))
 			{
-				const value:Vector.<ParseNode> = list(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter);
-				if (value == null || value.length == 0 || (node = value[0]) == null)
+				var value:Object = list(TokenType.OperatorBeginArguments, TokenType.OperatorEndArguments, TokenType.Delimiter);
+				if (value == null)
 					return reset(saved);
 				
-				return node;
+				if ((node = parseCurrent(TokenType.FunctionDeclarationOperator)) == null)
+					return value.length != 0 ? value[0] : reset(saved);
+				node.addChildren(value as Vector.<ParseNode>);
+				
+				if ((value = parseCodeBlock()) == null && (value == expression()) == null)
+					return trace("Error: Expected expression after token " + TokenType.FunctionDeclarationOperator + "."), null;
+				return node.addChild(value as ParseNode);
 			}
 			
 			if (currentToken.equals(TokenType.OperatorBeginData))
