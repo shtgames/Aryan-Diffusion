@@ -1,0 +1,10 @@
+DeployReinforcements = 
+{
+	name = "Deploy Reinforcements",
+	description = "Allows an additional Support card to be played this turn.",
+	
+	active = (source, target) ->
+		{
+			
+		}
+}

@@ -1,0 +1,5 @@
+SummonReinforcements = 
+{
+	name = "Summon Reinforcements",
+	description = "Brings a Support card to the top of the deck."
+}

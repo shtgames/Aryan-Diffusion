@@ -1,0 +1,10 @@
+Intimidate = 
+{
+	name = "Intimidate",
+	description = "Prevent any enemy Support cards from being played next turn.",
+	
+	active = (source, target) ->
+		{
+			
+		}
+}

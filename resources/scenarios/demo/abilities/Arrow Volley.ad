@@ -1,0 +1,10 @@
+ArrowVolley = 
+{
+	name = "Arrow Volley",
+	description = "Damage each enemy character by your AP divided by the number of targets hit.",
+	
+	active = (source, target) ->
+		{
+			
+		}
+}

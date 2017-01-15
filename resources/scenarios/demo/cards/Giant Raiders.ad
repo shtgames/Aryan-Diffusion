@@ -1,0 +1,10 @@
+GiantRaides = 
+{
+	name = "Giant Raiders",
+	description = "Placeholder",
+	race = Giant,
+	type = Support,
+	
+	health = 20,
+	attack = 5
+}

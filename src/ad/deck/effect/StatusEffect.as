@@ -43,6 +43,7 @@ package ad.deck.effect
 		}
 		
 		public function getEventEffect(event:EventType):DynamicEffect
+		{}
 		
 		
 		private function loadFromFile(source:ParseNode):void

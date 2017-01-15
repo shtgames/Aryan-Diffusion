@@ -1,0 +1,5 @@
+Scatter = 
+{
+	name = "Scatter",
+	description = "At the beginning of your turn, return one random enemy Support card on the Battlefield to the enemy's deck."
+}

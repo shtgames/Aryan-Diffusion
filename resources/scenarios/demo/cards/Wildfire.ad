@@ -1,0 +1,12 @@
+Wildfire = 
+{
+	name = "Wildfire",
+	description = "1 HP damage to all Characters and 25% chance of destroying enemy an Habitat card (unless Indestructible) each turn.",
+	race = Giant,
+	type = Habitat,
+	
+	effect = (event) ->
+		{
+			
+		}
+}

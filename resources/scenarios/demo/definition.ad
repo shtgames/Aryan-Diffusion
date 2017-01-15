@@ -1,0 +1,12 @@
+Demo = 
+{
+	name = "Demo",
+	description = "This is a demo. Victory Condition: Keep Thor and Sif alive for 10 Turns.",
+	victory_condition = (event) ->
+		{
+			
+		},
+	
+	player_deck = { Thor, Sif, Munon, Troan, TrojanInfantry, TroganCivilians, CargoBarrow, Riverbank }
+	ai_deck = { Farbauti, GiantCaptain, GiantRaiders, Wildfire }
+}

@@ -1,0 +1,5 @@
+Landscaping = 
+{
+	name = "Landscaping",
+	description = "Brings one random Habitat card to the top of the deck."
+}

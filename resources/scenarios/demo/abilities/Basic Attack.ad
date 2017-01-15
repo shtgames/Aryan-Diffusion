@@ -1,0 +1,10 @@
+BasicAttack = 
+{
+	name = "Basic Attack",
+	description = "Attacks the target card, dealing damage equal to your AP.",
+	
+	active = (source, target) ->
+		{
+			
+		}
+}

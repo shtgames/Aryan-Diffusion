@@ -1,0 +1,12 @@
+GiantCaptain = 
+{
+	name = "Giant Captain",
+	description = "Placeholder",
+	race = Giant,
+	type = Character,
+	
+	health = 40,
+	attack = 10,
+	
+	abilities = { ArrowVolley }
+}
