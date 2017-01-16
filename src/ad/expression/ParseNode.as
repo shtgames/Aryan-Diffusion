@@ -15,7 +15,7 @@ package ad.expression
 			return m_token == null ? "<Undefined>" : m_token.toString() + ": " + m_children.length;
 		}
 		
-		public function evaluate(scope:Object, context:Object):Object
+		public function evaluate(scope:Object = null, context:Object = null):Object
 		{
 			return m_token == null || m_token.type == null ?
 				null : m_token.type.evaluate(this, scope, context);

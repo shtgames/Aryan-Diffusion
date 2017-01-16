@@ -9,6 +9,11 @@ Riverbank =
 	
 	effect = (event) ->
 		{
-			
+			if (event == null || !event.isValid())
+				return;
+			if (event.type.equals(EventType.CardEvent))
+			{
+				
+			}
 		}
 }
