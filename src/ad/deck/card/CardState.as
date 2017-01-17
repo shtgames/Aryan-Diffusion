@@ -1,36 +1,27 @@
 package ad.deck.card 
 {
 	import ad.deck.effect.StatusEffect;
-	import ad.deck.effect.StatusEffectState;
-	import ad.event.Event;
-	import ad.event.EventListener;
-	import ad.map.Map;
+	import ad.deck.effect.StatusEffectInstance;
 	import ad.player.Player;
 	import ad.deck.card.Card;
+	import ad.event.Event;
+	import ad.event.EventListener;
 	
 	public class CardState extends EventListener
 	{
-		public function CardState(card:String) 
+		public function CardState(value:Card) 
 		{
-			if (!Card.exists(card)) return;
+			if (value == null) return;
 			
-			const buffer:Card = Card.getCard(card);
-			m_health = buffer.health;
-			m_attack = buffer.attack;
+			m_health = value.health;
+			m_attack = value.attack;
 		}
 		
 		
-		public function get cardKey():String
+		public function get card():Card
 		{
-			return m_key;
+			return m_card;
 		}
-		
-		public function setCardKey(key:String):CardState
-		{
-			if (Card.exists(key)) m_key = key;
-			return this;
-		}
-		
 		
 		public function get health():uint
 		{
@@ -40,6 +31,18 @@ package ad.deck.card
 		public function get attack():uint
 		{
 			return m_attack;
+		}
+		
+		public function get parent():Player
+		{
+			return m_parent;
+		}
+		
+		
+		public function setCard(value:Card):CardState
+		{
+			m_card = value;
+			return this;
 		}
 		
 		public function setHealth(health:uint):CardState
@@ -54,43 +57,39 @@ package ad.deck.card
 			return this;
 		}
 		
-		
-		public function get parent():Player
+		public function setParent(value:Player):CardState
 		{
-			return m_parent;
-		}
-		
-		public function setParent(newParent:Player):CardState
-		{
-			m_parent = newParent;
+			m_parent = value;
 			return this;
 		}
 		
 		
 		override public function input(event:Event):void
 		{
-			for (var effect:String in m_statusEffects)
-				StatusEffect.getEffect(effect).input(event, this);
+			if (m_card != null)
+				for each (var passive:String in m_card.passives)
+					StatusEffect.getEffect(passive).input(this, event);
+			
+			for each (var effect:StatusEffectInstance in m_statusEffects)
+				effect.input(event);
 		}
 		
 		public function applyStatusEffect(id:String):void
 		{
 			if (!StatusEffect.exists(id)) return;
-			
 			m_statusEffects.push(id, StatusEffect.getEffect(id).duration);
 		}
 		
 		public function useAbility(id:String, target:CardState):Boolean
 		{
-			if (!Card.exists(m_key) || !Card.getCard(m_key).hasAbility(id))	return false;
-			
-			return Ability.getAbility(id).applyTo(target, this);
+			if (m_card == null || !m_card.hasAbility(id)) return false;
+			return Ability.getAbility(id).applyTo(this, target);
 		}
 		
 		
-		private var m_key:String = null;
+		private var m_card:Card = null;
 		private var m_parent:Player = null;
 		private var m_health:int = 0, m_attack:uint = 0;
-		private var m_statusEffects:Vector.<StatusEffectState> = new Vector.<StatusEffectState>();
+		private var m_statusEffects:Vector.<StatusEffectInstance> = new Vector.<StatusEffectInstance>();
 	}
 }

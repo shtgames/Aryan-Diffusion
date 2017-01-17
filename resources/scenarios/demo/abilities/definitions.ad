@@ -1,11 +1,8 @@
-definitions = 
-{
-	"Arrow Volley.ad",
-	"Basic Attack.ad",
-	"Deploy Reinforcements.ad",
-	"Intimidate.ad",
-	"Landscaping.ad",
-	"Ricochet.ad",
-	"Scatter.ad",
-	"Summon Reinforcements.ad"
-}
+"Arrow Volley.ad";
+"Basic Attack.ad";
+"Deploy Reinforcements.ad";
+"Intimidate.ad";
+"Landscaping.ad";
+"Ricochet.ad";
+"Scatter.ad";
+"Summon Reinforcements.ad";

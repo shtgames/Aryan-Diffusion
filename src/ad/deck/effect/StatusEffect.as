@@ -2,17 +2,16 @@ package ad.deck.effect
 {
 	import ad.deck.card.CardState;
 	import ad.event.Event;
-	import ad.event.EventType;
-	import ad.file.StatementProcessor;
+	
+	import ad.file.FileProcessor;
 	import ad.expression.ParseNode;
-	import ad.expression.TokenType;
 	import ad.map.Map;
 	
 	public class StatusEffect
 	{
 		public function StatusEffect(source:ParseNode = null) 
 		{
-			loadFromFile(source);
+			load(source);
 		}
 		
 		
@@ -42,60 +41,48 @@ package ad.deck.effect
 			return m_duration;
 		}
 		
-		public function getEventEffect(event:EventType):DynamicEffect
+		
+		public function input(parent:Object, event:Event):Object
 		{
-			
+			if (m_effect == null)
+				return null;
+			return m_effect.call(null, new Array(parent, event));
 		}
 		
 		
-		private function loadFromFile(source:ParseNode):void
+		private function load(source:ParseNode):void
 		{
-			if (source == null || !source.token.type.equals(TokenType.AssignmentOperator) ||
-				!source.getChildren()[0].token.type.equals(TokenType.Identifier)) 
+			var object:Object;
+			if (source == null || (object = source.evaluate(/**/)) == null)
 				return;
 			
-			m_id = source.getChildren()[0].token.token.text;
+			m_id = source.getChild(0).token.text;
 			
-			for each (var statement:ParseNode in source.getChildren()[1].getChildren())
-				if (statement.token.type == TokenType.AssignmentOperator)
-					switch (statement.getChildren()[0].token.token.text.toLowerCase())
-					{
-					case "name":
-						m_name = statement.getChildren()[1].token.token.text;
-						break;
-					case "description":
-						m_description = statement.getChildren()[1].token.token.text;
-						break;
-					case "duration":
-						m_duration = parseInt(statement.getChildren()[1].token.token.text);
-						break;
-					}
+			m_name = object["name"];
+			m_description = object["description"];
+			m_duration = object["duration"];
+			m_effect = object["effect"];
 		}
 		
 		
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
 		private var m_duration:uint = 0;
-		private var m_effects:Map = new Map();
+		private var m_effect:Function = null;
 		
 		
 		public static function loadResources(path:String):void
-		{			
-			var file:StatementProcessor = new StatementProcessor(path, function():void
+		{
+			const directoryFile:FileProcessor = new FileProcessor(path, function():void
 				{
-					if (file.getStatements()[0].getChildren()[0].token.token.text != "directories") return;
-					
-					for each (var dir:ParseNode in file.getStatements()[0].getChildren()[1].getChildren())
-						var definitions:StatementProcessor = new StatementProcessor(dir.token.token.text,
+					for each (var definition:ParseNode in file.getStatements())
+						var file:FileProcessor = new FileProcessor(definition.evaluate(),
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-								{
-									const statusEffect:StatusEffect = new StatusEffect(statement);
-									statusEffects.push(statusEffect.m_id, statusEffect);
-								}
-							});
-				});
+									statusEffects.push(statement.getChild(0).token.text, new StatusEffect(statement));
+							} );
+				} );
 		}
 		
 		public static function getEffect(id:String):StatusEffect

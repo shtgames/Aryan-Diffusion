@@ -251,8 +251,8 @@ package ad.expression
 		public static const AssignmentOperator:TokenType = new TokenType(/^=(?!=)/, 24, "<Assignment Operator>", 
 			function(scope:Object, context:Object) : Object 
 			{
-				return context == null || this.getChildCount() != 2 || this.getChild(0).token == null || this.getChild(0).token.type == null || !this.getChild(0).token.type.equals(Identifier) ?
-					null : context[this.getChild(0).token.text] = this.getChild(1).evaluate(scope, context);
+				return this.getChildCount() != 2 || this.getChild(0).token == null || this.getChild(0).token.type == null || !this.getChild(0).token.type.equals(Identifier) ?
+						(context == null  ?	this.getChild(1).evaluate(scope, context) : context[this.getChild(0).token.text] = this.getChild(1).evaluate(scope, context)) : null;
 			} );
 		public static const AdditiveAssignmentOperator:TokenType = new TokenType(/^\+=/, 25, "<Additive-Assignment Operator>", 
 			function(scope:Object, context:Object) : Object 
@@ -508,8 +508,10 @@ package ad.expression
 			function(scope:Object, context:Object) : Object 
 			{
 				const object:Object = new Object();
-				for (var index:uint = 0, end:uint = this.getChildCount(); index != end; ++index)
+				var index:uint = 0;
+				for (var end:uint = this.getChildCount(); index != end; ++index)
 					object[index] = this.getChild(index).evaluate(scope, object);
+				object["$length"] = index;
 				
 				return object;
 			} );

@@ -9,9 +9,9 @@ package ad.file
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	
-	public class StatementProcessor 
+	public class FileProcessor 
 	{		
-		public function StatementProcessor(path:String = null, onLoad:Function = null)
+		public function FileProcessor(path:String = null, onLoad:Function = null)
 		{
 			if (path != null) loadFromFile(path, onLoad);
 		}

@@ -57,7 +57,7 @@ package ad.player
 		{
 			if (!Card.exists(card)) return this;
 			
-			const instance:CardState = new CardState(card);
+			const instance:CardState = new CardState(Card.getCard(card));
 			m_playedCards.at(Card.getCard(card).type).push(instance);
 			
 			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()

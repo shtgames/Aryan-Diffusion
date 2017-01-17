@@ -324,7 +324,7 @@ package ad.expression
 					return value.length != 0 ? value[0] : reset(saved);
 				node.addChildren(value as Vector.<ParseNode>);
 				
-				if ((value = parseCodeBlock()) == null && (value == expression()) == null)
+				if ((value = parseCodeBlock()) == null && (value = expression()) == null)
 					return trace("Error: Expected expression after token " + TokenType.FunctionDeclarationOperator + "."), null;
 				return node.addChild(value as ParseNode);
 			}

@@ -1,17 +1,17 @@
 package ad.deck.card 
 {
 	import ad.deck.card.Ability;
+	import ad.deck.effect.StatusEffect;
 	
 	import ad.expression.ParseNode;
-	import ad.expression.TokenType;
-	import ad.file.StatementProcessor;
+	import ad.file.FileProcessor;
 	import ad.map.Map;
 	
 	public class Card
 	{
 		public function Card(source:ParseNode = null)
 		{
-			loadFromFile(source);
+			load(source);
 		}
 		
 		
@@ -40,37 +40,6 @@ package ad.deck.card
 			return m_race;
 		}
 		
-		public function getAbilities(type:uint):Vector.<String>
-		{
-			switch (type)
-			{
-			case Ability.ACTIVE:
-				return m_active;
-			case Ability.ON_DEATH:
-				return m_passive;
-			case Ability.ON_SUMMON:
-				return m_onSummon;
-			}
-			return null;
-		}
-		
-		public function hasAbility(id:String):Boolean
-		{
-			if (!Ability.exists(id)) return false;
-			
-			switch (type)
-			{
-			case Ability.ACTIVE:
-				return m_active.indexOf(id) != -1;
-			case Ability.ON_DEATH:
-				return m_passive.indexOf(id) != -1;
-			case Ability.ON_SUMMON:
-				return m_onSummon.indexOf(id) != -1;
-			}
-			
-			return false;
-		}
-		
 		public function get health():uint
 		{
 			return m_baseHealth;
@@ -81,59 +50,47 @@ package ad.deck.card
 			return m_baseAttack;
 		}
 		
-		
-		private function loadFromFile(source:ParseNode):void
+		public function get abilities():Vector.<String>
 		{
-			if (source == null || !source.token.type.equals(TokenType.AssignmentOperator) ||
-				!source.getChildren()[0].token.type.equals(TokenType.Identifier)) 
-				return;			
-			
-			m_id = source.getChildren()[0].token.token.text;
-			
-			for each (var statement:ParseNode in source.getChildren()[1].getChildren())
-				if (statement.token.type == TokenType.AssignmentOperator)
-					switch (statement.getChildren()[0].token.token.text.toLowerCase())
-					{
-					case "name":
-						m_name = statement.getChildren()[1].token.token.text;
-						break;
-					case "description":
-						m_description = statement.getChildren()[1].token.token.text;
-						break;
-					case "race":
-						m_race = statement.getChildren()[1].token.token.text;
-						break;
-					case "type":
-						m_type = parseType(statement.getChildren()[1].token.token.text);
-						break;
-					case "health":
-						m_baseAttack = parseInt(statement.getChildren()[1].token.token.text, 10);
-						break;
-					case "attack":
-						m_baseHealth = parseInt(statement.getChildren()[1].token.token.text, 10);
-						break;
-					case "abilities":
-						for each (var ability:ParseNode in statement.getChildren()[1].getChildren())
-							addAbility(ability.token.token.text);
-						break;
-					}
-		}		
+			return m_abilities;
+		}
 		
-		private function addAbility(id:String):Card
+		public function get passives():Vector.<String>
 		{
-			if (!Ability.exists(id)) return this;
+			return m_passives;
+		}
+		
+		public function hasAbility(id:String):Boolean
+		{
+			if (!Ability.exists(id) || m_abilities.indexOf(id) == -1) return false;
+			return true;
+		}
+		
+		public function hasPassive(id:String):Boolean
+		{
+			if (!StatusEffect.exists(id) || m_passives.indexOf(id) == -1) return false;
+			return true;
+		}
+		
+		
+		private function load(source:ParseNode):void
+		{
+			var object:Object;
+			if (source == null || (object = source.evaluate(/**/)) == null)
+				return;
 			
-			switch (Ability.getAbility(id).type)
-			{
-			case Ability.ACTIVE:
-				m_active.push(id);
-			case Ability.ON_DEATH:
-				m_passive.push(id);
-			case Ability.ON_SUMMON:
-				m_onSummon.push(id);
-			}
+			m_id = source.getChild(0).token.text;
 			
-			return this;
+			m_name = object["name"];
+			m_description = object["description"];
+			m_race = object["race"];
+			m_type = parseType(object["type"]);
+			m_baseHealth = object["health"];
+			m_baseAttack = object["attack"];
+			for each (var ability:String in object["abilities"])
+				m_abilities.push(ability);
+			for each (var passive:String in object["passives"])
+				m_passives.push(passive);
 		}
 		
 		
@@ -144,25 +101,21 @@ package ad.deck.card
 		private var m_race:String = null;
 		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
 		
-		private var m_onSummon:Vector.<String> = new Vector.<String>(), m_passive:Vector.<String> = new Vector.<String>(), m_active:Vector.<String> = new Vector.<String>();
+		private var m_abilities:Vector.<String> = new Vector.<String>(), m_passives:Vector.<String> = new Vector.<String>();
 		
 		
 		public static function loadResources(path:String):void
 		{
-			var file:StatementProcessor = new StatementProcessor(path, function():void
+			const directoryFile:FileProcessor = new FileProcessor(path, function():void
 				{
-					if (file.getStatements()[0].getChildren()[0].token.token.text != "directories") return;
-					for each (var dir:ParseNode in file.getStatements()[0].getChildren()[1].getChildren())
-						var definitions:StatementProcessor = new StatementProcessor(dir.token.token.text,
+					for each (var definition:ParseNode in file.getStatements())
+						var file:FileProcessor = new FileProcessor(definition.evaluate(),
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-								{
-									const card:Card = new Card(statement);
-									cards.push(card.m_id, card);
-								}
-							});
-				});
+									cards.push(statement.getChild(0).token.text, new Card(statement));
+							} );
+				} );
 		}
 		
 		public static function getCard(id:String):Card
@@ -184,6 +137,8 @@ package ad.deck.card
 		
 		private static function parseType(type:String):uint
 		{
+			if (type == null) return CHARACTER;
+			
 			switch (type.toLowerCase())
 			{
 			case "character":
