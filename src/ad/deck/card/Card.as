@@ -72,34 +72,41 @@ package ad.deck.card
 			return true;
 		}
 		
+		public function hasFlag(flag:uint):Boolean
+		{
+			return Boolean(m_flags & flag);
+		}
+		
 		
 		private function load(source:ParseNode):void
 		{
-			var object:Object;
-			if (source == null || (object = source.evaluate(/**/)) == null)
+			var definition:Object;
+			if (source == null || (definition = source.evaluate(scope)) == null)
 				return;
 			
 			m_id = source.getChild(0).token.text;
 			
-			m_name = object["name"];
-			m_description = object["description"];
-			m_race = object["race"];
-			m_type = parseType(object["type"]);
-			m_baseHealth = object["health"];
-			m_baseAttack = object["attack"];
-			for each (var ability:String in object["abilities"])
+			m_name = definition["name"];
+			m_description = definition["description"];
+			m_race = definition["race"];
+			m_type = definition["type"];
+			m_baseHealth = definition["health"];
+			m_baseAttack = definition["attack"];
+			for each (var flag:uint in definition["flags"])
+				m_flags &= flag;
+			for each (var ability:String in definition["abilities"])
 				m_abilities.push(ability);
-			for each (var passive:String in object["passives"])
+			for each (var passive:String in definition["passives"])
 				m_passives.push(passive);
 		}
 		
 		
 		private var m_id:String = null
 		private var m_name:String = null, m_description:String = null;
-		
-		private var m_type:uint = CHARACTER;
 		private var m_race:String = null;
+		private var m_type:uint = CHARACTER;
 		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
+		private var m_flags:uint = 0;
 		
 		private var m_abilities:Vector.<String> = new Vector.<String>(), m_passives:Vector.<String> = new Vector.<String>();
 		
@@ -128,31 +135,19 @@ package ad.deck.card
 			return cards.contains(id);
 		}
 		
-		public static function isValidType(type:uint):Boolean
-		{
-			if (type == CHARACTER || type == SUPPORT || type == HABITAT) return true;
-			return false;
-		}
-		
-		
-		private static function parseType(type:String):uint
-		{
-			if (type == null) return CHARACTER;
-			
-			switch (type.toLowerCase())
-			{
-			case "character":
-				return CHARACTER;
-			case "support":
-				return SUPPORT;
-			case "habitat":
-				return HABITAT;
-			}
-			return CHARACTER;
-		}		
-		
 		
 		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
+		public static const UNIQUE:uint = 1, INDESTRUCTIBLE:uint = 1 << 1;
+		
+		private static const scope:Object = new Object();
+		{
+			scope["Character"] = CHARACTER;
+			scope["Support"] = SUPPORT;
+			scope["Habitat"] = HABITAT;
+			scope["Unique"] = UNIQUE;
+			scope["Indestructible"] = INDESTRUCTIBLE;
+		}
+		
 		private static var cards:Map = new Map();
 	}
 }

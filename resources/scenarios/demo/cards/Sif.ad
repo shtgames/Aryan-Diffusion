@@ -2,11 +2,13 @@ Sif =
 {
 	name = "Sif",
 	description = "Thor's childhood friend.",
-	race = Trojan,
+	race = "Trojan",
 	type = Character,
 	
 	health = 10,
 	attack = 5,
 	
-	abilities = { Landscaping }
+	flags = { Unique },
+	
+	abilities = { "Landscaping" }
 }

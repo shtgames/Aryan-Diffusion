@@ -2,7 +2,7 @@ GiantRaides =
 {
 	name = "Giant Raiders",
 	description = "Placeholder",
-	race = Giant,
+	race = "Giant",
 	type = Support,
 	
 	health = 20,

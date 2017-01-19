@@ -2,13 +2,11 @@ CargoBarrow =
 {
 	name = "Cargo Barrow",
 	description = "Reduce damage from all enemy attacks by 1 HP.",
-	race = Trojan,
+	race = "Trojan",
 	type = Habitat,
 	
 	effect = (event) ->
 		{
-			if (event == null || !event.isValid())
-				return;
 			if (event.type.equals(EventType.CardEvent))
 			{
 				

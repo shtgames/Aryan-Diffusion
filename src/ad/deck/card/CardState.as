@@ -66,6 +66,9 @@ package ad.deck.card
 		
 		override public function input(event:Event):void
 		{
+			if (event == null || !event.isValid())
+				return;
+			
 			if (m_card != null)
 				for each (var passive:String in m_card.passives)
 					StatusEffect.getEffect(passive).input(this, event);

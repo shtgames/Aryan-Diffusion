@@ -2,7 +2,7 @@ TrojanInfantry =
 {
 	name = "Trojan Infantry",
 	description = "Placeholder",
-	race = Trojan,
+	race = "Trojan",
 	type = Support,
 	
 	health = 20,

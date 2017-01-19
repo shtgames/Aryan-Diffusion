@@ -2,11 +2,13 @@ Munon =
 {
 	name = "Munon",
 	description = "Father of Thor.",
-	race = Trojan,
+	race = "Trojan",
 	type = Character,
 	
 	health = 20,
 	attack = 10,
 	
-	abilities = { SummonReinforcements }
+	flags = { Unique },
+	
+	abilities = { "SummonReinforcements" }
 }

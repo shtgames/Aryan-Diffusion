@@ -2,7 +2,7 @@ TrojanCivilians =
 {
 	name = "Trojan Civilians",
 	description = "In a war like this there are no civilians.",
-	race = Trojan,
+	race = "Trojan",
 	type = Support,
 	
 	health = 20

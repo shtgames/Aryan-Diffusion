@@ -1,7 +1,7 @@
 Demo = 
 {
 	name = "Demo",
-	description = "This is a demo. Victory Condition: Keep Thor and Sif alive for 10 Turns.",
+	description = "<Demo> Victory Condition: Keep Thor and Sif alive for 10 Turns.",
 	
 	cards = "/cards/definitions.ad",
 	status_effects = "/status_effects/definitions.ad";
@@ -9,15 +9,16 @@ Demo =
 	
 	victory_condition = (event) ->
 		{
-			if (event == null || !event.isValid())
-				return 0;
-			if (event.type == EventType.TurnEvent && event.data.at("count") == 10)
+			if (event.type == EventType.TurnEvent && event.data.at("count") > 10)
 				return 1;
 			if (event.type == EventType.FieldEvent && event.data.at("died") && (event.data.at("card").cardKey == "Thor" || event.data.at("card").cardKey == "Sif"))
 				return -1;
 			return 0;
 		},
 	
-	player_deck = { "Thor", "Sif", "Munon", "Troan", "TrojanInfantry", "TrojanCivilians", "CargoBarrow", "Riverbank" },
-	ai_deck = { "Farbauti", "GiantCaptain", "GiantRaiders", "Wildfire" }
+	player_field = { "Thor", "Sif" },
+	player_deck = { "Munon", "Troan", "TrojanInfantry", "TrojanCivilians", "CargoBarrow", "Riverbank" },
+	
+	ai_field = { "Farbauti" },
+	ai_deck = { "GiantCaptain", "GiantRaiders", "Wildfire" }
 }

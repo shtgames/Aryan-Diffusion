@@ -2,11 +2,13 @@ Thor =
 {
 	name = "Thor",
 	description = "Placeholder",
-	race = Trojan,
+	race = "Trojan",
 	type = Character,
 	
 	health = 10,
 	attack = 20,
 	
-	abilities = { Ricochet }
+	flags = { Unique },
+	
+	abilities = { "Ricochet" }
 }

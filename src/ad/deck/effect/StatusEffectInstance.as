@@ -9,7 +9,7 @@ package ad.deck.effect
 	{
 		override public function input(event:Event):void
 		{
-			if (m_parent == null || !StatusEffect.exists(m_effect)) 
+			if (m_parent == null || event == null || !event.isValid() || !StatusEffect.exists(m_effect)) 
 				return;
 			StatusEffect.getEffect(m_effect).input(this, event);
 			if (EventType.TurnEvent.equals(event.type))

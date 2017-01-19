@@ -1,6 +1,5 @@
 package ad.deck.effect 
 {
-	import ad.deck.card.CardState;
 	import ad.event.Event;
 	
 	import ad.file.FileProcessor;
@@ -44,7 +43,7 @@ package ad.deck.effect
 		
 		public function input(parent:Object, event:Event):Object
 		{
-			if (m_effect == null)
+			if (m_effect == null || parent == null || event == null || !event.isValid())
 				return null;
 			return m_effect.call(null, new Array(parent, event));
 		}
@@ -53,7 +52,7 @@ package ad.deck.effect
 		private function load(source:ParseNode):void
 		{
 			var object:Object;
-			if (source == null || (object = source.evaluate(/**/)) == null)
+			if (source == null || (object = source.evaluate(scope)) == null)
 				return;
 			
 			m_id = source.getChild(0).token.text;
@@ -96,6 +95,10 @@ package ad.deck.effect
 		}
 		
 		
+		private static const scope:Object = new Object();
+		{
+			
+		}
 		private static var statusEffects:Map = new Map();
 	}
 }
