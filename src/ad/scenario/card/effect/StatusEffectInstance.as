@@ -1,9 +1,9 @@
-package ad.deck.effect 
+package ad.scenario.card.effect 
 {
-	import ad.deck.card.CardState;
-	import ad.event.Event;
-	import ad.event.EventType;
-	import ad.event.EventListener;
+	import ad.scenario.card.card.CardState;
+	import ad.scenario.event.Event;
+	import ad.scenario.event.EventType;
+	import ad.scenario.event.EventListener;
 	
 	public class StatusEffectInstance extends EventListener
 	{

@@ -3,9 +3,9 @@ Demo =
 	name = "Demo",
 	description = "<Demo> Victory Condition: Keep Thor and Sif alive for 10 Turns.",
 	
-	cards = "/cards/definitions.ad",
-	status_effects = "/status_effects/definitions.ad";
-	abilities = "/abilities/definitions.ad",
+	cards = "cards/definitions.ad",
+	status_effects = "status_effects/definitions.ad";
+	abilities = "abilities/definitions.ad",
 	
 	victory_condition = (event) ->
 		{

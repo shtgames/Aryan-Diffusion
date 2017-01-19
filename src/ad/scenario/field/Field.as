@@ -1,12 +1,9 @@
-package ad.field 
+package ad.scenario.field 
 {	
-	import ad.player.Player;
+	import ad.scenario.player.Player;
 	
 	public class Field
-	{		
-		public function Field() {}
-		
-		
+	{
 		public function get first():Player
 		{
 			return m_first;
@@ -16,7 +13,6 @@ package ad.field
 		{
 			return m_second;
 		}
-		
 		
 		public function getOther(player:Player):Player
 		{

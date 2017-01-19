@@ -1,4 +1,4 @@
-package ad.event 
+package ad.scenario.event 
 {
 	public class EventListener 
 	{		

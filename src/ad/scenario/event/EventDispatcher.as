@@ -1,4 +1,4 @@
-package ad.event 
+package ad.scenario.event 
 {
 	import flash.concurrent.Mutex;
 	
@@ -22,6 +22,7 @@ package ad.event
 			listeners.push(listener);
 			mutex.unlock();
 		}
+		
 		
 		private static const listeners:Vector.<EventListener> = new Vector.<EventListener>();
 		private static const mutex:Mutex = new Mutex();

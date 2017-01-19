@@ -1,7 +1,7 @@
-package ad.deck.card 
+package ad.scenario.card.card 
 {
-	import ad.deck.card.Ability;
-	import ad.deck.effect.StatusEffect;
+	import ad.scenario.card.effect.Ability;
+	import ad.scenario.card.effect.StatusEffect;
 	
 	import ad.expression.ParseNode;
 	import ad.file.FileProcessor;
@@ -9,7 +9,7 @@ package ad.deck.card
 	
 	public class Card
 	{
-		public function Card(source:ParseNode = null)
+		public function Card(source:ParseNode)
 		{
 			load(source);
 		}
@@ -93,7 +93,7 @@ package ad.deck.card
 			m_baseHealth = definition["health"];
 			m_baseAttack = definition["attack"];
 			for each (var flag:uint in definition["flags"])
-				m_flags &= flag;
+				m_flags |= flag;
 			for each (var ability:String in definition["abilities"])
 				m_abilities.push(ability);
 			for each (var passive:String in definition["passives"])
@@ -101,9 +101,9 @@ package ad.deck.card
 		}
 		
 		
-		private var m_id:String = null
-		private var m_name:String = null, m_description:String = null;
-		private var m_race:String = null;
+		private var m_id:String;
+		private var m_name:String, m_description:String;
+		private var m_race:String;
 		private var m_type:uint = CHARACTER;
 		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
 		private var m_flags:uint = 0;
@@ -135,6 +135,11 @@ package ad.deck.card
 			return cards.contains(id);
 		}
 		
+		public static function isValidType(type:uint):Boolean
+		{
+			return type == CHARACTER || type == SUPPORT || type == HABITAT;
+		}
+		
 		
 		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
 		public static const UNIQUE:uint = 1, INDESTRUCTIBLE:uint = 1 << 1;
@@ -147,7 +152,6 @@ package ad.deck.card
 			scope["Unique"] = UNIQUE;
 			scope["Indestructible"] = INDESTRUCTIBLE;
 		}
-		
-		private static var cards:Map = new Map();
+		private static const cards:Map = new Map();
 	}
 }

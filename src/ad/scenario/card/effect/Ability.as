@@ -1,24 +1,20 @@
-package ad.deck.effect 
+package ad.scenario.card.effect 
 {
-	import ad.event.Event;
-	
-	import ad.file.FileProcessor;
 	import ad.expression.ParseNode;
+	import ad.file.FileProcessor;
 	import ad.map.Map;
 	
-	public class StatusEffect
+	public final class Ability
 	{
-		public function StatusEffect(source:ParseNode = null) 
+		public function Ability(source:ParseNode) 
 		{
 			load(source);
 		}
 		
-		
 		public function toString():String
 		{
-			return m_id;
+			return m_name;
 		}
-		
 		
 		public function get id():String
 		{
@@ -35,38 +31,36 @@ package ad.deck.effect
 			return m_description;
 		}
 		
-		public function get duration():uint
+		public function get effect():Function
 		{
-			return m_duration;
+			return m_effect;
 		}
 		
 		
-		public function input(parent:Object, event:Event):Object
+		public function applyTo(source:CardState, target:CardState):Object
 		{
-			if (m_effect == null || parent == null || event == null || !event.isValid())
+			if (m_effect == null)
 				return null;
-			return m_effect.call(null, new Array(parent, event));
+			return m_effect.call(null, new Array(source, target));
 		}
 		
 		
 		private function load(source:ParseNode):void
 		{
 			var object:Object;
-			if (source == null || (object = source.evaluate(scope)) == null)
+			if (source == null || (object = source.evaluate(/**/)) == null)
 				return;
 			
 			m_id = source.getChild(0).token.text;
 			
 			m_name = object["name"];
 			m_description = object["description"];
-			m_duration = object["duration"];
 			m_effect = object["effect"];
 		}
 		
 		
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
-		private var m_duration:uint = 0;
 		private var m_effect:Function = null;
 		
 		
@@ -79,26 +73,22 @@ package ad.deck.effect
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-									statusEffects.push(statement.getChild(0).token.text, new StatusEffect(statement));
+									abilities.push(statement.getChild(0).token.text, new Ability(statement));
 							} );
 				} );
 		}
 		
-		public static function getEffect(id:String):StatusEffect
+		public static function getAbility(id:String):Ability
 		{
-			return statusEffects.at(id);
+			return abilities.at(id);
 		}
 		
 		public static function exists(id:String):Boolean
 		{
-			return statusEffects.contains(id);
+			return abilities.contains(id);
 		}
 		
 		
-		private static const scope:Object = new Object();
-		{
-			
-		}
-		private static var statusEffects:Map = new Map();
+		private static const abilities:Map = new Map();
 	}
 }

@@ -1,11 +1,12 @@
-package ad.deck.card 
+package ad.scenario.card.card 
 {
-	import ad.deck.effect.StatusEffect;
-	import ad.deck.effect.StatusEffectInstance;
-	import ad.player.Player;
-	import ad.deck.card.Card;
-	import ad.event.Event;
-	import ad.event.EventListener;
+	import ad.scenario.card.effect.Ability;
+	import ad.scenario.card.effect.StatusEffect;
+	import ad.scenario.card.effect.StatusEffectInstance;
+	import ad.scenario.player.Player;
+	import ad.scenario.card.card.Card;
+	import ad.scenario.event.Event;
+	import ad.scenario.event.EventListener;
 	
 	public class CardState extends EventListener
 	{

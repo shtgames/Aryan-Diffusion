@@ -1,6 +1,6 @@
-package ad.event 
+package ad.scenario.event 
 {
-	import ad.event.EventType;
+	import ad.scenario.event.EventType;
 	import ad.map.Map;
 	
 	public class Event
