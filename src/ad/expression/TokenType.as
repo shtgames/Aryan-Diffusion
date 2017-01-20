@@ -251,8 +251,8 @@ package ad.expression
 		public static const AssignmentOperator:TokenType = new TokenType(/^=(?!=)/, 24, "<Assignment Operator>", 
 			function(scope:Object, context:Object) : Object 
 			{
-				return this.getChildCount() != 2 || this.getChild(0).token == null || this.getChild(0).token.type == null || !this.getChild(0).token.type.equals(Identifier) ?
-						(context == null  ?	this.getChild(1).evaluate(scope, context) : context[this.getChild(0).token.text] = this.getChild(1).evaluate(scope, context)) : null;
+				return this.getChildCount() != 2 ? null : (context == null || this.getChild(0).token == null || !Identifier.equals(this.getChild(0).token.type) ?
+							this.getChild(1).evaluate(scope, context) : context[this.getChild(0).token.text] = this.getChild(1).evaluate(scope, context));
 			} );
 		public static const AdditiveAssignmentOperator:TokenType = new TokenType(/^\+=/, 25, "<Additive-Assignment Operator>", 
 			function(scope:Object, context:Object) : Object 
@@ -302,7 +302,7 @@ package ad.expression
 				if (this.getChildCount() == 0) return null;
 				
 				const returnValue:Function = 
-					function (args:Array) : Object
+					function (...args) : Object
 					{
 						if (args != null && args.length > returnValue["$arguments"]["$count"])
 							return trace("Error: Argument count mismatch. Expected " + returnValue["$arguments"]["$count"] + ", got " + args.length + "."), null;
@@ -354,7 +354,6 @@ package ad.expression
 				}
 				
 				returnValue["$body"] = this.getChild(this.getChildCount() - 1);
-				returnValue["$flag"] = true;
 				
 				return returnValue;
 			} );
@@ -483,9 +482,6 @@ package ad.expression
 				
 				for (var it:uint = 1, end:uint = this.getChildCount(); it != end; ++it)
 					methodArguments.push(this.getChild(it).evaluate(scope, context));
-				
-				if (method.hasOwnProperty("$flag") && method["$flag"] === true)
-					return method.call(null, methodArguments);
 				
 				return method.apply(null, methodArguments);
 			} );

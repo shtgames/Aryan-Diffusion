@@ -1,5 +1,6 @@
 package ad.scenario.card 
 {
+	import ad.scenario.card.card.CardState;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
@@ -67,13 +68,14 @@ package ad.scenario.card
 			const returnValue:String = m_cards.at(type)[index];
 			m_cards.at(type).removeAt(index);
 			
-			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
-				.push("card", Card.getCard(returnValue[returnValue.length - 1]))
-				.push("player", m_parent)
-				.push("drawn", true)));
+			const card:CardState = new CardState(Card.getCard(returnValue), m_parent);
 			
 			if (m_parent != null)
-				m_parent.addCardToBattlefield(returnValue);
+				m_parent.addCardToBattlefield(card);
+			
+			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+				.push("card", card)
+				.push("added", true)));
 			
 			return returnValue;
 		}

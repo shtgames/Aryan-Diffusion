@@ -111,17 +111,32 @@ package ad.scenario.card.card
 		private var m_abilities:Vector.<String> = new Vector.<String>(), m_passives:Vector.<String> = new Vector.<String>();
 		
 		
-		public static function loadResources(path:String):void
+		public static function loadResources(path:String, onLoad:Function):void
 		{
+			cards.clear();
+			
 			const directoryFile:FileProcessor = new FileProcessor(path, function():void
 				{
-					for each (var definition:ParseNode in file.getStatements())
-						var file:FileProcessor = new FileProcessor(definition.evaluate(),
+					const directory:String = path.substring(0, path.lastIndexOf('/') + 1);
+					var channels:uint = 0, running:Boolean = true;
+					
+					for each (var definition:ParseNode in directoryFile.getStatements())
+					{
+						channels++;
+						const file:FileProcessor = new FileProcessor(directory + definition.evaluate(),
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
 									cards.push(statement.getChild(0).token.text, new Card(statement));
+								
+								if (--channels == 0 && !running && onLoad != null)
+									channels = onLoad(), -1;
 							} );
+					}
+					running = false;
+					
+					if (channels == 0 && onLoad != null)
+						onLoad();
 				} );
 		}
 		

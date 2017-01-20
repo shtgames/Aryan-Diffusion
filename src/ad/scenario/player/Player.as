@@ -18,6 +18,7 @@ package ad.scenario.player
 			m_playedCards = new Map().push(Card.CHARACTER, new Vector.<CardState>())
 				.push(Card.SUPPORT, new Vector.<CardState>())
 				.push(Card.HABITAT, new Vector.<CardState>());
+			
 			m_deck = new Deck(this);
 			m_hand = new Hand(this);
 		}
@@ -44,18 +45,12 @@ package ad.scenario.player
 		}
 		
 		
-		public function addCardToBattlefield(card:String):Player
+		public function addCardToBattlefield(card:CardState):Player
 		{
-			if (!Card.exists(card)) return this;
+			if (card == null || card.card == null)
+				return this;
 			
-			const instance:CardState = new CardState(Card.getCard(card));
-			m_playedCards.at(Card.getCard(card).type).push(instance);
-			
-			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
-				.push("card", instance)
-				.push("player", this)
-				.push("added", true)));
-			
+			m_playedCards.at(card.card.type).push(card);
 			return this;
 		}
 		

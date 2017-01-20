@@ -4,7 +4,7 @@ Demo =
 	description = "<Demo> Victory Condition: Keep Thor and Sif alive for 10 Turns.",
 	
 	cards = "cards/definitions.ad",
-	status_effects = "status_effects/definitions.ad";
+	status_effects = "status_effects/definitions.ad",
 	abilities = "abilities/definitions.ad",
 	
 	victory_condition = (event) ->
@@ -17,8 +17,9 @@ Demo =
 		},
 	
 	player_field = { "Thor", "Sif" },
-	player_deck = { "Munon", "Troan", "TrojanInfantry", "TrojanCivilians", "CargoBarrow", "Riverbank" },
+	player_deck = { "Munon", "Troan", "TrojanInfantry", "TrojanInfantry", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "CargoBarrow", "CargoBarrow", "Riverbank" },
 	
 	ai_field = { "Farbauti" },
-	ai_deck = { "GiantCaptain", "GiantRaiders", "Wildfire" }
+	ai_deck = { "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders",
+		"GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders", "Wildfire", "Wildfire", "Wildfire" }
 }

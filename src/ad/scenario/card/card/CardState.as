@@ -10,12 +10,14 @@ package ad.scenario.card.card
 	
 	public class CardState extends EventListener
 	{
-		public function CardState(value:Card) 
+		public function CardState(cardValue:Card, parentValue:Player) 
 		{
-			if (value == null) return;
+			if (cardValue == null) return;
 			
-			m_health = value.health;
-			m_attack = value.attack;
+			m_health = cardValue.health;
+			m_attack = cardValue.attack;
+			
+			m_parent = parentValue;
 		}
 		
 		
@@ -55,12 +57,6 @@ package ad.scenario.card.card
 		public function setAttack(attack:uint):CardState
 		{
 			m_attack = attack;
-			return this;
-		}
-		
-		public function setParent(value:Player):CardState
-		{
-			m_parent = value;
 			return this;
 		}
 		

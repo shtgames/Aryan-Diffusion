@@ -1,9 +1,23 @@
 package ad.scenario.field 
 {	
+	import ad.scenario.Scenario;
 	import ad.scenario.player.Player;
 	
 	public class Field
 	{
+		public function Field(parentValue:Scenario)
+		{
+			m_parent = parentValue;
+			m_first = new Player(this);
+			m_second = new Player(this);
+		}
+		
+		
+		public function get parent():Scenario
+		{
+			return m_parent;
+		}
+		
 		public function get first():Player
 		{
 			return m_first;
@@ -26,6 +40,7 @@ package ad.scenario.field
 		}
 		
 		
-		private var m_first:Player = null, m_second:Player = null;
+		private var m_first:Player, m_second:Player;
+		private var m_parent:Scenario;
 	}
 }
