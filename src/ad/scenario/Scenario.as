@@ -43,6 +43,11 @@ package ad.scenario
 			return m_description;
 		}
 		
+		public function get field():Field
+		{
+			return m_field;
+		}
+		
 		
 		override public function input(event:Event):void
 		{

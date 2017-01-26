@@ -90,12 +90,11 @@ package ad.scenario.card
 			var shuffledDeck:Vector.<String> = new Vector.<String>();
 			
 			var randomPos:Number = 0;
-			for (var i:uint = 0; i < shuffledDeck.length; i++)
+			for (var i:uint = 0; i < m_cards.length; i++)
 			{
 				randomPos = int(Math.random() * m_cards.length);
 				shuffledDeck[i] = m_cards.splice(randomPos, 1)[0];
 			}
-			
 			m_cards = shuffledDeck;
 			
 			return this;

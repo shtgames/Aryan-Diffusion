@@ -12,7 +12,7 @@
 				{
 					Scenario.getScenario("Demo").load(function ():void
 						{
-							trace ("Demo loaded.");
+							trace ("Demo loaded.", Scenario.getScenario("Demo").field.first.deck.nextCard);
 						} );
 				});
 		}

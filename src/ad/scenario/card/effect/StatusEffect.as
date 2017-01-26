@@ -40,6 +40,21 @@ package ad.scenario.card.effect
 			return m_duration;
 		}
 		
+		public function get instanceCap():uint
+		{
+			return m_instanceCap;
+		}
+		
+		public function get stackCap():uint
+		{
+			return m_stackCap;
+		}
+		
+		public function get refreshable():Boolean
+		{
+			return m_refreshable;
+		}
+		
 		
 		public function input(parent:Object, event:Event):Object
 		{
@@ -60,13 +75,17 @@ package ad.scenario.card.effect
 			m_name = object["name"];
 			m_description = object["description"];
 			m_duration = object["duration"];
+			m_instanceCap = object["instance_cap"];
+			m_stackCap = object["stack_cap"];
+			m_refreshable = object["refreshable"];
 			m_effect = object["effect"];
 		}
 		
 		
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
-		private var m_duration:uint = 0;
+		private var m_duration:uint = 1, m_instanceCap:uint = 1, m_stackCap:uint = 1;
+		private var m_refreshable:Boolean = true;
 		private var m_effect:Function = null;
 		
 		

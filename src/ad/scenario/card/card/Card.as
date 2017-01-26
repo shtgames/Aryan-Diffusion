@@ -130,7 +130,7 @@ package ad.scenario.card.card
 									cards.push(statement.getChild(0).token.text, new Card(statement));
 								
 								if (--channels == 0 && !running && onLoad != null)
-									channels = onLoad(), -1;
+									--channels, onLoad();
 							} );
 					}
 					running = false;

@@ -135,7 +135,7 @@
 		}
 		
 		
-		private var m_keyMap:Object = new Object();
-		private var m_array:Vector.<*> = new Vector.<*>();
+		protected var m_keyMap:Object = new Object();
+		protected var m_array:Vector.<*> = new Vector.<*>();
 	}
 }

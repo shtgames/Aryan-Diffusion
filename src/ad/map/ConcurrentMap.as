@@ -15,7 +15,7 @@
 			assign(other);
 		}
 		
-		public function assign(copy:Map):ConcurrentMap
+		override public function assign(copy:Map):Map
 		{
 			return super.assign(copy) as ConcurrentMap;
 		}
@@ -30,7 +30,7 @@
 			return returnValue;
 		}
 		
-		override public function push(key:*, value:*):ConcurrentMap
+		override public function push(key:*, value:*):Map
 		{
 			if (key == null) return this;
 			
@@ -106,7 +106,7 @@
 			return true;
 		}
 		
-		override public function clear():ConcurrentMap
+		override public function clear():Map
 		{
 			m_mutex.lock();
 			m_keyMap = [];
