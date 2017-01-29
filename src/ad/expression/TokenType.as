@@ -316,6 +316,8 @@ package ad.expression
 								returnValue["$context"][key] = returnValue["$arguments"][key]["$default"].evaluate(returnValue["$scope"], returnValue["$default context"]);
 							else return trace("Error: Argument count mismatch. Expected " + returnValue["$arguments"]["$count"] + ", got " + args.length + "."), null;
 						
+						returnValue["$context"]["this"] = this;
+						
 						const value:Object = returnValue["$body"].evaluate(returnValue["$scope"], returnValue["$context"]);
 						if (value != null && value.hasOwnProperty("$return"))
 							return value["$return"].evaluate(returnValue["$scope"], returnValue["$context"]);

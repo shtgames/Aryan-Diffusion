@@ -142,6 +142,8 @@ package ad.expression
 			}
 			else if ((node = parseCurrent(TokenType.ReturnStatement)) != null)
 			{
+				if (TokenType.Terminator.equals(getCurrentTokenType()))
+					return new ParseNode(new Token("return", TokenType.ReturnStatement));
 				if ((node = expression()) != null)
 					return new ParseNode(new Token("return", TokenType.ReturnStatement)).addChild(node);
 			}

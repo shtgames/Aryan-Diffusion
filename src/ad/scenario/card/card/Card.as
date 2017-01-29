@@ -2,6 +2,7 @@ package ad.scenario.card.card
 {
 	import ad.scenario.card.effect.Ability;
 	import ad.scenario.card.effect.StatusEffect;
+	import ad.scenario.event.Event;
 	
 	import ad.expression.ParseNode;
 	import ad.file.FileProcessor;
@@ -50,12 +51,12 @@ package ad.scenario.card.card
 			return m_baseAttack;
 		}
 		
-		public function get abilities():Vector.<String>
+		public function get abilities():Vector.<Ability>
 		{
 			return m_abilities;
 		}
 		
-		public function get passives():Vector.<String>
+		public function get passives():Vector.<StatusEffect>
 		{
 			return m_passives;
 		}
@@ -89,15 +90,21 @@ package ad.scenario.card.card
 			m_name = definition["name"];
 			m_description = definition["description"];
 			m_race = definition["race"];
-			m_type = definition["type"];
+			if ((m_type = definition["type"]) == HABITAT)
+				m_passives.push(new StatusEffect(source));
+			
 			m_baseHealth = definition["health"];
 			m_baseAttack = definition["attack"];
+			
 			for each (var flag:uint in definition["flags"])
 				m_flags |= flag;
+			
 			for each (var ability:String in definition["abilities"])
-				m_abilities.push(ability);
+				if (Ability.exists(ability))
+					m_abilities.push(Ability.getAbility(ability));
 			for each (var passive:String in definition["passives"])
-				m_passives.push(passive);
+				if (StatusEffect.exists(passive))
+					m_passives.push(StatusEffect.getEffect(passive));
 		}
 		
 		
@@ -108,7 +115,7 @@ package ad.scenario.card.card
 		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
 		private var m_flags:uint = 0;
 		
-		private var m_abilities:Vector.<String> = new Vector.<String>(), m_passives:Vector.<String> = new Vector.<String>();
+		private var m_abilities:Vector.<Ability> = new Vector.<Ability>(), m_passives:Vector.<StatusEffect> = new Vector.<StatusEffect>();
 		
 		
 		public static function loadResources(path:String, onLoad:Function):void

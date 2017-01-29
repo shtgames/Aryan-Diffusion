@@ -1,13 +1,12 @@
 package ad.scenario.card.effect 
 {
-	import ad.map.Map;
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
-	import ad.scenario.event.EventListener;
 	import ad.scenario.event.EventDispatcher;
+	import ad.map.Map;
 	
-	public class StatusEffectInstance extends EventListener
+	public class StatusEffectInstance
 	{
 		public function StatusEffectInstance(effect:StatusEffect, parent:CardState)
 		{
@@ -28,11 +27,12 @@ package ad.scenario.card.effect
 			return false;
 		}
 		
-		override public function input(event:Event):void
+		public function input(event:Event):void
 		{
-			if (m_parent == null || m_effect == null || event == null || !event.isValid()) 
+			if (m_parent == null || m_effect == null || m_effect.effect == null || event == null || !event.isValid()) 
 				return;
-			m_effect.input(this, event);
+			
+			m_effect.effect.call(this, event);
 			if (EventType.TurnEvent.equals(event.type) && m_duration > 0)
 				setDuration(m_duration - 1);
 		}

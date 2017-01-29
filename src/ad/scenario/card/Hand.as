@@ -32,7 +32,7 @@ package ad.scenario.card
 		
 		public function cardCount(type:uint):uint
 		{
-			return m_cards.at(type);
+			return m_cards.at(type).length;
 		}
 		
 		public function getPlayableCardLimit(type:uint):uint
@@ -62,20 +62,18 @@ package ad.scenario.card
 		
 		public function drawCard(type:uint, index:uint):String
 		{
-			if (!Card.isValidType(type) || index > cardCount(type) ||
+			if (!Card.isValidType(type) || index >= cardCount(type) ||
 				getPlayableCardLimit(type) == 0) return null;
 			
 			const returnValue:String = m_cards.at(type)[index];
 			m_cards.at(type).removeAt(index);
 			
-			const card:CardState = new CardState(Card.getCard(returnValue), m_parent);
+			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+				.push("card", returnValue)
+				.push("drawn", true)));
 			
 			if (m_parent != null)
-				m_parent.addCardToBattlefield(card);
-			
-			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
-				.push("card", card)
-				.push("added", true)));
+				m_parent.addCardToBattlefield(returnValue);
 			
 			return returnValue;
 		}

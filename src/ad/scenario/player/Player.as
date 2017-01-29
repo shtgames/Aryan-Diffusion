@@ -45,12 +45,28 @@ package ad.scenario.player
 		}
 		
 		
-		public function addCardToBattlefield(card:CardState):Player
+		public function input(event:Event):void
 		{
+			for each (var cards:Vector.<CardState> in m_playedCards)
+				for each (var card:CardState in cards)
+					card.input(event);
+		}
+		
+		public function addCardToBattlefield(cardKey:String):Player
+		{
+			const card:CardState = new CardState(Card.getCard(cardKey), this);
 			if (card == null || card.card == null)
 				return this;
 			
+			if (card.card.hasFlag(Card.UNIQUE))
+				for each (var it:CardState in m_playedCards.at(card.card.type))
+					if (it.card == card.card)
+						return this;
+			
 			m_playedCards.at(card.card.type).push(card);
+			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+				.push("card", card)
+				.push("added", true)));
 			return this;
 		}
 		

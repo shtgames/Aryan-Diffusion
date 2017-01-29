@@ -1,6 +1,8 @@
 package ad.scenario.card.effect 
 {
 	import ad.scenario.event.Event;
+	import ad.scenario.event.EventType;
+	import ad.scenario.card.card.Card;
 	
 	import ad.file.FileProcessor;
 	import ad.expression.ParseNode;
@@ -55,12 +57,9 @@ package ad.scenario.card.effect
 			return m_refreshable;
 		}
 		
-		
-		public function input(parent:Object, event:Event):Object
+		public function get effect():Function
 		{
-			if (m_effect == null || parent == null || event == null || !event.isValid())
-				return null;
-			return m_effect.call(null, new Array(parent, event));
+			return m_effect;
 		}
 		
 		
@@ -75,9 +74,14 @@ package ad.scenario.card.effect
 			m_name = object["name"];
 			m_description = object["description"];
 			m_duration = object["duration"];
+			
 			m_instanceCap = object["instance_cap"];
+			if (m_instanceCap == 0)
+				m_instanceCap = 1;
+			
 			m_stackCap = object["stack_cap"];
 			m_refreshable = object["refreshable"];
+			
 			m_effect = object["effect"];
 		}
 		
@@ -130,6 +134,32 @@ package ad.scenario.card.effect
 		
 		
 		private static const scope:Object = new Object();
+		{
+			scope["Card"] = Card;
+			scope["Ability"] = Ability;
+			scope["StatusEffect"] = StatusEffect;
+			scope["EventType"] = EventType;
+			
+			scope["random"] = Math.random;
+			scope["clamp"] = function (value:Number) : int
+			{
+				return value as int;
+			}
+			scope["outcome"] = function (percent:uint) : Boolean
+				{
+					if (Math.random() * 100 < percent)
+						return true;
+					return false;
+				};
+			scope["isAbility"] = function (object:Object) : Boolean
+				{
+					return object == null ? false : object instanceof AbilityInstance;
+				};
+			scope["isEffect"] = function (object:Object) : Boolean
+				{
+					return object == null ? false : object instanceof StatusEffectInstance;
+				};
+		}
 		private static const statusEffects:Map = new Map();
 	}
 }

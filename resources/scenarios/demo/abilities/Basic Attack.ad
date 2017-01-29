@@ -1,10 +1,13 @@
 BasicAttack = 
 {
 	name = "Basic Attack",
-	description = "Attacks the target card, dealing damage equal to your AP.",
+	description = "Attacks the target Card, dealing damage equal to your Attack Points.",
 	
-	active = (source, target) ->
+	effect = (target) ->
 		{
+			if (this.parent.parent == target.parent)
+				return;
 			
+			target.setHealth(target.health - this.parent.attack, this);
 		}
 }

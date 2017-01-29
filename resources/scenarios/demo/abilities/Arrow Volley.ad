@@ -1,10 +1,18 @@
 ArrowVolley = 
 {
 	name = "Arrow Volley",
-	description = "Damage each enemy character by your AP divided by the number of targets hit.",
+	description = "Damage each enemy Character by your AP divided by the number of targets hit.",
 	
-	active = (source, target) ->
+	effect = (target) ->
 		{
+			if (this.parent.parent == target.parent)
+				return;
 			
+			cards = target.parent.getPlayedCards(Card.CHARACTER);
+			length = cards.length;
+			damage = (this.parent.attack - this.parent.attack % length) / length;
+			
+			for (index = 0; index < length; index += 1)
+				cards[index].setHealth(cards[index].health - damage, this);
 		}
 }

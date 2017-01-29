@@ -11,6 +11,12 @@ package ad.scenario.event
 			data = eventData;
 		}
 		
+		
+		public function toString():String
+		{
+			return (type != null ? type.toString() : "N/A") + ": " + (data != null ? data.toString() : "N/A");
+		}
+		
 		public function isValid():Boolean
 		{
 			return type != null && data != null;

@@ -7,13 +7,13 @@ package ad.scenario
 	
 	import ad.scenario.field.Field;
 	import ad.scenario.event.Event;
-	import ad.scenario.event.EventListener;
+	import ad.scenario.event.EventDispatcher;
 	
 	import ad.expression.ParseNode;
 	import ad.file.FileProcessor;
 	import ad.map.Map;
 	
-	public class Scenario extends EventListener
+	public class Scenario
 	{
 		public function Scenario(source:ParseNode, directoryValue:String) 
 		{
@@ -49,23 +49,6 @@ package ad.scenario
 		}
 		
 		
-		override public function input(event:Event):void
-		{
-			if (m_victoryCondition == null || event == null || !event.isValid())
-				return;
-			
-			const outcome:int = m_victoryCondition.call(null, new Array(event));
-			if (outcome == -1) // Defeat
-			{
-				
-			}
-			else if (outcome == 1) // Victory
-			{
-				
-			}
-		}
-		
-		
 		public function load(onLoad:Function):void
 		{
 			if (m_definition == null || m_cardsDirectory == null || m_statusEffectsDirectory == null || m_abilitiesDirectory == null)
@@ -82,20 +65,22 @@ package ad.scenario
 							{
 								for each (var card:String in m_definition["player_field"])
 									if (Card.exists(card))
-										m_field.first.addCardToBattlefield(new CardState(Card.getCard(card), m_field.first));
+										m_field.first.addCardToBattlefield(card);
 								for each (var card:String in m_definition["player_deck"])
 									if (Card.exists(card))
 										m_field.first.deck.addCard(card);
 								
 								for each (var card:String in m_definition["ai_field"])
 									if (Card.exists(card))
-										m_field.second.addCardToBattlefield(new CardState(Card.getCard(card), m_field.second));
+										m_field.second.addCardToBattlefield(card);
 								for each (var card:String in m_definition["ai_deck"])
 									if (Card.exists(card))
 										m_field.second.deck.addCard(card);
 								
 								m_field.first.deck.shuffle();
 								m_field.second.deck.shuffle();
+								
+								EventDispatcher.addListener(input);
 								
 								if (onLoad != null)
 									onLoad();
@@ -104,6 +89,24 @@ package ad.scenario
 				} );
 		}
 		
+		
+		private function input(event:Event):void
+		{
+			if (m_victoryCondition == null || m_field == null || event == null || !event.isValid())
+				return;
+			
+			m_field.input(event);
+			
+			const outcome:int = m_victoryCondition.call(this, event);
+			if (outcome == -1) // Defeat
+			{
+				trace("Defeat");
+			}
+			else if (outcome == 1) // Victory
+			{
+				trace("Victory");
+			}
+		}
 		
 		private function init(source:ParseNode):void
 		{

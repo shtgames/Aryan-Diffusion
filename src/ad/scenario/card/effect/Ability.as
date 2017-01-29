@@ -3,6 +3,7 @@ package ad.scenario.card.effect
 	import ad.expression.ParseNode;
 	import ad.file.FileProcessor;
 	import ad.map.Map;
+	import ad.scenario.card.card.Card;
 	import ad.scenario.card.card.CardState;
 	
 	public final class Ability
@@ -14,7 +15,7 @@ package ad.scenario.card.effect
 		
 		public function toString():String
 		{
-			return m_name;
+			return m_id;
 		}
 		
 		public function get id():String
@@ -38,18 +39,10 @@ package ad.scenario.card.effect
 		}
 		
 		
-		public function applyTo(source:CardState, target:CardState):Object
-		{
-			if (m_effect == null)
-				return null;
-			return m_effect.call(null, new Array(source, target));
-		}
-		
-		
 		private function load(source:ParseNode):void
 		{
 			var object:Object;
-			if (source == null || (object = source.evaluate(/**/)) == null)
+			if (source == null || (object = source.evaluate(scope)) == null)
 				return;
 			
 			m_id = source.getChild(0).token.text;
@@ -105,6 +98,24 @@ package ad.scenario.card.effect
 		}
 		
 		
+		private static const scope:Object = new Object();
+		{
+			scope["Card"] = Card;
+			scope["Ability"] = Ability;
+			scope["StatusEffect"] = StatusEffect;
+			
+			scope["random"] = Math.random;
+			scope["clamp"] = function (value:Number) : int
+			{
+				return value as int;
+			}
+			scope["outcome"] = function (percent:uint) : Boolean
+				{
+					if (Math.random() * 100 < percent)
+						return true;
+					return false;
+				};
+		}
 		private static const abilities:Map = new Map();
 	}
 }

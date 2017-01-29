@@ -1,18 +1,18 @@
 package ad.scenario.card.card 
 {
-	import ad.map.ConcurrentMap;
-	import ad.map.Map;
 	import ad.scenario.card.effect.Ability;
+	import ad.scenario.card.effect.AbilityInstance;
 	import ad.scenario.card.effect.StatusEffect;
 	import ad.scenario.card.effect.StatusEffectInstance;
 	import ad.scenario.player.Player;
 	import ad.scenario.card.card.Card;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
-	import ad.scenario.event.EventListener;
 	import ad.scenario.event.EventDispatcher;
+	import ad.map.ConcurrentMap;
+	import ad.map.Map;
 	
-	public class CardState extends EventListener
+	public class CardState
 	{
 		public function CardState(cardValue:Card, parentValue:Player) 
 		{
@@ -23,6 +23,11 @@ package ad.scenario.card.card
 			m_attack = cardValue.attack;
 			
 			m_parent = parentValue;
+			
+			for each (var ability:Ability in m_card.abilities)
+				addAbility(ability);
+			for each (var effect:StatusEffect in m_card.passives)
+				applyStatusEffect(effect);
 		}
 		
 		
@@ -47,36 +52,35 @@ package ad.scenario.card.card
 		}
 		
 		
-		public function setHealth(health:uint):CardState
+		public function setHealth(health:uint, source:Object = null):CardState
 		{
 			const previous_health:uint = m_health;
 			m_health = health;
 			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
 				.push("card", this)
+				.push("source", source)
 				.push("health", true)
 				.push("previous_health", previous_health)));
 			return this;
 		}
 		
-		public function setAttack(attack:uint):CardState
+		public function setAttack(attack:uint, source:Object = null):CardState
 		{
 			const previous_attack:uint = m_attack;
 			m_attack = attack;
 			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
 				.push("card", this)
+				.push("source", source)
 				.push("attack", true)
 				.push("previous_attack", previous_attack)));
 			return this;
 		}
 		
 		
-		override public function input(event:Event):void
+		public function input(event:Event):void
 		{
 			if (m_card == null || event == null || !event.isValid())
 				return;
-			
-			for each (var passive:String in m_card.passives)
-				StatusEffect.getEffect(passive).input(this, event);
 			
 			const toErase:Vector.<String> = new Vector.<String>();
 			for (var key:String in m_statusEffects)
@@ -91,7 +95,6 @@ package ad.scenario.card.card
 						if (effect.duration != 0)
 							continue;
 						
-						effect.dispose = true;
 						EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
 							.push("effect_expired", true)
 							.push("effect", effect)));
@@ -109,28 +112,65 @@ package ad.scenario.card.card
 					m_statusEffects.erase(key);
 		}
 		
-		public function applyStatusEffect(id:String):void
+		
+		public function useAbility(id:String, target:CardState):Boolean
 		{
-			const effect:StatusEffect = StatusEffect.getEffect(id);
+			if (!m_abilities.contains(id))
+				return false;
+			return m_abilities.at(id).useOn(target), true;
+		}
+		
+		public function addAbility(ability:Ability, source:Object = null):void
+		{
+			if (ability == null)
+				return;
+			
+			const instance:AbilityInstance = new AbilityInstance(ability, this);
+			m_abilities.push(ability.id, instance);
+			
+			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
+				.push("ability_gained", true)
+				.push("source", source)
+				.push("ability", instance)));
+		}
+		
+		public function removeAbility(id:String, source:Object = null):void
+		{
+			const instance:AbilityInstance = m_abilities.at(id);
+			if (instance == null)
+				return;
+			
+			m_abilities.erase(id);
+			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
+				.push("ability_lost", true)
+				.push("source", source)
+				.push("ability", instance)));
+		}
+		
+		
+		public function applyStatusEffect(effect:StatusEffect, source:Object = null):void
+		{
 			if (effect == null) return;
 			
-			if (!m_statusEffects.contains(id))
-				m_statusEffects.push(id, new Vector.<StatusEffectInstance>());
+			if (!m_statusEffects.contains(effect.id))
+				m_statusEffects.push(effect.id, new Vector.<StatusEffectInstance>());
 			
-			if (m_statusEffects.at(id).length < effect.instanceCap)
+			if (m_statusEffects.at(effect.id).length < effect.instanceCap)
 			{
 				const instance:StatusEffectInstance = new StatusEffectInstance(effect, this);
-				m_statusEffects.at(id).push(instance);
+				m_statusEffects.at(effect.id).push(instance);
+				
 				EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
 					.push("effect_applied", true)
+					.push("source", source)
 					.push("effect", instance)));
 			}
-			else for each (var it:StatusEffectInstance in m_statusEffects.at(id))
+			else for each (var it:StatusEffectInstance in m_statusEffects.at(effect.id))
 				if (it.apply())
 					break;
 		}
 		
-		public function removeStatusEffect(id:String):void
+		public function removeStatusEffect(id:String, source:Object = null):void
 		{
 			if (!m_statusEffects.contains(id))
 				return;
@@ -139,26 +179,21 @@ package ad.scenario.card.card
 			if (effects.length == 0)
 				return;
 			
-			effects[effects.length - 1].dispose = true;
-			
 			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
 				.push("effect_removed", true)
+				.push("source", source)
 				.push("effect", effects.pop())));
 			
 			if (effects.length == 0)
 				m_statusEffects.erase(id);
 		}
 		
-		public function useAbility(id:String, target:CardState):Boolean
-		{
-			if (m_card == null || !m_card.hasAbility(id)) return false;
-			return Ability.getAbility(id).applyTo(this, target);
-		}
-		
 		
 		private var m_card:Card = null;
 		private var m_parent:Player = null;
 		private var m_health:int = 0, m_attack:uint = 0;
+		
 		private var m_statusEffects:ConcurrentMap = new ConcurrentMap();
+		private var m_abilities:ConcurrentMap = new ConcurrentMap();
 	}
 }

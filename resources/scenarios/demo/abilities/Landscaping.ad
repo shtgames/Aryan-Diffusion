@@ -1,5 +1,13 @@
 Landscaping = 
 {
 	name = "Landscaping",
-	description = "Brings one random Habitat card to the top of the deck."
+	description = "Brings one random Habitat Card to the top of the Deck.",
+	
+	effect = (target) ->
+		{
+			deck = this.parent.parent.deck;
+			cards = deck.nextCards(deck.cardCount);
+			
+			
+		}
 }

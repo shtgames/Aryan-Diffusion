@@ -16,20 +16,28 @@ package ad.scenario.event
 				processEvent(eventQueue[index]);
 			eventQueue.length = 0;
 			eventQueueLock.unlock();
-			
-			listenersLock.lock();
-			for (var index:uint = 0; index < listeners.length; ++index)
-				if (listeners[index].dispose)
-					listeners.removeAt(index--);
-			listenersLock.unlock();
 		}
 		
-		public static function addListener(listener:EventListener):void
+		public static function addListener(listener:Function):void
 		{
 			if (listener == null) return;
 			
 			listenersLock.lock();
 			listeners.push(listener);
+			listenersLock.unlock();
+		}
+		
+		public static function removeListener(listener:Function):void
+		{
+			if (listener == null) return;
+			
+			listenersLock.lock();
+			for (var index:uint = 0, end:uint = listeners.length; index != end; ++index)
+				if (listeners[index] == listener)
+				{
+					listeners[index] = null;
+					break;
+				}
 			listenersLock.unlock();
 		}
 		
@@ -49,14 +57,14 @@ package ad.scenario.event
 			listenersLock.lock();
 			for (var index:uint = 0; index < listeners.length; ++index)
 				if (listeners[index] != null)
-					listeners[index].input(event);
+					listeners[index](event);
 				else listeners.removeAt(index--);
 			listenersLock.unlock();
 			processing = false;
 		}
 		
 		
-		private static const listeners:Vector.<EventListener> = new Vector.<EventListener>(), eventQueue:Vector.<Event> = new Vector.<Event>();
+		private static const listeners:Vector.<Function> = new Vector.<Function>(), eventQueue:Vector.<Event> = new Vector.<Event>();
 		private static const listenersLock:Mutex = new Mutex(), eventQueueLock:Mutex = new Mutex();
 		private static var processing:Boolean = false;
 	}

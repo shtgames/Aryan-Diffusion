@@ -23,6 +23,18 @@
 			return this;
 		}
 		
+		public function toString():String
+		{
+			if (empty())
+				return "{}";
+			
+			var returnValue:String = "{ ";
+			for (var key:String in this)
+				returnValue += key + ": " + at(key) + ", ";
+			
+			return returnValue.substr(0, returnValue.length - 2) + " }";
+		}
+		
 		
 		public function size():uint
 		{

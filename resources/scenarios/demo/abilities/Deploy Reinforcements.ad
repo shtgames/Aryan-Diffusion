@@ -3,8 +3,9 @@ DeployReinforcements =
 	name = "Deploy Reinforcements",
 	description = "Allows an additional Support card to be played this turn.",
 	
-	active = (source, target) ->
+	effect = (target) ->
 		{
-			
+			hand = this.parent.parent.hand;
+			hand.setPlayableCardLimit(Card.SUPPORT, hand.getPlayableCardLimit() + 1);
 		}
 }

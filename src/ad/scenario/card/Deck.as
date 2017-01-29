@@ -37,7 +37,7 @@ package ad.scenario.card
 			var returnValue:Vector.<String> = new Vector.<String>();
 			
 			if (m_cards.length != 0)
-				for (var i:uint = m_cards.length - 1; i >= 0 && i >= m_cards.length - count; --i)
+				for (var i:int = m_cards.length - 1; i >= 0 && i >= m_cards.length - count; --i)
 					returnValue.push(m_cards[i]);
 			
 			return returnValue;
@@ -87,10 +87,10 @@ package ad.scenario.card
 		
 		public function shuffle():Deck
 		{
-			var shuffledDeck:Vector.<String> = new Vector.<String>();
+			const shuffledDeck:Vector.<String> = new Vector.<String>(m_cards.length);
 			
 			var randomPos:Number = 0;
-			for (var i:uint = 0; i < m_cards.length; i++)
+			for (var i:uint = 0; i < shuffledDeck.length; ++i)
 			{
 				randomPos = int(Math.random() * m_cards.length);
 				shuffledDeck[i] = m_cards.splice(randomPos, 1)[0];
