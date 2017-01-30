@@ -16,6 +16,11 @@ package ad.scenario.card.effect
 		}
 		
 		
+		public function toString():String
+		{
+			return (m_effect == null ? "<Undefined>" : m_effect.toString()) + " (" + m_duration + "/" + m_stacks + ")";
+		}
+		
 		public function apply():Boolean
 		{
 			if (m_effect == null)

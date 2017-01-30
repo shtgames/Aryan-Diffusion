@@ -10,11 +10,16 @@ package ad.scenario.card.card
 	
 	public class Card
 	{
-		public function Card(source:ParseNode)
+		public function Card(source:Object)
 		{
 			load(source);
 		}
 		
+		
+		public function toString():String
+		{
+			return "<" + m_id + ">";
+		}
 		
 		public function get id():String
 		{
@@ -79,30 +84,31 @@ package ad.scenario.card.card
 		}
 		
 		
-		private function load(source:ParseNode):void
+		private function load(source:Object):void
 		{
-			var definition:Object;
-			if (source == null || (definition = source.evaluate(scope)) == null)
+			if (source == null)
 				return;
 			
-			m_id = source.getChild(0).token.text;
+			m_id = source["id"];
 			
-			m_name = definition["name"];
-			m_description = definition["description"];
-			m_race = definition["race"];
-			if ((m_type = definition["type"]) == HABITAT)
-				m_passives.push(new StatusEffect(source));
+			m_name = source["name"];
+			m_description = source["description"];
+			m_race = source["race"];
+			m_type = source["type"];
 			
-			m_baseHealth = definition["health"];
-			m_baseAttack = definition["attack"];
+			m_baseHealth = source["health"];
+			if (m_baseHealth == 0)
+				m_baseHealth = 1;
 			
-			for each (var flag:uint in definition["flags"])
+			m_baseAttack = source["attack"];
+			
+			for each (var flag:uint in source["flags"])
 				m_flags |= flag;
 			
-			for each (var ability:String in definition["abilities"])
+			for each (var ability:String in source["abilities"])
 				if (Ability.exists(ability))
 					m_abilities.push(Ability.getAbility(ability));
-			for each (var passive:String in definition["passives"])
+			for each (var passive:String in source["passives"])
 				if (StatusEffect.exists(passive))
 					m_passives.push(StatusEffect.getEffect(passive));
 		}
@@ -134,7 +140,10 @@ package ad.scenario.card.card
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-									cards.push(statement.getChild(0).token.text, new Card(statement));
+								{
+									const source:Object = statement.evaluate(scope);
+									cards.push(source["id"] = statement.getChild(0).token.text, new Card(source));
+								}
 								
 								if (--channels == 0 && !running && onLoad != null)
 									--channels, onLoad();

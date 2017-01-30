@@ -5,7 +5,7 @@ Farbauti =
 	race = "Giant",
 	type = Character,
 	
-	health = 50,
+	health = 40,
 	attack = 15,
 	
 	flags = { Unique },

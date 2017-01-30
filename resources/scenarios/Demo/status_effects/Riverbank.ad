@@ -1,0 +1,12 @@
+Riverbank = 
+{
+	name = "Riverbank",
+	description = "50% chance of cancelling damage from Wildfire to own Character cards.",
+	
+	effect = (event) ->
+		{
+			if (outcome(50) && event.type.equals(EventType.CardEvent) && event.data.at("health") &&
+					isAbility(event.data.at("source")) && event.data.at("source").ability.id == "ArrowVolley")
+				event.data.at("card").setHealth(event.data.at("previous_health"), this);
+		}
+}

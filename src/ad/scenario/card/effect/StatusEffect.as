@@ -1,5 +1,6 @@
 package ad.scenario.card.effect 
 {
+	import ad.scenario.player.Player;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.card.card.Card;
@@ -10,7 +11,7 @@ package ad.scenario.card.effect
 	
 	public class StatusEffect
 	{
-		public function StatusEffect(source:ParseNode) 
+		public function StatusEffect(source:Object) 
 		{
 			load(source);
 		}
@@ -18,7 +19,7 @@ package ad.scenario.card.effect
 		
 		public function toString():String
 		{
-			return m_id;
+			return "<" + m_id + ">";
 		}
 		
 		
@@ -63,26 +64,25 @@ package ad.scenario.card.effect
 		}
 		
 		
-		private function load(source:ParseNode):void
+		private function load(source:Object):void
 		{
-			var object:Object;
-			if (source == null || (object = source.evaluate(scope)) == null)
+			if (source == null)
 				return;
 			
-			m_id = source.getChild(0).token.text;
+			m_id = source["id"];
 			
-			m_name = object["name"];
-			m_description = object["description"];
-			m_duration = object["duration"];
+			m_name = source["name"];
+			m_description = source["description"];
+			m_duration = source["duration"];
 			
-			m_instanceCap = object["instance_cap"];
+			m_instanceCap = source["instance_cap"];
 			if (m_instanceCap == 0)
 				m_instanceCap = 1;
 			
-			m_stackCap = object["stack_cap"];
-			m_refreshable = object["refreshable"];
+			m_stackCap = source["stack_cap"];
+			m_refreshable = source["refreshable"];
 			
-			m_effect = object["effect"];
+			m_effect = source["effect"];
 		}
 		
 		
@@ -109,7 +109,10 @@ package ad.scenario.card.effect
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-									statusEffects.push(statement.getChild(0).token.text, new StatusEffect(statement));
+								{
+									const source:Object = statement.evaluate(scope);
+									statusEffects.push(source["id"] = statement.getChild(0).token.text, new StatusEffect(source));
+								}
 								
 								if (--channels == 0 && !running && onLoad != null)
 									--channels, onLoad();
@@ -140,11 +143,27 @@ package ad.scenario.card.effect
 			scope["StatusEffect"] = StatusEffect;
 			scope["EventType"] = EventType;
 			
-			scope["random"] = Math.random;
-			scope["clamp"] = function (value:Number) : int
+			scope["trace"] = trace;
+			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
 			{
-				return value as int;
+				const source:Object = new Object();
+				source["id"] = id;
+				source["name"] = name;
+				source["description"] = description;
+				source["effect"] = effect;
+				source["duration"] = duration;
+				
+				return new StatusEffect(source);
 			}
+			scope["vector"] = function () : Array
+				{
+					return new Array();
+				};
+			scope["clamp"] = function (value:Number) : int
+				{
+					return int(value);
+				};
+			scope["random"] = Math.random;
 			scope["outcome"] = function (percent:uint) : Boolean
 				{
 					if (Math.random() * 100 < percent)
@@ -153,11 +172,15 @@ package ad.scenario.card.effect
 				};
 			scope["isAbility"] = function (object:Object) : Boolean
 				{
-					return object == null ? false : object instanceof AbilityInstance;
+					return object == null ? false : object is AbilityInstance;
 				};
 			scope["isEffect"] = function (object:Object) : Boolean
 				{
-					return object == null ? false : object instanceof StatusEffectInstance;
+					return object == null ? false : object is StatusEffectInstance;
+				};
+			scope["isPlayer"] = function (object:Object) : Boolean
+				{
+					return object == null ? false : object is Player;
 				};
 		}
 		private static const statusEffects:Map = new Map();

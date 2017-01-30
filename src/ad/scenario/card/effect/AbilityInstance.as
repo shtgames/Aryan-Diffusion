@@ -12,6 +12,11 @@ package ad.scenario.card.effect
 		}
 		
 		
+		public function toString():String
+		{
+			return m_ability == null ? "<Undefined>" : m_ability.toString();
+		}
+		
 		public function useOn(target:CardState):void
 		{
 			if (m_parent == null || m_ability == null || m_ability.effect == null || target == null) 

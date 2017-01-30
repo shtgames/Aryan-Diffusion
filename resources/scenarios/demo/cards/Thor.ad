@@ -10,5 +10,5 @@ Thor =
 	
 	flags = { Unique },
 	
-	abilities = { "Ricochet" }
+	passives = { "Ricochet" }
 }

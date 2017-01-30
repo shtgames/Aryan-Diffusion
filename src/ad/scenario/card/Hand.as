@@ -23,10 +23,21 @@ package ad.scenario.card
 		}
 		
 		
-		public function peekCard(type:uint, index:uint):String
+		public function toString():String
+		{
+			return "<Hand> (" + m_playableCardsLimit.at(Card.CHARACTER) + "/" + m_playableCardsLimit.at(Card.SUPPORT) + "/" + m_playableCardsLimit.at(Card.HABITAT) + ")";
+		}
+		
+		public function peekCard(type:uint, index:uint, source:Object = null):String
 		{			
 			if (!Card.isValidType(type) || index > cardCount(type))
 				return null;
+			
+			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+				.push("peeked", true)
+				.push("source", source)
+				.push("card", m_cards.at(type)[index])
+				.push("hand", this)));
 			return m_cards.at(type)[index];
 		}
 		
@@ -46,36 +57,70 @@ package ad.scenario.card
 		}
 		
 		
-		public function setPlayableCardLimit(type:uint, value:uint):Hand
+		public function setPlayableCardLimit(type:uint, value:uint, source:Object = null):Hand
 		{
 			if (Card.isValidType(type))
+			{
+				const previous:uint = m_playableCardsLimit.at(type);
 				m_playableCardsLimit.push(type, value);
+				EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+					.push("limit", true)
+					.push("source", source)
+					.push("type", type)
+					.push("previous_limit", previous)
+					.push("hand", this)));
+			}
 			return this;
 		}
 		
-		public function addCard(card:String):String
+		public function addCard(card:String, source:Object = null):Hand
 		{
 			if (Card.exists(card))
+			{
 				m_cards.at(Card.getCard(card).type).push(card);
-			return card;
+				EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+					.push("added", true)
+					.push("source", source)
+					.push("card", card)
+					.push("hand", this)));
+			}
+			return this;
 		}
 		
-		public function drawCard(type:uint, index:uint):String
+		public function removeCard(card:String, source:Object = null):Hand
+		{
+			if (Card.exists(card))
+				for (var i:uint = 0, cards:Vector.<String> = m_cards.at(Card.getCard(card).type), end:uint = cards.length; i != end; ++i)
+					if (cards[i] == card)
+					{
+						EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
+							.push("removed", true)
+							.push("source", source)
+							.push("card", cards.removeAt(i))
+							.push("hand", this)));
+						break;
+					}
+			return this;
+		}
+		
+		public function playCard(type:uint, index:uint):Hand
 		{
 			if (!Card.isValidType(type) || index >= cardCount(type) ||
 				getPlayableCardLimit(type) == 0) return null;
 			
-			const returnValue:String = m_cards.at(type)[index];
+			const card:String = m_cards.at(type)[index];
 			m_cards.at(type).removeAt(index);
+			m_playableCardsLimit.push(type, m_playableCardsLimit.at(type) - 1);
 			
 			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
-				.push("card", returnValue)
-				.push("drawn", true)));
+				.push("card", card)
+				.push("drawn", true)
+				.push("hand", this)));
 			
 			if (m_parent != null)
-				m_parent.addCardToBattlefield(returnValue);
+				m_parent.addCardToBattlefield(card);
 			
-			return returnValue;
+			return this;
 		}
 		
 		

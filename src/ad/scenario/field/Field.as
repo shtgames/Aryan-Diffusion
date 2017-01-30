@@ -14,12 +14,18 @@ package ad.scenario.field
 		}
 		
 		
+		public function toString():String
+		{
+			return "<Field>";
+		}
+		
 		public function input(event:Event):void
 		{
-			if (m_first != null)
-				m_first.input(event);
-			if (m_second != null)
-				m_second.input(event);
+			m_first.input(event);
+			m_second.input(event);
+			
+			m_first.cull();
+			m_second.cull();
 		}
 		
 		

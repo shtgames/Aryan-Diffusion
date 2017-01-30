@@ -31,6 +31,11 @@ package ad.scenario.card.card
 		}
 		
 		
+		public function toString():String
+		{
+			return (m_card == null ? "<Undefined>" : card.toString()) + " (" + m_health + "/" + m_attack + ")";
+		}
+		
 		public function get card():Card
 		{
 			return m_card;
@@ -52,8 +57,11 @@ package ad.scenario.card.card
 		}
 		
 		
-		public function setHealth(health:uint, source:Object = null):CardState
+		public function setHealth(health:int, source:Object = null):CardState
 		{
+			if (health < m_health && m_card.hasFlag(Card.INDESTRUCTIBLE))
+				return this;
+			
 			const previous_health:uint = m_health;
 			m_health = health;
 			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()

@@ -5,7 +5,7 @@ GiantCaptain =
 	race = "Giant",
 	type = Character,
 	
-	health = 40,
+	health = 30,
 	attack = 10,
 	
 	abilities = { "ArrowVolley" }

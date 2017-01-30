@@ -1,5 +1,0 @@
-Ricochet = 
-{
-	name = "Ricochet",
-	description = "When fighting multiple enemies, every time Thor attacks, a random additional enemy receives 50% of the damage dealt to the main target."
-}

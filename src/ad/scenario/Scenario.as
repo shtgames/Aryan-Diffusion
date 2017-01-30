@@ -23,6 +23,11 @@ package ad.scenario
 		}
 		
 		
+		public function toString():String
+		{
+			return "<" + m_id + ">";
+		}
+		
 		public function get id():String
 		{
 			return m_id;

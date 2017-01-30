@@ -34,9 +34,14 @@ package ad.scenario.player
 			return m_hand;
 		}
 		
-		public function getPlayedCards(type:uint):Vector.<CardState>
+		public function getPlayedCard(type:uint, index:uint):CardState
 		{
-			return m_playedCards.at(type);
+			return m_playedCards.at(type) == null ? null : m_playedCards.at(type)[index];
+		}
+		
+		public function getPlayedCardCount(type:uint):uint
+		{
+			return m_playedCards.at(type) == null ? 0 : m_playedCards.at(type).length;
 		}
 		
 		public function get parent():Field
@@ -52,7 +57,17 @@ package ad.scenario.player
 					card.input(event);
 		}
 		
-		public function addCardToBattlefield(cardKey:String):Player
+		public function cull():void
+		{
+			for each (var cards:Vector.<CardState> in m_playedCards)
+				for (var index:uint = 0; index < cards.length; ++index)
+					if (!cards[index].card.hasFlag(Card.INDESTRUCTIBLE) && cards[index].health <= 0)
+						EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+							.push("card", cards.removeAt(index--))
+							.push("destroyed", true)));
+		}
+		
+		public function addCardToBattlefield(cardKey:String, source:Object = null):Player
 		{
 			const card:CardState = new CardState(Card.getCard(cardKey), this);
 			if (card == null || card.card == null)
@@ -66,7 +81,48 @@ package ad.scenario.player
 			m_playedCards.at(card.card.type).push(card);
 			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 				.push("card", card)
+				.push("source", source)
 				.push("added", true)));
+			return this;
+		}
+		
+		public function destroyCard(card:CardState, source:Object = null):Player
+		{
+			if (card == null || card.card == null || card.card.hasFlag(Card.INDESTRUCTIBLE))
+				return this;
+			
+			const cards:Vector.<CardState> = m_playedCards.at(card.card.type);
+			for (var index:uint = 0, end:uint = cards.length; index != end; ++index)
+				if (cards[index] == card)
+				{
+					cards.removeAt(index);
+					break;
+				}
+			
+			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+				.push("card", card)
+				.push("source", source)
+				.push("destroyed", true)));
+			return this;
+		}
+		
+		public function removeCardFromBattlefield(card:CardState, source:Object = null):Player
+		{
+			if (card == null || card.card == null)
+				return this;
+			
+			const cards:Vector.<CardState> = m_playedCards.at(card.card.type);
+			for (var index:uint = 0, end:uint = cards.length; index != end; ++index)
+				if (cards[index] == card)
+				{
+					cards.removeAt(index);
+					break;
+				}
+			
+			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+				.push("card", card)
+				.push("source", source)
+				.push("removed", true)));
 			return this;
 		}
 		

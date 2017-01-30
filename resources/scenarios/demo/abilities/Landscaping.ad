@@ -8,6 +8,20 @@ Landscaping =
 			deck = this.parent.parent.deck;
 			cards = deck.nextCards(deck.cardCount);
 			
+			if (cards.length == 0)
+				return;
 			
+			habitatCards = vector();
+			for (i = 0; i != cards.length; i += 1)
+				if (cards[i].type == Card.HABITAT)
+					habitatCards.push(i);
+			
+			if (habitatCards.length == 0)
+				return;
+			index = habitatCards[clamp(random() * habitatCards.length)];
+			card = cards[0];
+			
+			cards[0] = cards[index];
+			cards[index] = card;
 		}
 }

@@ -1,13 +1,11 @@
 Intimidate = 
 {
 	name = "Intimidate",
-	description = "Prevent any enemy Support cards from being played next turn.",
+	description = "Prevent any enemy Support Cards from being played next Turn.",
 	
 	effect = (target) ->
 		{
-			if (this.parent.parent == target.parent)
-			
-			hand = target.parent.hand;
-			hand.setPlayableCardLimit(Card.SUPPORT, 0);
+			self = this.parent.parent;
+			self.parent.getOther(self).setPlayableCardLimit(Card.SUPPORT, 0, this);
 		}
 }

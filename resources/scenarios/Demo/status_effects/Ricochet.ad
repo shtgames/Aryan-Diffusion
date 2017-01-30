@@ -1,0 +1,29 @@
+Ricochet = 
+{
+	name = "Ricochet",
+	description = "When fighting multiple enemies, every time Thor attacks, a random additional enemy receives 50% of the damage dealt to the main target."
+	
+	effect = (event) ->
+		{
+			if (event.type.equals(EventType.CardEvent) && event.data.at("health") && event.data.at("card").parent != this.parent.parent &&
+					(isEffect(event.data.at("source")) || isAbility(event.data.at("source"))) && event.data.at("source").parent == this.parent)
+			{
+				player = event.data.at("card").parent;
+				
+				card = event.data.at("card");
+				cards = null;
+				if (player.getPlayedCards(Card.SUPPORT).length != card.type.equals(Card.SUPPORT) &&
+						( !outcome(50) || player.getPlayedCards(Card.CHARACTER).length == card.type.equals(Card.CHARACTER) ))
+					cards = player.getPlayedCards(Card.SUPPORT);
+				else if (player.getPlayedCards(Card.CHARACTER).length != card.type.equals(Card.CHARACTER))
+					cards = player.getPlayedCards(Card.CHARACTER);
+				else return;
+				
+				index = clamp(random() * cards.length);
+				while (cards[index] == card)
+					index = clamp(random() * cards.length);
+				
+				cards[index].setHealth(cards[index].health - clamp((event.data.at("previous_health") - card.health) / 2.));
+			}
+		}
+}

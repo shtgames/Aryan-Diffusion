@@ -8,14 +8,14 @@ package ad.scenario.card.effect
 	
 	public final class Ability
 	{
-		public function Ability(source:ParseNode) 
+		public function Ability(source:Object) 
 		{
 			load(source);
 		}
 		
 		public function toString():String
 		{
-			return m_id;
+			return "<" + m_id + ">";
 		}
 		
 		public function get id():String
@@ -39,17 +39,16 @@ package ad.scenario.card.effect
 		}
 		
 		
-		private function load(source:ParseNode):void
+		private function load(source:Object):void
 		{
-			var object:Object;
-			if (source == null || (object = source.evaluate(scope)) == null)
+			if (source == null)
 				return;
 			
-			m_id = source.getChild(0).token.text;
+			m_id = source["id"];
 			
-			m_name = object["name"];
-			m_description = object["description"];
-			m_effect = object["effect"];
+			m_name = source["name"];
+			m_description = source["description"];
+			m_effect = source["effect"];
 		}
 		
 		
@@ -74,7 +73,10 @@ package ad.scenario.card.effect
 							function(statements:Vector.<ParseNode>):void
 							{
 								for each (var statement:ParseNode in statements)
-									abilities.push(statement.getChild(0).token.text, new Ability(statement));
+								{
+									const source:Object = statement.evaluate(scope);
+									abilities.push(source["id"] = statement.getChild(0).token.text, new Ability(source));
+								}
 								
 								if (--channels == 0 && !running && onLoad != null)
 									--channels, onLoad();
@@ -104,11 +106,27 @@ package ad.scenario.card.effect
 			scope["Ability"] = Ability;
 			scope["StatusEffect"] = StatusEffect;
 			
-			scope["random"] = Math.random;
-			scope["clamp"] = function (value:Number) : int
+			scope["trace"] = trace;
+			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
 			{
-				return value as int;
-			}
+				const source:Object = new Object();
+				source["id"] = id;
+				source["name"] = name;
+				source["description"] = description;
+				source["effect"] = effect;
+				source["duration"] = duration;
+				
+				return new StatusEffect(source);
+			};
+			scope["vector"] = function () : Array
+				{
+					return new Array();
+				};
+			scope["clamp"] = function (value:Number) : int
+				{
+					return int(value);
+				};
+			scope["random"] = Math.random;
 			scope["outcome"] = function (percent:uint) : Boolean
 				{
 					if (Math.random() * 100 < percent)

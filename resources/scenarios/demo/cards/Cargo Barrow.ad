@@ -7,9 +7,9 @@ CargoBarrow =
 	
 	effect = (event) ->
 		{
-			if (event.type.equals(EventType.CardEvent))
-			{
-				
-			}
+			if (event.type.equals(EventType.CardEvent) && event.data.at("health") && !event.data.at("card").type.equals(Card.HABITAT) &&
+					(isEffect(event.data.at("source")) || isAbility(event.data.at("source"))) && event.data.at("source").parent.parent != this.parent.parent &&
+					event.data.at("previous_health") > event.data.at("card").health)
+				event.data.at("card").setHealth(event.data.at("card").health + 1, this);
 		}
 }
