@@ -8,7 +8,7 @@ Scatter =
 			this.parent.applyStatusEffect(composeEffect("Scatter", "Scatter", "Will return one random enemy Support Card on the Battlefield to the enemy's Deck next turn.", 
 				(event) -> 
 				{
-					if (event.type.equals(TurnEvent))
+					if (event.type.equals(TurnEvent) && event.data.at("player") == this.parent.parent)
 					{
 						self = this.parent.parent;
 						enemy = self.parent.getOther(self);

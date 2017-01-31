@@ -5,10 +5,10 @@ Wildfire =
 	
 	effect = (event) ->
 		{
-			if (!event.type.equals(EventType.TurnEvent))
+			self = this.parent.parent;
+			if (!event.type.equals(EventType.TurnEvent) || event.data.at("player") != self)
 				return;
 			
-			self = this.parent.parent;
 			enemy = self.parent.getOther(self);
 			
 			for (i = 0; i != enemy.getPlayedCardCount(Card.CHARACTER); i += 1)

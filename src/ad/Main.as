@@ -37,6 +37,7 @@
 								}
 							
 							Scenario.getScenario("Demo").field.first.addCardToBattlefield("Riverbank");
+							Scenario.getScenario("Demo").endTurn();
 							
 							Scenario.getScenario("Demo").field.second.getPlayedCard(Card.CHARACTER, 1).useAbility("ArrowVolley", Scenario.getScenario("Demo").field.first.getPlayedCard(Card.CHARACTER, 0));
 						} );

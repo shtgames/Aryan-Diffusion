@@ -7,6 +7,7 @@ package ad.scenario
 	
 	import ad.scenario.field.Field;
 	import ad.scenario.event.Event;
+	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
 	
 	import ad.expression.ParseNode;
@@ -53,6 +54,15 @@ package ad.scenario
 			return m_field;
 		}
 		
+		
+		public function endTurn(source:Object = null):void
+		{
+			if (m_field.swapCurrent() == m_field.first)
+				m_turn++;
+			EventDispatcher.pollEvent(new Event(EventType.TurnEvent, new Map()
+				.push("player", m_field.current)
+				.push("count", m_turn)));
+		}
 		
 		public function load(onLoad:Function):void
 		{

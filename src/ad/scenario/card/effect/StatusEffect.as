@@ -1,5 +1,7 @@
 package ad.scenario.card.effect 
 {
+	import ad.scenario.card.Deck;
+	import ad.scenario.card.Hand;
 	import ad.scenario.player.Player;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
@@ -144,21 +146,6 @@ package ad.scenario.card.effect
 			scope["EventType"] = EventType;
 			
 			scope["trace"] = trace;
-			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
-			{
-				const source:Object = new Object();
-				source["id"] = id;
-				source["name"] = name;
-				source["description"] = description;
-				source["effect"] = effect;
-				source["duration"] = duration;
-				
-				return new StatusEffect(source);
-			}
-			scope["vector"] = function () : Array
-				{
-					return new Array();
-				};
 			scope["clamp"] = function (value:Number) : int
 				{
 					return int(value);
@@ -170,6 +157,23 @@ package ad.scenario.card.effect
 						return true;
 					return false;
 				};
+			
+			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
+				{
+					const source:Object = new Object();
+					source["id"] = id;
+					source["name"] = name;
+					source["description"] = description;
+					source["effect"] = effect;
+					source["duration"] = duration;
+					
+					return new StatusEffect(source);
+				};
+			scope["vector"] = function () : Array
+				{
+					return new Array();
+				};
+			
 			scope["isAbility"] = function (object:Object) : Boolean
 				{
 					return object == null ? false : object is AbilityInstance;
@@ -177,6 +181,14 @@ package ad.scenario.card.effect
 			scope["isEffect"] = function (object:Object) : Boolean
 				{
 					return object == null ? false : object is StatusEffectInstance;
+				};
+			scope["isDeck"] = function (object:Object) : Boolean
+				{
+					return object == null ? false : object is Deck;
+				};
+			scope["isHand"] = function (object:Object) : Boolean
+				{
+					return object == null ? false : object is Hand;
 				};
 			scope["isPlayer"] = function (object:Object) : Boolean
 				{

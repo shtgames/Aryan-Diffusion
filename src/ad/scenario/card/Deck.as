@@ -52,23 +52,20 @@ package ad.scenario.card
 		{
 			if (m_cards.length != 0)
 			{
+				const card:String = getNextCard();
 				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 					.push("peeked", true)
 					.push("source", source)
-					.push("card", m_cards[m_cards.length - 1])
+					.push("card", card)
 					.push("deck", this)));
-				return m_cards[m_cards.length - 1];
+				return card;
 			}
 			return null;
 		}
 		
 		public function peekCards(count:uint, source:Object = null):Vector.<String>
 		{
-			var returnValue:Vector.<String> = new Vector.<String>();
-			
-			if (m_cards.length != 0)
-				for (var i:int = m_cards.length - 1; i >= 0 && i >= m_cards.length - count; --i)
-					returnValue.push(m_cards[i]);
+			const returnValue:Vector.<String> = getNextCards(count);
 			
 			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 				.push("peeked", true)
@@ -131,37 +128,23 @@ package ad.scenario.card
 		
 		public function drawNextCard(source:Object = null):String
 		{
-			var returnValue:String = null;
+			const card:String = m_cards.pop();
+			if (m_cards.length != 0 && m_parent != null && m_parent.hand != null)
+				m_parent.hand.addCard(card, this);
 			
-			if (m_cards.length != 0)
-			{
-				returnValue = m_cards[m_cards.length - 1];
-				m_cards.pop();
-				
-				if (m_parent != null && m_parent.hand != null)
-					m_parent.hand.addCard(returnValue);
-				
-				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
-					.push("drawn", true)
-					.push("source", source)
-					.push("card", returnValue)
-					.push("deck", this)));
-			}
-			
-			return returnValue;
+			return card;
 		}
 		
 		public function drawNextCards(count:uint, source:Object = null):Vector.<String>
 		{
-			var returnValue:Vector.<String> = new Vector.<String>();
-			
+			const cards:Vector.<String> = new Vector.<String>();
 			while (count != 0 && m_cards.length != 0)
 			{
-				returnValue.push(drawNextCard(source));
+				cards.push(drawNextCard(source));
 				count--;
 			}
 			
-			return returnValue;
+			return cards;
 		}
 		
 		

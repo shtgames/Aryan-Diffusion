@@ -24,6 +24,11 @@ package ad.scenario.player
 		}
 		
 		
+		public function toString():String
+		{
+			return "<Player> (" + m_deck.toString() + "/" + m_hand.toString() + ")";
+		}
+		
 		public function get deck():Deck
 		{
 			return m_deck;
@@ -52,6 +57,8 @@ package ad.scenario.player
 		
 		public function input(event:Event):void
 		{
+			m_hand.input(event);
+			
 			for each (var cards:Vector.<CardState> in m_playedCards)
 				for each (var card:CardState in cards)
 					card.input(event);

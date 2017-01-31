@@ -11,6 +11,7 @@ package ad.scenario.field
 			m_parent = parentValue;
 			m_first = new Player(this);
 			m_second = new Player(this);
+			m_current = m_first;
 		}
 		
 		
@@ -44,6 +45,11 @@ package ad.scenario.field
 			return m_second;
 		}
 		
+		public function get current():Player
+		{
+			return m_current;
+		}
+		
 		public function getOther(player:Player):Player
 		{
 			if (player != m_first)
@@ -55,8 +61,18 @@ package ad.scenario.field
 			return null;
 		}
 		
+		public function isCurrent(player:Player):Boolean
+		{
+			return m_current == player;
+		}
 		
-		private var m_first:Player, m_second:Player;
+		public function swapCurrent():Player
+		{
+			return m_current = getOther(m_current);
+		}
+		
+		
+		private var m_first:Player, m_second:Player, m_current:Player;
 		private var m_parent:Scenario;
 	}
 }

@@ -107,21 +107,6 @@ package ad.scenario.card.effect
 			scope["StatusEffect"] = StatusEffect;
 			
 			scope["trace"] = trace;
-			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
-			{
-				const source:Object = new Object();
-				source["id"] = id;
-				source["name"] = name;
-				source["description"] = description;
-				source["effect"] = effect;
-				source["duration"] = duration;
-				
-				return new StatusEffect(source);
-			};
-			scope["vector"] = function () : Array
-				{
-					return new Array();
-				};
 			scope["clamp"] = function (value:Number) : int
 				{
 					return int(value);
@@ -132,6 +117,22 @@ package ad.scenario.card.effect
 					if (Math.random() * 100 < percent)
 						return true;
 					return false;
+				};
+			
+			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
+				{
+					const source:Object = new Object();
+					source["id"] = id;
+					source["name"] = name;
+					source["description"] = description;
+					source["effect"] = effect;
+					source["duration"] = duration;
+					
+					return new StatusEffect(source);
+				};
+			scope["vector"] = function () : Array
+				{
+					return new Array();
 				};
 		}
 		private static const abilities:Map = new Map();

@@ -19,7 +19,7 @@ package ad.scenario.card.effect
 		
 		public function useOn(target:CardState):void
 		{
-			if (m_parent == null || m_ability == null || m_ability.effect == null || target == null) 
+			if (m_parent == null || m_ability == null || m_ability.effect == null || target == null || !m_parent.parent.parent.isCurrent(m_parent.parent)) 
 				return;
 			
 			m_ability.effect.call(this, target);

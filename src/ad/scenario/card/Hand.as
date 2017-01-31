@@ -57,6 +57,14 @@ package ad.scenario.card
 		}
 		
 		
+		public function input(event:Event):void
+		{
+			if (event != null && event.type.equals(EventType.TurnEvent) && event.data.at("player") == m_parent)
+				for (var type:String in m_playableCardsLimit)
+					if (m_playableCardsLimit.at(type) < 1)
+						setPlayableCardLimit(parseInt(type), 1);
+		}
+		
 		public function setPlayableCardLimit(type:uint, value:uint, source:Object = null):Hand
 		{
 			if (Card.isValidType(type))
@@ -103,7 +111,7 @@ package ad.scenario.card
 			return this;
 		}
 		
-		public function playCard(type:uint, index:uint):Hand
+		public function playCard(type:uint, index:uint):String
 		{
 			if (!Card.isValidType(type) || index >= cardCount(type) ||
 				getPlayableCardLimit(type) == 0) return null;
@@ -112,15 +120,10 @@ package ad.scenario.card
 			m_cards.at(type).removeAt(index);
 			m_playableCardsLimit.push(type, m_playableCardsLimit.at(type) - 1);
 			
-			EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
-				.push("card", card)
-				.push("drawn", true)
-				.push("hand", this)));
-			
 			if (m_parent != null)
-				m_parent.addCardToBattlefield(card);
+				m_parent.addCardToBattlefield(card, this);
 			
-			return this;
+			return card;
 		}
 		
 		

@@ -53,8 +53,6 @@ package ad.scenario.event
 				return;
 			}
 			
-			trace(event);
-			
 			processing = true;
 			listenersLock.lock();
 			for (var index:uint = 0; index < listeners.length; ++index)
