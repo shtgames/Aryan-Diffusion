@@ -1,10 +1,11 @@
 package ad.scenario.card.effect 
 {
+	import ad.scenario.card.card.Card;
+	import ad.scenario.card.card.CardState;
+	
 	import ad.expression.ParseNode;
 	import ad.file.FileProcessor;
 	import ad.map.Map;
-	import ad.scenario.card.card.Card;
-	import ad.scenario.card.card.CardState;
 	
 	public final class Ability
 	{
@@ -33,6 +34,21 @@ package ad.scenario.card.effect
 			return m_description;
 		}
 		
+		public function get targets():uint
+		{
+			return m_targets;
+		}
+		
+		public function get cooldown():uint
+		{
+			return m_cooldown;
+		}
+		
+		public function get charges():uint
+		{
+			return m_charges;
+		}
+		
 		public function get effect():Function
 		{
 			return m_effect;
@@ -48,17 +64,26 @@ package ad.scenario.card.effect
 			
 			m_name = source["name"];
 			m_description = source["description"];
+			m_targets = source["targets"];
+			
+			source.hasOwnProperty("cooldown") ? m_cooldown = source["cooldown"] : m_cooldown = 1;
+			m_charges = source["charges"];
+			if (m_charges == 0)
+				m_charges = 1;
+			
 			m_effect = source["effect"];
 		}
 		
 		
 		private var m_id:String = null;
 		private var m_name:String = "", m_description:String = "";
+		private var m_cooldown:uint , m_charges:uint, m_targets:uint = 0;
 		private var m_effect:Function = null;
 		
 		
 		public static function loadResources(path:String, onLoad:Function):void
 		{
+			loadScope();
 			abilities.clear();
 			
 			const directoryFile:FileProcessor = new FileProcessor(path, function():void
@@ -99,8 +124,7 @@ package ad.scenario.card.effect
 			return abilities.contains(id);
 		}
 		
-		
-		private static const scope:Object = new Object();
+		private static function loadScope():void
 		{
 			scope["Card"] = Card;
 			scope["Ability"] = Ability;
@@ -119,22 +143,14 @@ package ad.scenario.card.effect
 					return false;
 				};
 			
-			scope["composeEffect"] = function (id:String, name:String, description:String, effect:Function, duration:uint = 1) : StatusEffect
-				{
-					const source:Object = new Object();
-					source["id"] = id;
-					source["name"] = name;
-					source["description"] = description;
-					source["effect"] = effect;
-					source["duration"] = duration;
-					
-					return new StatusEffect(source);
-				};
 			scope["vector"] = function () : Array
 				{
 					return new Array();
 				};
 		}
+		
+		
+		private static const scope:Object = new Object();
 		private static const abilities:Map = new Map();
 	}
 }

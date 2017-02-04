@@ -43,7 +43,7 @@ package ad.scenario.event
 		
 		private static function processEvent(event:Event):void
 		{
-			if (event == null) return;
+			if (event == null || !event.isValid()) return;
 			
 			if (processing)
 			{

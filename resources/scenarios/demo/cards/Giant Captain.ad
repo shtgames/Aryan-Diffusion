@@ -8,5 +8,5 @@ GiantCaptain =
 	health = 30,
 	attack = 10,
 	
-	abilities = { "ArrowVolley" }
+	abilities = { "BasicAttack", "ArrowVolley" }
 }

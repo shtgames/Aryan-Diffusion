@@ -1,5 +1,6 @@
 package ad.scenario.card 
 {
+	import ad.scenario.Scenario;
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
@@ -75,7 +76,7 @@ package ad.scenario.card
 					.push("limit", true)
 					.push("source", source)
 					.push("type", type)
-					.push("previous_limit", previous)
+					.push("previous", previous)
 					.push("hand", this)));
 			}
 			return this;
@@ -85,17 +86,20 @@ package ad.scenario.card
 		{
 			if (Card.exists(card))
 			{
-				m_cards.at(Card.getCard(card).type).push(card);
+				const vector:Vector.<String> = m_cards.at(Card.getCard(card).type);
+				vector.push(card);
+				
 				EventDispatcher.pollEvent(new Event(EventType.HandEvent, new Map()
 					.push("added", true)
 					.push("source", source)
+					.push("index", vector.length - 1)
 					.push("card", card)
 					.push("hand", this)));
 			}
 			return this;
 		}
 		
-		public function removeCard(card:String, source:Object = null):Hand
+		public function removeCard(card:String, source:Object = null):String
 		{
 			if (Card.exists(card))
 				for (var i:uint = 0, cards:Vector.<String> = m_cards.at(Card.getCard(card).type), end:uint = cards.length; i != end; ++i)
@@ -105,21 +109,20 @@ package ad.scenario.card
 							.push("removed", true)
 							.push("source", source)
 							.push("card", cards.removeAt(i))
+							.push("index", i)
 							.push("hand", this)));
-						break;
+						return card;
 					}
-			return this;
+			return null;
 		}
 		
-		public function playCard(type:uint, index:uint):String
+		public function playCard(card:String):String
 		{
-			if (!Card.isValidType(type) || index >= cardCount(type) ||
-				getPlayableCardLimit(type) == 0) return null;
+			const value:Card = Card.getCard(card);
+			if (value == null || m_parent != Scenario.current.field.current || getPlayableCardLimit(value.type) == 0 || (card = removeCard(card)) == null)
+				return null;
 			
-			const card:String = m_cards.at(type)[index];
-			m_cards.at(type).removeAt(index);
-			m_playableCardsLimit.push(type, m_playableCardsLimit.at(type) - 1);
-			
+			setPlayableCardLimit(value.type, m_playableCardsLimit.at(value.type) - 1);
 			if (m_parent != null)
 				m_parent.addCardToBattlefield(card, this);
 			

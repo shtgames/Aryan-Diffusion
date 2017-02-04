@@ -126,6 +126,7 @@ package ad.scenario.card.card
 		
 		public static function loadResources(path:String, onLoad:Function):void
 		{
+			loadScope();
 			cards.clear();
 			
 			const directoryFile:FileProcessor = new FileProcessor(path, function():void
@@ -175,7 +176,8 @@ package ad.scenario.card.card
 		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
 		public static const UNIQUE:uint = 1, INDESTRUCTIBLE:uint = 1 << 1;
 		
-		private static const scope:Object = new Object();
+		
+		private static function loadScope():void
 		{
 			scope["Character"] = CHARACTER;
 			scope["Support"] = SUPPORT;
@@ -183,6 +185,9 @@ package ad.scenario.card.card
 			scope["Unique"] = UNIQUE;
 			scope["Indestructible"] = INDESTRUCTIBLE;
 		}
+		
+		
+		private static const scope:Object = new Object();
 		private static const cards:Map = new Map();
 	}
 }

@@ -2,23 +2,10 @@ Scatter =
 {
 	name = "Scatter",
 	description = "At the beginning of your Turn, return one random enemy Support Card on the Battlefield to the enemy's Deck.",
+	targets = 0,
 	
 	effect = (target) ->
 		{
-			this.parent.applyStatusEffect(composeEffect("Scatter", "Scatter", "Will return one random enemy Support Card on the Battlefield to the enemy's Deck next turn.", 
-				(event) -> 
-				{
-					if (event.type.equals(TurnEvent) && event.data.at("player") == this.parent.parent)
-					{
-						self = this.parent.parent;
-						enemy = self.parent.getOther(self);
-						if (enemy.getPlayedCardCount(Card.HABITAT) == 0)
-							return;
-						
-						index = clamp(random() * enemy.getPlayedCardCount(Card.HABITAT));
-						enemy.hand.addCard(enemy.getPlayedCard(Card.HABITAT, index).card.id);
-						enemy.removeCardFromBattlefield(enemy.getPlayedCard(Card.HABITAT, index), this);
-					}
-				}, 1), this);
+			this.parent.applyStatusEffect(StatusEffect.getEffect("Scatter"), this);
 		}
 }

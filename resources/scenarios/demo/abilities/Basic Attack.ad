@@ -2,6 +2,7 @@ BasicAttack =
 {
 	name = "Basic Attack",
 	description = "Attacks the target Card, dealing damage equal to your Attack Power.",
+	targets = 1,
 	
 	effect = (target) ->
 		{

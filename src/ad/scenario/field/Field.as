@@ -61,11 +61,6 @@ package ad.scenario.field
 			return null;
 		}
 		
-		public function isCurrent(player:Player):Boolean
-		{
-			return m_current == player;
-		}
-		
 		public function swapCurrent():Player
 		{
 			return m_current = getOther(m_current);

@@ -64,7 +64,7 @@ package ad.scenario
 				.push("count", m_turn)));
 		}
 		
-		public function load(onLoad:Function):void
+		public function load(onLoad:Function = null):void
 		{
 			if (m_definition == null || m_cardsDirectory == null || m_statusEffectsDirectory == null || m_abilitiesDirectory == null)
 				return;
@@ -78,24 +78,37 @@ package ad.scenario
 					{
 						Card.loadResources(m_cardsDirectory, function ():void
 							{
+								current = m_field.parent;
+								
 								for each (var card:String in m_definition["player_field"])
-									if (Card.exists(card))
-										m_field.first.addCardToBattlefield(card);
+									m_field.first.addCardToBattlefield(card);
+								for each (var card:String in m_definition["player_hand"])
+									m_field.first.hand.addCard(card);
 								for each (var card:String in m_definition["player_deck"])
-									if (Card.exists(card))
-										m_field.first.deck.addCard(card);
+									m_field.first.deck.addCard(card);
 								
 								for each (var card:String in m_definition["ai_field"])
-									if (Card.exists(card))
-										m_field.second.addCardToBattlefield(card);
+									m_field.second.addCardToBattlefield(card);
+								for each (var card:String in m_definition["ai_hand"])
+									m_field.second.hand.addCard(card);
 								for each (var card:String in m_definition["ai_deck"])
-									if (Card.exists(card))
-										m_field.second.deck.addCard(card);
+									m_field.second.deck.addCard(card);
 								
 								m_field.first.deck.shuffle();
 								m_field.second.deck.shuffle();
 								
+								m_field.first.hand.setPlayableCardLimit(Card.CHARACTER, 1);
+								m_field.first.hand.setPlayableCardLimit(Card.SUPPORT, 1);
+								m_field.first.hand.setPlayableCardLimit(Card.HABITAT, 1);
+								
+								m_field.second.hand.setPlayableCardLimit(Card.CHARACTER, 1);
+								m_field.second.hand.setPlayableCardLimit(Card.SUPPORT, 1);
+								m_field.second.hand.setPlayableCardLimit(Card.HABITAT, 1);
+								
 								EventDispatcher.addListener(input);
+								
+								EventDispatcher.pollEvent(new Event(EventType.GameEvent, new Map()
+									.push("loaded", true)));
 								
 								if (onLoad != null)
 									onLoad();
@@ -107,7 +120,7 @@ package ad.scenario
 		
 		private function input(event:Event):void
 		{
-			if (m_victoryCondition == null || m_field == null || event == null || !event.isValid())
+			if (m_victoryCondition == null || m_field == null)
 				return;
 			
 			m_field.input(event);
@@ -115,11 +128,13 @@ package ad.scenario
 			const outcome:int = m_victoryCondition.call(this, event);
 			if (outcome == -1) // Defeat
 			{
-				trace("Defeat");
+				EventDispatcher.pollEvent(new Event(EventType.GameEvent, new Map()
+					.push("defeat", true)));
 			}
 			else if (outcome == 1) // Victory
 			{
-				trace("Victory");
+				EventDispatcher.pollEvent(new Event(EventType.GameEvent, new Map()
+					.push("victory", true)));
 			}
 		}
 		
@@ -195,5 +210,6 @@ package ad.scenario
 		
 		private static const scope:Object = new Object();
 		private static const scenarios:Map = new Map();
+		public static var current:Scenario;
 	}
 }

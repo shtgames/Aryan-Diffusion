@@ -6,5 +6,7 @@ GiantRaiders =
 	type = Support,
 	
 	health = 20,
-	attack = 5
+	attack = 5,
+	
+	abilities = { "BasicAttack" }
 }

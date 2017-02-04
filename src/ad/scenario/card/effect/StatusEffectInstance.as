@@ -34,12 +34,12 @@ package ad.scenario.card.effect
 		
 		public function input(event:Event):void
 		{
-			if (m_parent == null || m_effect == null || m_effect.effect == null || event == null || !event.isValid()) 
+			if (m_parent == null || m_effect == null || m_effect.effect == null) 
 				return;
 			
-			m_effect.effect.call(this, event);
-			if (EventType.TurnEvent.equals(event.type) && m_duration > 0)
+			if (EventType.TurnEvent.equals(event.type) && event.data.at("player") == m_parent.parent && m_duration > 0)
 				setDuration(m_duration - 1);
+			m_effect.effect.call(this, event);
 		}
 		
 		
@@ -58,30 +58,43 @@ package ad.scenario.card.effect
 			return m_stacks;
 		}
 		
+		public function get persistent():Map
+		{
+			return m_persistent;
+		}
+		
 		public function get parent():CardState
 		{
 			return m_parent;
 		}
 		
 		
-		public function setDuration(turnDuration:uint):StatusEffectInstance
+		public function setDuration(value:uint, source:Object = null):StatusEffectInstance
 		{
+			if (m_duration == value)
+				return this;
+			
 			const previous:uint = m_duration;
-			m_duration = turnDuration;
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("effect_refreshed", true)
-				.push("previous_duration", previous)
+			m_duration = value;
+			EventDispatcher.pollEvent(new Event(EventType.StatusEffectEvent, new Map()
+				.push("duration", true)
+				.push("source", source)
+				.push("previous", previous)
 				.push("effect", this)));
 			return this;
 		}
 		
-		public function setStacks(stacks:uint):StatusEffectInstance
+		public function setStacks(value:uint, source:Object = null):StatusEffectInstance
 		{
+			if (m_stacks == value)
+				return this;
+			
 			const previous:uint = m_stacks;
-			m_stacks = stacks;
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("effect_stacked", true)
-				.push("previous_stacks", previous)
+			m_stacks = value;
+			EventDispatcher.pollEvent(new Event(EventType.StatusEffectEvent, new Map()
+				.push("stacks", true)
+				.push("source", source)
+				.push("previous", previous)
 				.push("effect", this)));
 			return this;
 		}
@@ -89,6 +102,7 @@ package ad.scenario.card.effect
 		
 		private var m_effect:StatusEffect = null;
 		private var m_duration:uint = 0, m_stacks:uint = 1;
+		private var m_persistent:Map = new Map();
 		private var m_parent:CardState = null;
 	}
 }

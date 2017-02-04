@@ -97,6 +97,7 @@ package ad.scenario.card.effect
 		
 		public static function loadResources(path:String, onLoad:Function):void
 		{
+			loadScope();
 			statusEffects.clear();
 			
 			const directoryFile:FileProcessor = new FileProcessor(path, function():void
@@ -137,8 +138,7 @@ package ad.scenario.card.effect
 			return statusEffects.contains(id);
 		}
 		
-		
-		private static const scope:Object = new Object();
+		private static function loadScope():void
 		{
 			scope["Card"] = Card;
 			scope["Ability"] = Ability;
@@ -195,6 +195,9 @@ package ad.scenario.card.effect
 					return object == null ? false : object is Player;
 				};
 		}
+		
+		
+		private static const scope:Object = new Object();
 		private static const statusEffects:Map = new Map();
 	}
 }

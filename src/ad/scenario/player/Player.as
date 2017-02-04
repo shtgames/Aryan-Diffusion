@@ -41,7 +41,7 @@ package ad.scenario.player
 		
 		public function getPlayedCard(type:uint, index:uint):CardState
 		{
-			return m_playedCards.at(type) == null ? null : m_playedCards.at(type)[index];
+			return m_playedCards.at(type) == null || index >= m_playedCards.at(type).length ? null : m_playedCards.at(type)[index];
 		}
 		
 		public function getPlayedCardCount(type:uint):uint
@@ -57,6 +57,7 @@ package ad.scenario.player
 		
 		public function input(event:Event):void
 		{
+			m_deck.input(event);
 			m_hand.input(event);
 			
 			for each (var cards:Vector.<CardState> in m_playedCards)
@@ -71,6 +72,7 @@ package ad.scenario.player
 					if (!cards[index].card.hasFlag(Card.INDESTRUCTIBLE) && cards[index].health <= 0)
 						EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 							.push("card", cards.removeAt(index--))
+							.push("index", index + 1)
 							.push("destroyed", true)));
 		}
 		
@@ -88,6 +90,7 @@ package ad.scenario.player
 			m_playedCards.at(card.card.type).push(card);
 			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 				.push("card", card)
+				.push("index", m_playedCards.at(card.card.type).length - 1)
 				.push("source", source)
 				.push("added", true)));
 			return this;
@@ -103,13 +106,14 @@ package ad.scenario.player
 				if (cards[index] == card)
 				{
 					cards.removeAt(index);
+					EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+						.push("card", card)
+						.push("index", index)
+						.push("source", source)
+						.push("destroyed", true)));
 					break;
 				}
 			
-			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
-				.push("card", card)
-				.push("source", source)
-				.push("destroyed", true)));
 			return this;
 		}
 		
@@ -123,13 +127,13 @@ package ad.scenario.player
 				if (cards[index] == card)
 				{
 					cards.removeAt(index);
+					EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
+						.push("card", card)
+						.push("index", index)
+						.push("source", source)
+						.push("removed", true)));
 					break;
 				}
-			
-			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
-				.push("card", card)
-				.push("source", source)
-				.push("removed", true)));
 			return this;
 		}
 		

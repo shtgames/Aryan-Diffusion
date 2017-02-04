@@ -42,10 +42,17 @@ package ad.scenario.card
 			var returnValue:Vector.<String> = new Vector.<String>();
 			
 			if (m_cards.length != 0)
-				for (var i:int = m_cards.length - 1; i >= 0 && i >= m_cards.length - count; --i)
+				for (var i:uint = 0, end:uint = count > m_cards.length ? m_cards.length : count; i != end; ++i)
 					returnValue.push(m_cards[i]);
 			
 			return returnValue;
+		}
+		
+		
+		public function input(event:Event):void
+		{
+			if (event.type.equals(EventType.TurnEvent) && event.data.at("player") == m_parent)
+				drawNextCard();
 		}
 		
 		public function peekCard(source:Object = null):String
@@ -116,6 +123,7 @@ package ad.scenario.card
 			const card:String = m_cards[first];
 			m_cards[first] = m_cards[second];
 			m_cards[second] = card;
+			
 			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 				.push("swapped", true)
 				.push("source", source)
@@ -128,23 +136,18 @@ package ad.scenario.card
 		
 		public function drawNextCard(source:Object = null):String
 		{
+			if (m_cards.length == 0 || m_parent == null || m_parent.hand == null)
+				return null;
+			
 			const card:String = m_cards.pop();
-			if (m_cards.length != 0 && m_parent != null && m_parent.hand != null)
-				m_parent.hand.addCard(card, this);
+			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
+				.push("removed", true)
+				.push("card", card)
+				.push("deck", this)));
+			
+			m_parent.hand.addCard(card, this);
 			
 			return card;
-		}
-		
-		public function drawNextCards(count:uint, source:Object = null):Vector.<String>
-		{
-			const cards:Vector.<String> = new Vector.<String>();
-			while (count != 0 && m_cards.length != 0)
-			{
-				cards.push(drawNextCard(source));
-				count--;
-			}
-			
-			return cards;
 		}
 		
 		

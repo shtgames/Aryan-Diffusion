@@ -10,5 +10,5 @@ Troan =
 	
 	flags = { Unique },
 	
-	abilities = { "DeployReinforcements" }
+	abilities = { "BasicAttack", "DeployReinforcements" }
 }

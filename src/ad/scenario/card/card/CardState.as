@@ -24,10 +24,17 @@ package ad.scenario.card.card
 			
 			m_parent = parentValue;
 			
-			for each (var ability:Ability in m_card.abilities)
-				addAbility(ability);
+			m_cacheEvents = true;
 			for each (var effect:StatusEffect in m_card.passives)
 				applyStatusEffect(effect);
+			
+			for each (var ability:Ability in m_card.abilities)
+				addAbility(ability);
+			m_cacheEvents = false;
+			
+			for each (var event:Event in m_eventCache)
+				EventDispatcher.pollEvent(event);
+			m_eventCache.length = 0;
 		}
 		
 		
@@ -51,6 +58,25 @@ package ad.scenario.card.card
 			return m_attack;
 		}
 		
+		public function get abilities():Vector.<AbilityInstance>
+		{
+			const returnValue:Vector.<AbilityInstance> = new Vector.<AbilityInstance>();
+			
+			for each (var ability:AbilityInstance in m_abilities)
+				returnValue.push(ability);
+			return returnValue;
+		}
+		
+		public function get effects():Vector.<StatusEffectInstance>
+		{
+			const returnValue:Vector.<StatusEffectInstance> = new Vector.<StatusEffectInstance>();
+			
+			for each (var effects:Vector.<StatusEffectInstance> in m_statusEffects)
+				for each (var effect:StatusEffectInstance in effects)
+					returnValue.push(effect);
+			return returnValue;
+		}
+		
 		public function get parent():Player
 		{
 			return m_parent;
@@ -64,11 +90,12 @@ package ad.scenario.card.card
 			
 			const previous_health:uint = m_health;
 			m_health = health;
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("card", this)
-				.push("source", source)
-				.push("health", true)
-				.push("previous_health", previous_health)));
+			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+				.call(null, new Event(EventType.CardEvent, new Map()
+					.push("card", this)
+					.push("source", source)
+					.push("health", true)
+					.push("previous", previous_health)));
 			return this;
 		}
 		
@@ -76,19 +103,23 @@ package ad.scenario.card.card
 		{
 			const previous_attack:uint = m_attack;
 			m_attack = attack;
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("card", this)
-				.push("source", source)
-				.push("attack", true)
-				.push("previous_attack", previous_attack)));
+			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+				.call(null, new Event(EventType.CardEvent, new Map()
+					.push("card", this)
+					.push("source", source)
+					.push("attack", true)
+					.push("previous", previous_attack)));
 			return this;
 		}
 		
 		
 		public function input(event:Event):void
 		{
-			if (m_card == null || event == null || !event.isValid())
+			if (m_card == null)
 				return;
+			
+			for each (var ability:AbilityInstance in m_abilities)
+				ability.input(event);
 			
 			const toErase:Vector.<String> = new Vector.<String>();
 			for (var key:String in m_statusEffects)
@@ -103,10 +134,10 @@ package ad.scenario.card.card
 						if (effect.duration != 0)
 							continue;
 						
-						EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-							.push("effect_expired", true)
-							.push("effect", effect)));
-						effects.removeAt(index);
+						(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+							.call(null, new Event(EventType.StatusEffectEvent, new Map()
+								.push("expired", true)
+								.push("effect", effects.removeAt(index))));
 					}
 					else effect.input(event);
 				}
@@ -136,10 +167,11 @@ package ad.scenario.card.card
 			const instance:AbilityInstance = new AbilityInstance(ability, this);
 			m_abilities.push(ability.id, instance);
 			
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("ability_gained", true)
-				.push("source", source)
-				.push("ability", instance)));
+			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+				.call(null, new Event(EventType.AbilityEvent, new Map()
+					.push("gained", true)
+					.push("source", source)
+					.push("ability", instance)));
 		}
 		
 		public function removeAbility(id:String, source:Object = null):void
@@ -149,10 +181,11 @@ package ad.scenario.card.card
 				return;
 			
 			m_abilities.erase(id);
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("ability_lost", true)
-				.push("source", source)
-				.push("ability", instance)));
+			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+				.call(null, new Event(EventType.AbilityEvent, new Map()
+					.push("lost", true)
+					.push("source", source)
+					.push("ability", instance)));
 		}
 		
 		
@@ -168,10 +201,11 @@ package ad.scenario.card.card
 				const instance:StatusEffectInstance = new StatusEffectInstance(effect, this);
 				m_statusEffects.at(effect.id).push(instance);
 				
-				EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-					.push("effect_applied", true)
-					.push("source", source)
-					.push("effect", instance)));
+				(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+					.call(null, new Event(EventType.StatusEffectEvent, new Map()
+						.push("applied", true)
+						.push("source", source)
+						.push("effect", instance)));
 			}
 			else for each (var it:StatusEffectInstance in m_statusEffects.at(effect.id))
 				if (it.apply())
@@ -187,10 +221,11 @@ package ad.scenario.card.card
 			if (effects.length == 0)
 				return;
 			
-			EventDispatcher.pollEvent(new Event(EventType.CardEvent, new Map()
-				.push("effect_removed", true)
-				.push("source", source)
-				.push("effect", effects.pop())));
+			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
+				.call(null, new Event(EventType.StatusEffectEvent, new Map()
+					.push("removed", true)
+					.push("source", source)
+					.push("effect", effects.pop())));
 			
 			if (effects.length == 0)
 				m_statusEffects.erase(id);
@@ -203,5 +238,7 @@ package ad.scenario.card.card
 		
 		private var m_statusEffects:ConcurrentMap = new ConcurrentMap();
 		private var m_abilities:ConcurrentMap = new ConcurrentMap();
+		
+		private var m_cacheEvents:Boolean = false, m_eventCache:Vector.<Event> = new Vector.<Event>();
 	}
 }

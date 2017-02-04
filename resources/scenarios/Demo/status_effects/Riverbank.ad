@@ -7,6 +7,6 @@ Riverbank =
 		{
 			if (outcome(50) && event.type.equals(EventType.CardEvent) && event.data.at("health") &&
 					isEffect(event.data.at("source")) && event.data.at("source").effect.id == "Wildfire")
-				event.data.at("card").setHealth(event.data.at("previous_health"), this);
+				event.data.at("card").setHealth(event.data.at("previous"), this);
 		}
 }

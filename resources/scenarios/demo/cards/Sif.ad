@@ -10,5 +10,5 @@ Sif =
 	
 	flags = { Unique },
 	
-	abilities = { "Landscaping" }
+	abilities = { "BasicAttack", "Landscaping" }
 }

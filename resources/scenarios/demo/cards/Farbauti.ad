@@ -10,5 +10,5 @@ Farbauti =
 	
 	flags = { Unique },
 	
-	abilities = { "Scatter", "Intimidate" }
+	abilities = { "BasicAttack", "Scatter", "Intimidate" }
 }

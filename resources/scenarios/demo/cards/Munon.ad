@@ -1,7 +1,7 @@
 Munon = 
 {
 	name = "Munon",
-	description = "Father of Thor.",
+	description = "Father of Thor",
 	race = "Trojan",
 	type = Character,
 	
@@ -10,5 +10,5 @@ Munon =
 	
 	flags = { Unique },
 	
-	abilities = { "SummonReinforcements" }
+	abilities = { "BasicAttack", "SummonReinforcements" }
 }

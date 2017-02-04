@@ -1,5 +1,6 @@
 ﻿package ad
 {
+	import ad.gui.UI;
 	import flash.display.MovieClip;
 	
 	import ad.scenario.Scenario;
@@ -9,38 +10,11 @@
 	{
 		public function Main() 
 		{
+			addChild(new UI(stage));
+			
 			Scenario.loadResources("../resources/scenarios/scenarios.ad", function ():void 
 				{
-					Scenario.getScenario("Demo").load(function ():void
-						{
-							var counter:uint = 0;
-							while (true)
-								if (counter == 2 || Scenario.getScenario("Demo").field.first.deck.peekCard() == null)
-									break;
-								else if (Card.getCard(Scenario.getScenario("Demo").field.first.deck.drawNextCard()).type == Card.CHARACTER)
-									counter++;
-							
-							Scenario.getScenario("Demo").field.first.hand.setPlayableCardLimit(Card.CHARACTER, 2);
-							Scenario.getScenario("Demo").field.first.hand.playCard(Card.CHARACTER, 0);
-							Scenario.getScenario("Demo").field.first.hand.playCard(Card.CHARACTER, 0);
-							
-							while (true)
-								if (Scenario.getScenario("Demo").field.second.deck.drawNextCard() == "GiantCaptain")
-									break;
-							
-							Scenario.getScenario("Demo").field.second.hand.setPlayableCardLimit(Card.CHARACTER, 2);
-							for (var index:uint = 0; index != Scenario.getScenario("Demo").field.second.hand.cardCount(Card.CHARACTER); ++index)
-								if (Scenario.getScenario("Demo").field.second.hand.peekCard(Card.CHARACTER, index) == "GiantCaptain")
-								{
-									Scenario.getScenario("Demo").field.second.hand.playCard(Card.CHARACTER, index);
-									break;
-								}
-							
-							Scenario.getScenario("Demo").field.first.addCardToBattlefield("Riverbank");
-							Scenario.getScenario("Demo").endTurn();
-							
-							Scenario.getScenario("Demo").field.second.getPlayedCard(Card.CHARACTER, 1).useAbility("ArrowVolley", Scenario.getScenario("Demo").field.first.getPlayedCard(Card.CHARACTER, 0));
-						} );
+					Scenario.getScenario("Demo").load();
 				});
 		}
 	}

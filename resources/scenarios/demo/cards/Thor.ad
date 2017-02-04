@@ -10,5 +10,6 @@ Thor =
 	
 	flags = { Unique },
 	
+	abilities = { "BasicAttack" },
 	passives = { "Ricochet" }
 }

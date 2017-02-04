@@ -35,10 +35,13 @@ package ad.scenario.event
 		private var m_name:String;
 		
 		
-		public static const TurnEvent:EventType = new EventType(0, "<Turn Event>");
-		public static const DeckEvent:EventType = new EventType(1, "<Deck Event>");
-		public static const HandEvent:EventType = new EventType(2, "<Hand Event>");
-		public static const FieldEvent:EventType = new EventType(3, "<Field Event>");
-		public static const CardEvent:EventType = new EventType(4, "<Card Event>");
+		public static const GameEvent:EventType = new EventType(0, "<Game Event>");
+		public static const TurnEvent:EventType = new EventType(1, "<Turn Event>");
+		public static const DeckEvent:EventType = new EventType(2, "<Deck Event>");
+		public static const HandEvent:EventType = new EventType(3, "<Hand Event>");
+		public static const FieldEvent:EventType = new EventType(4, "<Field Event>");
+		public static const CardEvent:EventType = new EventType(5, "<Card Event>");
+		public static const AbilityEvent:EventType = new EventType(6, "<Ability Event>");
+		public static const StatusEffectEvent:EventType = new EventType(7, "<Status-Effect Event>");
 	}
 }

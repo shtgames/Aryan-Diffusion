@@ -6,5 +6,7 @@ TrojanInfantry =
 	type = Support,
 	
 	health = 20,
-	attack = 10
+	attack = 10,
+	
+	abilities = { "BasicAttack" }
 }

@@ -17,9 +17,11 @@ Demo =
 		},
 	
 	player_field = { "Thor", "Sif" },
-	player_deck = { "Munon", "Troan", "TrojanInfantry", "TrojanInfantry", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "CargoBarrow", "CargoBarrow", "Riverbank" },
+	player_hand = { "Munon", "Troan", "TrojanInfantry" },
+	player_deck = { "TrojanInfantry", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "TrojanCivilians", "CargoBarrow", "CargoBarrow", "Riverbank" },
 	
 	ai_field = { "Farbauti" },
-	ai_deck = { "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders",
+	ai_hand = { "GiantCaptain", "GiantRaiders" },
+	ai_deck = { "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantRaiders", "GiantRaiders", "GiantRaiders",
 		"GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders", "Wildfire", "Wildfire", "Wildfire" }
 }
