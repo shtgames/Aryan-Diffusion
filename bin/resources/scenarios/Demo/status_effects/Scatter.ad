@@ -1,0 +1,21 @@
+Scatter = 
+{
+	name = "Scatter",
+	description = "Will return one random enemy Support Card on the Battlefield to the enemy's Deck next turn.",
+	duration = 1,
+	
+	effect = (event) -> 
+		{
+			if (event.type != EventType.TurnEvent || event.data.at("player") != this.parent.parent)
+				return;
+			
+			self = this.parent.parent;
+			enemy = self.parent.getOther(self);
+			if (enemy.getPlayedCardCount(Card.SUPPORT) == 0)
+				return;
+			
+			index = clamp(random() * enemy.getPlayedCardCount(Card.SUPPORT));
+			enemy.hand.addCard(enemy.getPlayedCard(Card.SUPPORT, index).card);
+			enemy.removeCardFromBattlefield(enemy.getPlayedCard(Card.SUPPORT, index), this);
+		}
+}

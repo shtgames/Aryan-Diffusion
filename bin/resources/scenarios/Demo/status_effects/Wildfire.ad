@@ -1,0 +1,23 @@
+Wildfire = 
+{
+	name = "Wildfire",
+	description = "2 HP damage to all Characters and 25% chance of destroying an enemy Habitat card each turn.",
+	
+	effect = (event) ->
+		{
+			if (event.type != EventType.TurnEvent || event.data.at("player") != this.parent.parent)
+				return;
+			
+			self = this.parent.parent;
+			enemy = self.parent.getOther(self);
+			
+			for (i = 0; i != enemy.getPlayedCardCount(Card.CHARACTER); i += 1)
+			{
+				card = enemy.getPlayedCard(Card.CHARACTER, i);
+				card.setHealth(card.health - 2, this);
+			}
+			
+			if (enemy.getPlayedCardCount(Card.HABITAT) != 0 && outcome(25))
+				enemy.destroyCard(enemy.getPlayedCard(Card.HABITAT, clamp(random() * enemy.getPlayedCardCount(Card.HABITAT))), this);
+		}
+}

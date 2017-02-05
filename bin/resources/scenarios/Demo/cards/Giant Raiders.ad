@@ -1,0 +1,17 @@
+GiantRaiders = 
+{
+	name = "Giant Raiders",
+	description = "Placeholder",
+	race = "Giant",
+	type = Support,
+	
+	health = 20,
+	attack = 5,
+	
+	abilities = { "BasicAttack" },
+	
+	ai_evaluation = (ai) ->
+		{
+			return 60;
+		}
+}

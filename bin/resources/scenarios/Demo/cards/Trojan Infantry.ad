@@ -1,0 +1,12 @@
+TrojanInfantry = 
+{
+	name = "Trojan Infantry",
+	description = "Placeholder",
+	race = "Trojan",
+	type = Support,
+	
+	health = 25,
+	attack = 10,
+	
+	abilities = { "BasicAttack" }
+}

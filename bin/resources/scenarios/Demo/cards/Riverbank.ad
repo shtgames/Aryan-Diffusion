@@ -1,0 +1,11 @@
+Riverbank = 
+{
+	name = "Riverbank",
+	description = "50% chance of cancelling damage from Wildfire to own Character cards.",
+	race = "Trojan",
+	type = Habitat,
+	
+	flags = { Unique, Indestructible },
+	
+	passives = { "Riverbank" }
+}

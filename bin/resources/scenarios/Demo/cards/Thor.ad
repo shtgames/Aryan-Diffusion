@@ -1,0 +1,15 @@
+Thor = 
+{
+	name = "Thor",
+	description = "Placeholder",
+	race = "Trojan",
+	type = Character,
+	
+	health = 40,
+	attack = 20,
+	
+	flags = { Unique },
+	
+	abilities = { "BasicAttack" },
+	passives = { "Ricochet" }
+}

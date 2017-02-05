@@ -1,0 +1,14 @@
+Sif = 
+{
+	name = "Sif",
+	description = "Thor's childhood friend.",
+	race = "Trojan",
+	type = Character,
+	
+	health = 30,
+	attack = 15,
+	
+	flags = { Unique },
+	
+	abilities = { "BasicAttack", "Landscaping" }
+}

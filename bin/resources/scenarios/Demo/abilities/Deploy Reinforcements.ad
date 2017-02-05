@@ -1,0 +1,12 @@
+DeployReinforcements = 
+{
+	name = "Deploy Reinforcements",
+	description = "Allows an additional Support Card to be played this Turn.",
+	targets = 0,
+	
+	effect = (target) ->
+		{
+			hand = this.parent.parent.hand;
+			hand.setPlayableCardLimit(Card.SUPPORT, hand.getPlayableCardLimit(Card.SUPPORT) + 1, this);
+		}
+}
