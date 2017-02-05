@@ -5,7 +5,7 @@ package ad.gui.card
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.Event;
-	import ad.map.Map;
+	import utils.map.Map;
 	import ad.scenario.player.Player;
 	import flash.display.MovieClip;
 	import flash.display.Stage;
@@ -30,7 +30,7 @@ package ad.gui.card
 		public function input(event:Event):void
 		{
 			if (player == null || 
-				(!event.type.equals(EventType.FieldEvent) && !event.type.equals(EventType.CardEvent) && !event.type.equals(EventType.AbilityEvent) && !event.type.equals(EventType.StatusEffectEvent)))
+				(event.type != EventType.FieldEvent && event.type != EventType.CardEvent && event.type != EventType.AbilityEvent && event.type != EventType.StatusEffectEvent))
 				return;
 			
 			if (event.data.at("added") && event.data.at("card") != null && event.data.at("card").parent == player)
@@ -42,9 +42,7 @@ package ad.gui.card
 			}
 			else if ((event.data.at("destroyed") || event.data.at("removed")) && event.data.at("card") != null && event.data.at("card").parent == player)
 			{
-				m_cards.at(event.data.at("card").card.type).removeAt(event.data.at("index"));
-				removeChildAt((event.data.at("card").card.type == Card.CHARACTER ? 0 :
-					(event.data.at("card").card.type == Card.SUPPORT ? m_cards.at(Card.CHARACTER).length : m_cards.at(Card.CHARACTER).length + m_cards.at(Card.SUPPORT).length)) + event.data.at("index"));
+				CardStateVisual(removeChild(m_cards.at(event.data.at("card").card.type).removeAt(event.data.at("index")))).dispose();
 				reposition();
 			}
 			

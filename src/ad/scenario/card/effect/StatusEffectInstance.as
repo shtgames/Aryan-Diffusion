@@ -4,7 +4,7 @@ package ad.scenario.card.effect
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	public class StatusEffectInstance
 	{
@@ -37,8 +37,9 @@ package ad.scenario.card.effect
 			if (m_parent == null || m_effect == null || m_effect.effect == null) 
 				return;
 			
-			if (EventType.TurnEvent.equals(event.type) && event.data.at("player") == m_parent.parent && m_duration > 0)
+			if (event.type == EventType.TurnEvent && event.data.at("player") == m_parent.parent && m_duration > 0)
 				setDuration(m_duration - 1);
+			
 			m_effect.effect.call(this, event);
 		}
 		

@@ -1,13 +1,21 @@
 CargoBarrow = 
 {
 	name = "Cargo Barrow",
-	description = "Reduce damage from all enemy attacks by 1 HP.",
+	description = "Reduce damage from all enemy attacks by 5 HP.",
 	
 	effect = (event) ->
 		{
-			if (event.type.equals(EventType.CardEvent) && event.data.at("health") && !event.data.at("card").type.equals(Card.HABITAT) &&
-					(isEffect(event.data.at("source")) || isAbility(event.data.at("source"))) && event.data.at("source").parent.parent != this.parent.parent &&
-					event.data.at("previous") > event.data.at("card").health)
-				event.data.at("card").setHealth(event.data.at("card").health + 1, this);
+			data = event.data;
+			card = data.at("card");
+			
+			if (event.type == EventType.CardEvent && data.at("health") && card.card.type != Card.HABITAT &&
+					(isEffect(data.at("source")) || isAbility(data.at("source"))) && data.at("source").parent.parent != this.parent.parent &&
+					card.health < data.at("previous"))
+			{
+				health = card.health + 5;
+				if (health > data.at("previous"))
+					health = data.at("previous");
+				card.setHealth(health, this);
+			}
 		}
 }

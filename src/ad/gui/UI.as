@@ -8,7 +8,7 @@ package ad.gui
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
-	import ad.map.Map;
+	import utils.map.Map;
 	import flash.display.SimpleButton;
 	import flash.events.MouseEvent;
 	
@@ -165,13 +165,32 @@ package ad.gui
 				addChild(hand);
 			}
 			
+			{
+				const turn:TextField = new TextField();
+				turn.text = "Turn: 0";
+				turn.textColor = 0x000000;
+				turn.width = text.textWidth + 5;
+				turn.height = text.textHeight * 1.2;
+				turn.x = stage.stageWidth - turn.width - 20;
+				
+				elements.push("turn", turn);
+				addChild(turn);
+			}
+			
+			{
+				const victory:TextField = new TextField();
+				victory.visible = false;
+				elements.push("victory", victory);
+				addChild(victory);
+			}
+			
 			EventDispatcher.addListener(input);
 		}
 		
 		
 		public function input(event:Event):void
 		{
-			if (event.type.equals(EventType.TurnEvent))
+			if (event.type == EventType.TurnEvent)
 			{
 				if (event.data.at("player") == Scenario.current.field.first)
 				{
@@ -199,13 +218,15 @@ package ad.gui
 					
 					elements.at("endTurn").upState = bg;
 				}
+				
+				elements.at("turn").text = "Turn: " + event.data.at("count");
 			}
-			else if (event.type.equals(EventType.DeckEvent))
+			else if (event.type == EventType.DeckEvent)
 			{
 				if ((event.data.at("added") || event.data.at("removed")) && event.data.at("deck").parent == Scenario.current.field.first)
 					elements.at("cardsInDeck").text = " Deck: " + event.data.at("deck").cardCount;
 			}
-			else if (event.type.equals(EventType.HandEvent))
+			else if (event.type == EventType.HandEvent)
 			{
 				if (event.data.at("limit"))
 				{
@@ -222,14 +243,38 @@ package ad.gui
 					elements.at("enemyHand").input(event);
 				}
 			}
-			else if (event.type.equals(EventType.FieldEvent) || event.type.equals(EventType.CardEvent) || event.type.equals(EventType.AbilityEvent) || event.type.equals(EventType.StatusEffectEvent))
+			else if (event.type == EventType.FieldEvent || event.type == EventType.CardEvent || event.type == EventType.AbilityEvent || event.type == EventType.StatusEffectEvent)
 			{
 				elements.at("field").input(event);
 				elements.at("enemyField").input(event);
 			}
-			else if (event.type.equals(EventType.GameEvent))
+			else if (event.type == EventType.GameEvent)
 			{
-				if (event.data.at("loaded"))
+				if (event.data.at("victory"))
+				{
+					elements.at("victory").text = "Victory!";
+					elements.at("victory").scaleX = 3;
+					elements.at("victory").scaleY = 3;
+					elements.at("victory").width = elements.at("victory").textWidth + 5;
+					elements.at("victory").height = elements.at("victory").textHeight + 5;
+					elements.at("victory").x = (stage.stageWidth - elements.at("victory").width) / 2;
+					elements.at("victory").y = (stage.stageHeight - elements.at("victory").height) / 2;
+					elements.at("victory").textColor = 0x00cc00;
+					elements.at("victory").visible = true;
+				}
+				else if (event.data.at("defeat"))
+				{
+					elements.at("victory").text = "Defeat!";
+					elements.at("victory").scaleX = 3;
+					elements.at("victory").scaleY = 3;
+					elements.at("victory").width = elements.at("victory").textWidth + 5;
+					elements.at("victory").height = elements.at("victory").textHeight + 5;
+					elements.at("victory").x = (stage.stageWidth - elements.at("victory").width) / 2;
+					elements.at("victory").y = (stage.stageHeight - elements.at("victory").height) / 2;
+					elements.at("victory").textColor = 0xcc0000;
+					elements.at("victory").visible = true;
+				}
+				else if (event.data.at("loaded"))
 					elements.at("endTurn").addEventListener(MouseEvent.CLICK, Scenario.current.endTurn );
 			}
 			

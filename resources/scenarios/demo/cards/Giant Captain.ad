@@ -5,8 +5,13 @@ GiantCaptain =
 	race = "Giant",
 	type = Character,
 	
-	health = 30,
+	health = 25,
 	attack = 10,
 	
-	abilities = { "BasicAttack", "ArrowVolley" }
+	abilities = { "BasicAttack", "ArrowVolley" },
+	
+	ai_evaluation = (ai) ->
+		{
+			return 70;
+		}
 }

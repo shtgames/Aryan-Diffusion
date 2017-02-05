@@ -1,11 +1,10 @@
-package ad.scenario.event 
+package ad.ai 
 {
-	import ad.scenario.event.EventType;
 	import utils.map.Map;
 	
-	public class Event
+	public class Goal 
 	{
-		public function Event(type:EventType, data:Map)
+		public function Goal(type:GoalType, data:Map)
 		{
 			m_type = type;
 			m_data = data;
@@ -17,7 +16,7 @@ package ad.scenario.event
 			return (m_type != null ? m_type.toString() : "N/A") + ": " + (m_data != null ? m_data.toString() : "N/A");
 		}
 		
-		public function get type():EventType
+		public function get type():GoalType
 		{
 			return m_type;
 		}
@@ -29,11 +28,11 @@ package ad.scenario.event
 		
 		public function isValid():Boolean
 		{
-			return type != null && data != null;
+			return m_type != null && m_data != null;
 		}
 		
 		
-		private var m_type:EventType;
+		private var m_type:GoalType;
 		private var m_data:Map;
 	}
 }

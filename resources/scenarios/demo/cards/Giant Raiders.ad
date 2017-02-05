@@ -8,5 +8,10 @@ GiantRaiders =
 	health = 20,
 	attack = 5,
 	
-	abilities = { "BasicAttack" }
+	abilities = { "BasicAttack" },
+	
+	ai_evaluation = (ai) ->
+		{
+			return 60;
+		}
 }

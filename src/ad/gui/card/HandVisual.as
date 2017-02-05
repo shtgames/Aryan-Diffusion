@@ -5,7 +5,7 @@ package ad.gui.card
 	import ad.scenario.card.card.Card;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
-	import ad.map.Map;
+	import utils.map.Map;
 	import flash.display.Stage;
 	
 	import flash.display.MovieClip;
@@ -24,10 +24,10 @@ package ad.gui.card
 		
 		public function input(event:Event):void
 		{
-			if (!event.type.equals(EventType.HandEvent) || event.data.at("hand") != getHand())
+			if (event.type != EventType.HandEvent || event.data.at("hand") != getHand())
 				return;
 			
-			const card:Card = Card.getCard(event.data.at("card"));
+			const card:Card = event.data.at("card");
 			if (event.data.at("added"))
 			{
 				const visual:CardVisual = new CardVisual(card, m_visible, this);

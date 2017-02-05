@@ -8,8 +8,8 @@ package ad.scenario.card.effect
 	import ad.scenario.card.card.Card;
 	
 	import ad.file.FileProcessor;
-	import ad.expression.ParseNode;
-	import ad.map.Map;
+	import utils.expression.ParseNode;
+	import utils.map.Map;
 	
 	public class StatusEffect
 	{
@@ -60,6 +60,11 @@ package ad.scenario.card.effect
 			return m_refreshable;
 		}
 		
+		public function get harmful():Boolean
+		{
+			return m_harmful;
+		}
+		
 		public function get effect():Function
 		{
 			return m_effect;
@@ -84,15 +89,16 @@ package ad.scenario.card.effect
 			m_stackCap = source["stack_cap"];
 			m_refreshable = source["refreshable"];
 			
+			m_harmful = source["harmful"];
 			m_effect = source["effect"];
 		}
 		
 		
-		private var m_id:String = null;
-		private var m_name:String = "", m_description:String = "";
+		private var m_id:String;
+		private var m_name:String, m_description:String;
 		private var m_duration:uint = 1, m_instanceCap:uint = 1, m_stackCap:uint = 1;
-		private var m_refreshable:Boolean = true;
-		private var m_effect:Function = null;
+		private var m_refreshable:Boolean = true, m_harmful:Boolean;
+		private var m_effect:Function;
 		
 		
 		public static function loadResources(path:String, onLoad:Function):void

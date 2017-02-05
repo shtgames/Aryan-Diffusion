@@ -1,4 +1,4 @@
-﻿package ad.map
+﻿package utils.map
 {
 	import flash.utils.Proxy;
 	import flash.utils.flash_proxy;
@@ -10,6 +10,11 @@
 		public function Map(other:Map = null)
 		{
 			assign(other);
+		}
+		
+		public function hasOwnProperty(name:String):Boolean
+		{
+			return false;
 		}
 		
 		public function assign(copy:Map):Map

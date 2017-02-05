@@ -5,7 +5,7 @@ Thor =
 	race = "Trojan",
 	type = Character,
 	
-	health = 10,
+	health = 40,
 	attack = 20,
 	
 	flags = { Unique },

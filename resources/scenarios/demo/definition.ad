@@ -11,7 +11,7 @@ Demo =
 		{
 			if (event.type == EventType.TurnEvent && event.data.at("count") > 10)
 				return 1;
-			if (event.type == EventType.FieldEvent && event.data.at("died") && (event.data.at("card").cardKey == "Thor" || event.data.at("card").cardKey == "Sif"))
+			if (event.type == EventType.FieldEvent && event.data.at("destroyed") && (event.data.at("card").card.id == "Thor" || event.data.at("card").card.id == "Sif"))
 				return -1;
 			return 0;
 		},
@@ -23,5 +23,7 @@ Demo =
 	ai_field = { "Farbauti" },
 	ai_hand = { "GiantCaptain", "GiantRaiders" },
 	ai_deck = { "GiantCaptain", "GiantCaptain", "GiantCaptain", "GiantRaiders", "GiantRaiders", "GiantRaiders",
-		"GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders", "Wildfire", "Wildfire", "Wildfire" }
+		"GiantRaiders", "GiantRaiders", "GiantRaiders", "GiantRaiders", "Wildfire", "Wildfire", "Wildfire" },
+	
+	ai_goals = { destroy("Thor"), destroy("Sif") }
 }

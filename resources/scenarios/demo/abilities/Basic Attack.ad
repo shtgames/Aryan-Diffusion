@@ -3,6 +3,7 @@ BasicAttack =
 	name = "Basic Attack",
 	description = "Attacks the target Card, dealing damage equal to your Attack Power.",
 	targets = 1,
+	harmful = true,
 	
 	effect = (target) ->
 		{
@@ -10,5 +11,15 @@ BasicAttack =
 				return;
 			
 			target.setHealth(target.health - this.parent.attack, this);
+		},
+	
+	ai_evaluation = (ai, target) ->
+		{
+			score = 20;
+			if (target.health <= this.parent.attack)
+				score += 20;
+			if (ai.hasGoal( (goal) -> { return goal.type == GoalType.DestroyCard && goal.data.at("id") == target.card.id; } ))
+				score += 40;
+			return score;
 		}
 }

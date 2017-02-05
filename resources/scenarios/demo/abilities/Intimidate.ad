@@ -3,10 +3,16 @@ Intimidate =
 	name = "Intimidate",
 	description = "Prevent any enemy Support Cards from being played next Turn.",
 	targets = 0,
+	harmful = true,
 	
 	effect = (target) ->
 		{
 			self = this.parent.parent;
 			self.parent.getOther(self).hand.setPlayableCardLimit(Card.SUPPORT, 0, this);
+		},
+	
+	ai_evaluation = (ai, target) ->
+		{
+			return 85;
 		}
 }

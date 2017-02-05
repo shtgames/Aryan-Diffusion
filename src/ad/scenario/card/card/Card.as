@@ -1,12 +1,14 @@
 package ad.scenario.card.card 
 {
+	import ad.ai.AI;
+	import ad.ai.GoalType;
 	import ad.scenario.card.effect.Ability;
 	import ad.scenario.card.effect.StatusEffect;
 	import ad.scenario.event.Event;
 	
-	import ad.expression.ParseNode;
+	import utils.expression.ParseNode;
 	import ad.file.FileProcessor;
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	public class Card
 	{
@@ -83,6 +85,17 @@ package ad.scenario.card.card
 			return Boolean(m_flags & flag);
 		}
 		
+		public function evaluationMethod():Function
+		{
+			return m_evaluation;
+		}
+		
+		
+		public function AIEvaluation(ai:AI):uint
+		{
+			return ai == null || ai.player.hand.getPlayableCardLimit(m_type) == 0 || m_evaluation == null ? 0 : m_evaluation.call(this, ai);
+		}
+		
 		
 		private function load(source:Object):void
 		{
@@ -111,6 +124,8 @@ package ad.scenario.card.card
 			for each (var passive:String in source["passives"])
 				if (StatusEffect.exists(passive))
 					m_passives.push(StatusEffect.getEffect(passive));
+			
+			m_evaluation = source["ai_evaluation"];
 		}
 		
 		
@@ -118,8 +133,9 @@ package ad.scenario.card.card
 		private var m_name:String, m_description:String;
 		private var m_race:String;
 		private var m_type:uint = CHARACTER;
-		private var m_baseHealth:uint = 0, m_baseAttack:uint = 0;
-		private var m_flags:uint = 0;
+		private var m_baseHealth:uint, m_baseAttack:uint;
+		private var m_flags:uint;
+		private var m_evaluation:Function;
 		
 		private var m_abilities:Vector.<Ability> = new Vector.<Ability>(), m_passives:Vector.<StatusEffect> = new Vector.<StatusEffect>();
 		
@@ -184,6 +200,29 @@ package ad.scenario.card.card
 			scope["Habitat"] = HABITAT;
 			scope["Unique"] = UNIQUE;
 			scope["Indestructible"] = INDESTRUCTIBLE;
+			
+			scope["Card"] = Card;
+			scope["Ability"] = Ability;
+			scope["StatusEffect"] = StatusEffect;
+			scope["GoalType"] = GoalType;
+			
+			scope["trace"] = trace;
+			scope["clamp"] = function (value:Number) : int
+				{
+					return int(value);
+				};
+			scope["random"] = Math.random;
+			scope["outcome"] = function (percent:uint) : Boolean
+				{
+					if (Math.random() * 100 < percent)
+						return true;
+					return false;
+				};
+			
+			scope["vector"] = function () : Array
+				{
+					return new Array();
+				};
 		}
 		
 		

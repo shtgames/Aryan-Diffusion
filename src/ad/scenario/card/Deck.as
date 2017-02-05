@@ -5,7 +5,7 @@ package ad.scenario.card
 	import ad.scenario.event.EventDispatcher;
 	import ad.scenario.player.Player;
 	import ad.scenario.card.card.Card;
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	public class Deck
 	{		
@@ -30,16 +30,16 @@ package ad.scenario.card
 			return m_cards.length;
 		}
 		
-		public function getNextCard():String
+		public function getNextCard():Card
 		{
 			if (m_cards.length != 0)
 				return m_cards[m_cards.length - 1];
 			return null;
 		}
 		
-		public function getNextCards(count:uint):Vector.<String>
+		public function getNextCards(count:uint):Vector.<Card>
 		{
-			var returnValue:Vector.<String> = new Vector.<String>();
+			const returnValue:Vector.<Card> = new Vector.<Card>();
 			
 			if (m_cards.length != 0)
 				for (var i:uint = 0, end:uint = count > m_cards.length ? m_cards.length : count; i != end; ++i)
@@ -51,15 +51,15 @@ package ad.scenario.card
 		
 		public function input(event:Event):void
 		{
-			if (event.type.equals(EventType.TurnEvent) && event.data.at("player") == m_parent)
+			if (event.type == EventType.TurnEvent && event.data.at("player") == m_parent)
 				drawNextCard();
 		}
 		
-		public function peekCard(source:Object = null):String
+		public function peekCard(source:Object = null):Card
 		{
 			if (m_cards.length != 0)
 			{
-				const card:String = getNextCard();
+				const card:Card = getNextCard();
 				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 					.push("peeked", true)
 					.push("source", source)
@@ -70,9 +70,9 @@ package ad.scenario.card
 			return null;
 		}
 		
-		public function peekCards(count:uint, source:Object = null):Vector.<String>
+		public function peekCards(count:uint, source:Object = null):Vector.<Card>
 		{
-			const returnValue:Vector.<String> = getNextCards(count);
+			const returnValue:Vector.<Card> = getNextCards(count);
 			
 			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 				.push("peeked", true)
@@ -84,23 +84,23 @@ package ad.scenario.card
 		}
 		
 		
-		public function addCard(card:String, source:Object = null):Deck
+		public function addCard(card:Card, source:Object = null):Deck
 		{
-			if (Card.exists(card))
-			{
-				m_cards.push(card);
-				EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
-					.push("added", true)
-					.push("source", source)
-					.push("card", card)
-					.push("deck", this)));
-			}
+			if (card == null)
+				return null;
+			
+			m_cards.push(card);
+			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
+				.push("added", true)
+				.push("source", source)
+				.push("card", card)
+				.push("deck", this)));
 			return this;
 		}
 		
-		public function removeCard(card:String, source:Object = null):Deck
+		public function removeCard(card:Card, source:Object = null):Deck
 		{
-			if (Card.exists(card))
+			if (card != null)
 				for (var index:uint = 0, end:uint = m_cards.length; index != end; ++index)
 					if (m_cards[index] == card)
 					{
@@ -120,7 +120,7 @@ package ad.scenario.card
 			if (first == second || first >= m_cards.length || second >= m_cards.length)
 				return this;
 			
-			const card:String = m_cards[first];
+			const card:Card = m_cards[first];
 			m_cards[first] = m_cards[second];
 			m_cards[second] = card;
 			
@@ -134,12 +134,12 @@ package ad.scenario.card
 			return this;
 		}
 		
-		public function drawNextCard(source:Object = null):String
+		public function drawNextCard(source:Object = null):Card
 		{
 			if (m_cards.length == 0 || m_parent == null || m_parent.hand == null)
 				return null;
 			
-			const card:String = m_cards.pop();
+			const card:Card = m_cards.pop();
 			EventDispatcher.pollEvent(new Event(EventType.DeckEvent, new Map()
 				.push("removed", true)
 				.push("card", card)
@@ -153,7 +153,7 @@ package ad.scenario.card
 		
 		public function shuffle(source:Object = null):Deck
 		{
-			const shuffledDeck:Vector.<String> = new Vector.<String>(m_cards.length);
+			const shuffledDeck:Vector.<Card> = new Vector.<Card>(m_cards.length);
 			
 			var randomPos:Number = 0;
 			for (var i:uint = 0; i < shuffledDeck.length; ++i)
@@ -178,7 +178,7 @@ package ad.scenario.card
 		}
 		
 		
-		private var m_cards:Vector.<String> = new Vector.<String>();
+		private var m_cards:Vector.<Card> = new Vector.<Card>();
 		private var m_parent:Player;
 	}	
 }

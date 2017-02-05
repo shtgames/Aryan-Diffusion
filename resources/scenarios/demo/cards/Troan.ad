@@ -5,8 +5,8 @@ Troan =
 	race = "Trojan",
 	type = Character,
 	
-	health = 20,
-	attack = 10,
+	health = 30,
+	attack = 15,
 	
 	flags = { Unique },
 	

@@ -1,4 +1,4 @@
-package ad.expression
+package utils.expression
 {
 	import flash.utils.ByteArray;
 	public class TokenType
@@ -509,7 +509,6 @@ package ad.expression
 				var index:uint = 0;
 				for (var end:uint = this.getChildCount(); index != end; ++index)
 					object[index] = this.getChild(index).evaluate(scope, object);
-				object["$length"] = index;
 				
 				return object;
 			} );
@@ -525,7 +524,7 @@ package ad.expression
 							controlStatement.hasOwnProperty("$return") ))
 						return controlStatement;
 				
-				return context;
+				return null;
 			} );
 		
 		public static const StartOfInput:TokenType = new TokenType(null, 51, "<Start of Input>");

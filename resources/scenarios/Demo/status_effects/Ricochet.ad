@@ -5,7 +5,7 @@ Ricochet =
 	
 	effect = (event) ->
 		{
-			if (event.type.equals(EventType.CardEvent) && event.data.at("health") && event.data.at("card").parent != this.parent.parent &&
+			if (event.type == EventType.CardEvent && event.data.at("health") && event.data.at("card").parent != this.parent.parent &&
 					(isEffect(event.data.at("source")) || isAbility(event.data.at("source"))) && event.data.at("source").parent == this.parent)
 			{
 				player = event.data.at("card").parent;

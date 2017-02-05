@@ -9,8 +9,8 @@ package ad.scenario.card.card
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
-	import ad.map.ConcurrentMap;
-	import ad.map.Map;
+	import utils.map.ConcurrentMap;
+	import utils.map.Map;
 	
 	public class CardState
 	{
@@ -48,7 +48,7 @@ package ad.scenario.card.card
 			return m_card;
 		}
 		
-		public function get health():uint
+		public function get health():int
 		{
 			return m_health;
 		}
@@ -88,7 +88,7 @@ package ad.scenario.card.card
 			if (health < m_health && m_card.hasFlag(Card.INDESTRUCTIBLE))
 				return this;
 			
-			const previous_health:uint = m_health;
+			const previous_health:int = m_health;
 			m_health = health;
 			(m_cacheEvents ? m_eventCache.push : EventDispatcher.pollEvent)
 				.call(null, new Event(EventType.CardEvent, new Map()

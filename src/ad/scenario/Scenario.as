@@ -1,18 +1,25 @@
 package ad.scenario 
 {
+	import ad.ai.AI;
+	import ad.ai.Goal;
+	import ad.ai.GoalType;
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.card.card.Card;
 	import ad.scenario.card.effect.Ability;
 	import ad.scenario.card.effect.StatusEffect;
+	import com.adobe.tvsdk.mediacore.events.TimeChangeEvent;
 	
 	import ad.scenario.field.Field;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
 	
-	import ad.expression.ParseNode;
+	import utils.expression.ParseNode;
 	import ad.file.FileProcessor;
-	import ad.map.Map;
+	import utils.map.Map;
+	import flash.system.fscommand;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	public class Scenario
 	{
@@ -62,6 +69,10 @@ package ad.scenario
 			EventDispatcher.pollEvent(new Event(EventType.TurnEvent, new Map()
 				.push("player", m_field.current)
 				.push("count", m_turn)));
+			
+			if (m_field.current == m_field.second)
+				m_aiTimer.start();
+			else m_aiTimer.stop();
 		}
 		
 		public function load(onLoad:Function = null):void
@@ -71,6 +82,11 @@ package ad.scenario
 			
 			m_turn = 0;
 			m_field = new Field(this);
+			m_ai = new AI(m_field.second);
+			m_aiTimer.addEventListener(TimerEvent.TIMER, function (event:TimerEvent) : void
+				{
+					m_ai.nextMove();
+				});
 			
 			StatusEffect.loadResources(m_statusEffectsDirectory, function ():void
 				{
@@ -81,18 +97,21 @@ package ad.scenario
 								current = m_field.parent;
 								
 								for each (var card:String in m_definition["player_field"])
-									m_field.first.addCardToBattlefield(card);
+									m_field.first.addCardToBattlefield(Card.getCard(card));
 								for each (var card:String in m_definition["player_hand"])
-									m_field.first.hand.addCard(card);
+									m_field.first.hand.addCard(Card.getCard(card));
 								for each (var card:String in m_definition["player_deck"])
-									m_field.first.deck.addCard(card);
+									m_field.first.deck.addCard(Card.getCard(card));
 								
 								for each (var card:String in m_definition["ai_field"])
-									m_field.second.addCardToBattlefield(card);
+									m_field.second.addCardToBattlefield(Card.getCard(card));
 								for each (var card:String in m_definition["ai_hand"])
-									m_field.second.hand.addCard(card);
+									m_field.second.hand.addCard(Card.getCard(card));
 								for each (var card:String in m_definition["ai_deck"])
-									m_field.second.deck.addCard(card);
+									m_field.second.deck.addCard(Card.getCard(card));
+								
+								for each (var goal:Goal in m_definition["ai_goals"])
+									m_ai.goals.push(goal);
 								
 								m_field.first.deck.shuffle();
 								m_field.second.deck.shuffle();
@@ -126,16 +145,12 @@ package ad.scenario
 			m_field.input(event);
 			
 			const outcome:int = m_victoryCondition.call(this, event);
-			if (outcome == -1) // Defeat
-			{
+			if (outcome == -1)
 				EventDispatcher.pollEvent(new Event(EventType.GameEvent, new Map()
 					.push("defeat", true)));
-			}
-			else if (outcome == 1) // Victory
-			{
+			else if (outcome == 1)
 				EventDispatcher.pollEvent(new Event(EventType.GameEvent, new Map()
 					.push("victory", true)));
-			}
 		}
 		
 		private function init(source:ParseNode):void
@@ -164,11 +179,13 @@ package ad.scenario
 		private var m_victoryCondition:Function;
 		private var m_turn:uint;
 		private var m_field:Field;
+		private var m_ai:AI, m_aiTimer:Timer = new Timer(1000);
 		
 		
 		
 		public static function loadResources(path:String, onLoad:Function):void
 		{
+			loadScope();
 			scenarios.clear();
 			
 			const directoryFile:FileProcessor = new FileProcessor(path, function():void
@@ -205,6 +222,21 @@ package ad.scenario
 		public static function exists(id:String):Boolean
 		{
 			return scenarios.contains(id);
+		}
+		
+		
+		private static function loadScope():void
+		{
+			scope["Card"] = Card;
+			scope["Ability"] = Ability;
+			scope["StatusEffect"] = StatusEffect;
+			scope["EventType"] = EventType;
+			
+			scope["trace"] = trace;
+			scope["destroy"] = function (id:String) : Goal
+				{
+					return new Goal(GoalType.DestroyCard, new Map().push("id", id));
+				};
 		}
 		
 		

@@ -8,7 +8,7 @@ package ad.scenario.player
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	public class Player
 	{
@@ -71,14 +71,14 @@ package ad.scenario.player
 				for (var index:uint = 0; index < cards.length; ++index)
 					if (!cards[index].card.hasFlag(Card.INDESTRUCTIBLE) && cards[index].health <= 0)
 						EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
-							.push("card", cards.removeAt(index--))
-							.push("index", index + 1)
+							.push("card", cards.removeAt(index))
+							.push("index", index--)
 							.push("destroyed", true)));
 		}
 		
-		public function addCardToBattlefield(cardKey:String, source:Object = null):Player
+		public function addCardToBattlefield(cardPrototype:Card, source:Object = null):Player
 		{
-			const card:CardState = new CardState(Card.getCard(cardKey), this);
+			const card:CardState = new CardState(cardPrototype, this);
 			if (card == null || card.card == null)
 				return this;
 			

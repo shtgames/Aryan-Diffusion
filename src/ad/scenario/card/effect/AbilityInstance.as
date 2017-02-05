@@ -1,11 +1,15 @@
 package ad.scenario.card.effect 
 {
+	import ad.ai.AI;
+	import ad.ai.TargetScore;
 	import ad.scenario.Scenario;
+	import ad.scenario.card.card.Card;
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.event.EventDispatcher;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.Event;
-	import ad.map.Map;
+	import ad.scenario.player.Player;
+	import utils.map.Map;
 	
 	public class AbilityInstance 
 	{
@@ -89,8 +93,30 @@ package ad.scenario.card.effect
 			if (m_parent == null || m_ability == null) 
 				return;
 			
-			if (m_cooldown > 0 && event.type.equals(EventType.TurnEvent) && event.data.at("player") == m_parent.parent)
+			if (m_cooldown > 0 && event.type == EventType.TurnEvent && event.data.at("player") == m_parent.parent)
 				setCooldown(m_cooldown - 1);
+		}
+		
+		public function AIEvaluation(ai:AI):TargetScore
+		{
+			if (ai == null || m_charges == 0 || m_ability == null)
+				return new TargetScore();
+			
+			if (m_ability.targets == 0)
+				return m_ability.AIEvaluation(this, ai, null);
+			
+			var returnValue:TargetScore = new TargetScore(), buffer:TargetScore;
+			var card:CardState;
+			
+			const source:Player = m_ability.harmful ? ai.player.parent.getOther(ai.player) : ai.player;
+			
+			for (var type:uint = Card.CHARACTER, last:uint = Card.HABITAT; type < last; ++type)
+				for (var i:uint = 0, end:uint = source.getPlayedCardCount(type); i != end; ++i)
+					if ((card = source.getPlayedCard(type, i)) == m_parent)
+						continue;
+					else if ((buffer = m_ability.AIEvaluation(this, ai, card)).score  > returnValue.score)
+						returnValue = buffer;
+			return returnValue;
 		}
 		
 		public function useOn(target:CardState = null):void

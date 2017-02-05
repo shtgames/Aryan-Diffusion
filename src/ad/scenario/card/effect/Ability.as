@@ -1,11 +1,14 @@
 package ad.scenario.card.effect 
 {
+	import ad.ai.AI;
+	import ad.ai.GoalType;
+	import ad.ai.TargetScore;
 	import ad.scenario.card.card.Card;
 	import ad.scenario.card.card.CardState;
 	
-	import ad.expression.ParseNode;
+	import utils.expression.ParseNode;
 	import ad.file.FileProcessor;
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	public final class Ability
 	{
@@ -39,6 +42,11 @@ package ad.scenario.card.effect
 			return m_targets;
 		}
 		
+		public function get harmful():Boolean
+		{
+			return m_harmful;
+		}
+		
 		public function get cooldown():uint
 		{
 			return m_cooldown;
@@ -54,6 +62,12 @@ package ad.scenario.card.effect
 			return m_effect;
 		}
 		
+		public function AIEvaluation(ability:AbilityInstance, ai:AI, target:CardState):TargetScore
+		{
+			const returnValue:TargetScore = m_evaluation == null ? null : new TargetScore(m_evaluation.call(ability, ai, target), target);
+			return returnValue == null ? new TargetScore() : returnValue;
+		}
+		
 		
 		private function load(source:Object):void
 		{
@@ -65,6 +79,7 @@ package ad.scenario.card.effect
 			m_name = source["name"];
 			m_description = source["description"];
 			m_targets = source["targets"];
+			m_harmful = source["harmful"];
 			
 			source.hasOwnProperty("cooldown") ? m_cooldown = source["cooldown"] : m_cooldown = 1;
 			m_charges = source["charges"];
@@ -72,13 +87,16 @@ package ad.scenario.card.effect
 				m_charges = 1;
 			
 			m_effect = source["effect"];
+			m_evaluation = source["ai_evaluation"];
 		}
 		
 		
-		private var m_id:String = null;
-		private var m_name:String = "", m_description:String = "";
-		private var m_cooldown:uint , m_charges:uint, m_targets:uint = 0;
-		private var m_effect:Function = null;
+		private var m_id:String;
+		private var m_name:String, m_description:String;
+		private var m_cooldown:uint, m_charges:uint, m_targets:uint;
+		private var m_harmful:Boolean;
+		private var m_effect:Function;
+		private var m_evaluation:Function;
 		
 		
 		public static function loadResources(path:String, onLoad:Function):void
@@ -129,6 +147,7 @@ package ad.scenario.card.effect
 			scope["Card"] = Card;
 			scope["Ability"] = Ability;
 			scope["StatusEffect"] = StatusEffect;
+			scope["GoalType"] = GoalType;
 			
 			scope["trace"] = trace;
 			scope["clamp"] = function (value:Number) : int

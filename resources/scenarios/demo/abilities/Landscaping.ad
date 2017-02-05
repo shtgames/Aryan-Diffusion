@@ -14,7 +14,7 @@ Landscaping =
 			
 			habitatCards = vector();
 			for (i = 0; i != cards.length; i += 1)
-				if (Card.getCard(cards[i]).type == Card.HABITAT)
+				if (cards[i].type == Card.HABITAT)
 					habitatCards.push(i);
 			if (habitatCards.length == 0)
 				return;

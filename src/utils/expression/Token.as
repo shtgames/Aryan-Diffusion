@@ -1,6 +1,6 @@
-package ad.expression
+package utils.expression
 {
-	import ad.expression.TokenType;
+	import utils.expression.TokenType;
 	
 	public class Token
 	{

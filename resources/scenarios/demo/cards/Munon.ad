@@ -5,8 +5,8 @@ Munon =
 	race = "Trojan",
 	type = Character,
 	
-	health = 20,
-	attack = 10,
+	health = 35,
+	attack = 20,
 	
 	flags = { Unique },
 	

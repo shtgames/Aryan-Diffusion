@@ -104,7 +104,7 @@ package ad.gui.card
 			stopDrag();
 			
 			if (y + cardHeight + 10 < m_dragY && m_visible && Scenario.current != null)
-				Scenario.current.field.first.hand.playCard(m_card.id);
+				Scenario.current.field.first.hand.playCard(m_card);
 			
 			m_hand.reposition();
 		}

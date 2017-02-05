@@ -1,6 +1,6 @@
 package ad.gui.card 
 {
-	import ad.gui.components.ScrollPane;
+	import utils.gui.components.ScrollPane;
 	import ad.scenario.card.card.CardState;
 	import ad.scenario.card.card.Card;
 	import ad.scenario.card.effect.AbilityInstance;
@@ -122,9 +122,9 @@ package ad.gui.card
 		
 		public function input(event:Event):void
 		{
-			if ((!event.type.equals(EventType.AbilityEvent) || event.data.at("ability").parent != m_card) &&
-				(!event.type.equals(EventType.StatusEffectEvent) || event.data.at("effect").parent != m_card) &&
-				(!event.type.equals(EventType.CardEvent) || event.data.at("card") != m_card))
+			if ((event.type != EventType.AbilityEvent || event.data.at("ability").parent != m_card) &&
+				(event.type != EventType.StatusEffectEvent || event.data.at("effect").parent != m_card) &&
+				(event.type != EventType.CardEvent || event.data.at("card") != m_card))
 				return;
 			
 			if (event.data.at("health") || event.data.at("attack"))
@@ -174,11 +174,18 @@ package ad.gui.card
 						break;
 					else if (effect.effect == event.data.at("effect"))
 					{
-						effect.dispose();
-						m_effects.removeChild(effect);
+						EffectVisual(m_effects.removeChild(effect)).dispose();
 						break;
 					}
 				}
+		}
+		
+		public function dispose():void
+		{
+			while (m_abilities.numChildren > 1)
+				AbilityVisual(m_abilities.removeChildAt(m_abilities.numChildren - 1)).dispose();
+			while (m_effects.numChildren > 1)
+				EffectVisual(m_effects.removeChildAt(m_effects.numChildren - 1)).dispose();
 		}
 		
 		private function mouseUp(event:MouseEvent):void

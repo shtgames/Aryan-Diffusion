@@ -1,10 +1,10 @@
-﻿package ad.map
+﻿package utils.map
 {
 	import flash.concurrent.Mutex;
 	import flash.utils.Proxy;
 	import flash.utils.flash_proxy;
 	
-	import ad.map.Map;
+	import utils.map.Map;
 	
 	use namespace flash_proxy;
 	
