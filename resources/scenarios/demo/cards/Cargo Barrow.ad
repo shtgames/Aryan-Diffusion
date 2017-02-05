@@ -1,9 +1,0 @@
-CargoBarrow = 
-{
-	name = "Cargo Barrow",
-	description = "Reduce damage from all enemy attacks by 5 HP.",
-	race = "Trojan",
-	type = Habitat,
-	
-	passives = { "CargoBarrow" }
-}

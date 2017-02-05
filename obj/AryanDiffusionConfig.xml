@@ -37,6 +37,7 @@
       <path-element>C:\Users\Stefan\Documents\Aryan Diffusion\Aryan-Diffusion\src</path-element>
       <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
+    <include-libraries />
   </compiler>
   <file-specs>
     <path-element>C:\Users\Stefan\Documents\Aryan Diffusion\Aryan-Diffusion\src\ad\Main.as</path-element>

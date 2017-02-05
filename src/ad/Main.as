@@ -12,7 +12,7 @@
 		{
 			addChild(new UI(stage));
 			
-			Scenario.loadResources("../resources/scenarios/scenarios.ad", function ():void 
+			Scenario.loadResources("resources/scenarios/scenarios.ad", function ():void 
 				{
 					Scenario.getScenario("Demo").load();
 				});

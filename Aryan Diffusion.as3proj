@@ -48,7 +48,7 @@
   </build>
   <!-- SWC Include Libraries -->
   <includeLibraries>
-    <!-- example: <element path="..." /> -->
+    <element path="resources" />
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
