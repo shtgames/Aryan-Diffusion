@@ -5,8 +5,8 @@ Sif =
 	race = "Trojan",
 	type = Character,
 	
-	health = 30,
-	attack = 15,
+	health = 25,
+	attack = 20,
 	
 	flags = { Unique },
 	

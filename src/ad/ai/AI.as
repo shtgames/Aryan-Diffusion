@@ -48,13 +48,24 @@ package ad.ai
 						card = secondaryBuffer;
 					}
 			
-			if (card != null)
-				m_player.hand.playCard(card);
+			var target:TargetScore = new TargetScore(score), targetBuffer:TargetScore;
+			for (var i:uint = 0, end:uint = hand.cardCount(Card.SUPPORT); i != end; ++i)
+				if ((targetBuffer = (secondaryBuffer = hand.getCard(Card.SUPPORT, i)).AIEvaluation(this)).score > target.score)
+				{
+					target = targetBuffer;
+					card = secondaryBuffer;
+				}
 			
-			var target:TargetScore = new TargetScore(), targetBuffer:TargetScore;
+			if (card != null && (card.type != Card.SUPPORT || target.target != null))
+			{
+				m_player.hand.playCard(card, target.target);
+				return;
+			}
+			
 			var ability:AbilityInstance = null;
+			target = new TargetScore();
 			
-			for (var type:uint = Card.CHARACTER, last:uint = Card.HABITAT; type <= last; ++type)
+			for (var type:uint = Card.CHARACTER, last:uint = Card.SUPPORT; type <= last; ++type)
 				for (var i:uint = 0, end:uint = m_player.getPlayedCardCount(type); i != end; ++i)
 					for each (var it:AbilityInstance in m_player.getPlayedCard(type, i).abilities)
 						if ((targetBuffer = it.AIEvaluation(this)).score > target.score)
@@ -65,9 +76,7 @@ package ad.ai
 			
 			if (ability != null)
 				ability.useOn(target.target);
-			
-			if (card == null && ability == null)
-				m_player.parent.parent.endTurn();
+			else m_player.parent.parent.endTurn();
 		}
 		
 		

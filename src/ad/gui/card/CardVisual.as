@@ -104,7 +104,11 @@ package ad.gui.card
 			stopDrag();
 			
 			if (y + cardHeight + 10 < m_dragY && m_visible && Scenario.current != null)
-				Scenario.current.field.first.hand.playCard(m_card);
+			{
+				if (card.type == Card.SUPPORT)
+					m_hand.getHand().playCard(card, m_hand.ui.getField(m_hand.getPlayer()).getCharacterIntersection(getBounds(m_hand.ui.getStage())));
+				else m_hand.getHand().playCard(m_card);
+			}
 			
 			m_hand.reposition();
 		}

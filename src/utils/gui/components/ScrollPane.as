@@ -12,7 +12,7 @@ package utils.gui.components
 		public function ScrollPane()
 		{
 			addChild(m_background);
-			resetScrollRect(100, 30);
+			resetScrollRect(0, 0);
 			addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel, true);
 			cacheAsBitmap = true;
 		}

@@ -4,9 +4,8 @@ Thor =
 	description = "Placeholder",
 	race = "Trojan",
 	type = Character,
-	
-	health = 40,
-	attack = 20,
+	health = 30,
+	attack = 25,
 	
 	flags = { Unique },
 	

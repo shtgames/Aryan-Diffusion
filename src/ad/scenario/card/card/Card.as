@@ -2,9 +2,11 @@ package ad.scenario.card.card
 {
 	import ad.ai.AI;
 	import ad.ai.GoalType;
+	import ad.ai.TargetScore;
 	import ad.scenario.card.effect.Ability;
 	import ad.scenario.card.effect.StatusEffect;
 	import ad.scenario.event.Event;
+	import ad.scenario.player.Player;
 	
 	import utils.expression.ParseNode;
 	import ad.file.FileProcessor;
@@ -91,9 +93,26 @@ package ad.scenario.card.card
 		}
 		
 		
-		public function AIEvaluation(ai:AI):uint
+		public function AIEvaluation(ai:AI):*
 		{
-			return ai == null || ai.player.hand.getPlayableCardLimit(m_type) == 0 || m_evaluation == null ? 0 : m_evaluation.call(this, ai);
+			if (ai == null || ai.player.hand.getPlayableCardLimit(m_type) == 0 || m_evaluation == null)
+				return m_type == Card.SUPPORT ? new TargetScore() : 0;
+			
+			if (m_type == Card.SUPPORT)
+			{
+				var returnValue:TargetScore = new TargetScore(), buffer:uint;
+				var card:CardState;
+				
+				const source:Player = ai.player;
+				
+				for (var i:uint = 0, end:uint = source.getPlayedCardCount(Card.CHARACTER); i != end; ++i)
+					if ((buffer = m_evaluation.call(this, ai, card = source.getPlayedCard(Card.CHARACTER, i))) > returnValue.score)
+						returnValue = new TargetScore(buffer, card);
+				
+				return returnValue;
+			}
+			
+			return m_evaluation.call(this, ai);
 		}
 		
 		
@@ -189,7 +208,7 @@ package ad.scenario.card.card
 		}
 		
 		
-		public static const CHARACTER:uint = 0, SUPPORT:uint = 1, HABITAT:uint = 2;
+		public static const CHARACTER:uint = 0, HABITAT:uint = 1, SUPPORT:uint = 2;
 		public static const UNIQUE:uint = 1, INDESTRUCTIBLE:uint = 1 << 1;
 		
 		

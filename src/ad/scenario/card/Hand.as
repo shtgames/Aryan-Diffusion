@@ -123,13 +123,17 @@ package ad.scenario.card
 			return null;
 		}
 		
-		public function playCard(card:Card):Card
+		public function playCard(card:Card, target:CardState = null):Card
 		{
-			if (card == null || Scenario.current == null || m_parent != Scenario.current.field.current || getPlayableCardLimit(card.type) == 0 || (card = removeCard(card)) == null)
+			if (card == null || Scenario.current == null || (card.type == Card.SUPPORT && target == null) ||
+					m_parent != Scenario.current.field.current || getPlayableCardLimit(card.type) == 0 || (card = removeCard(card)) == null)
 				return null;
 			
 			setPlayableCardLimit(card.type, m_playableCardsLimit.at(card.type) - 1);
-			if (m_parent != null)
+			
+			if (card.type == Card.SUPPORT && target != null)
+				target.addSupport(card);
+			else if (m_parent != null)
 				m_parent.addCardToBattlefield(card, this);
 			
 			return card;

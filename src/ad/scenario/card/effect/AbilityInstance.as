@@ -110,7 +110,7 @@ package ad.scenario.card.effect
 			
 			const source:Player = m_ability.harmful ? ai.player.parent.getOther(ai.player) : ai.player;
 			
-			for (var type:uint = Card.CHARACTER, last:uint = Card.HABITAT; type < last; ++type)
+			for (var type:uint = Card.CHARACTER, last:uint = Card.SUPPORT; type < last; ++type)
 				for (var i:uint = 0, end:uint = source.getPlayedCardCount(type); i != end; ++i)
 					if ((card = source.getPlayedCard(type, i)) == m_parent)
 						continue;

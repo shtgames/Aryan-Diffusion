@@ -1,10 +1,12 @@
 package ad.gui.card 
 {
+	import ad.gui.UI;
 	import ad.scenario.Scenario;
 	import ad.scenario.card.Hand;
 	import ad.scenario.card.card.Card;
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
+	import ad.scenario.player.Player;
 	import utils.map.Map;
 	import flash.display.Stage;
 	
@@ -12,14 +14,19 @@ package ad.gui.card
 	
 	public class HandVisual extends MovieClip
 	{
-		public function HandVisual(stage:Stage, visible:Boolean)
+		public function HandVisual(ui:UI, visible:Boolean)
 		{
-			m_stage = stage;
+			m_parent = ui;
 			m_visible = visible;
 			
 			m_cards.push(Card.CHARACTER, new Vector.<CardVisual>())
 				.push(Card.SUPPORT, new Vector.<CardVisual>())
 				.push(Card.HABITAT, new Vector.<CardVisual>());
+		}
+		
+		public function get ui():UI
+		{
+			return m_parent;
 		}
 		
 		public function input(event:Event):void
@@ -69,12 +76,20 @@ package ad.gui.card
 				vector[i].y = 0;
 			}
 			
-			x = (m_stage.stageWidth - width) / 2;
-			y = m_visible ? m_stage.stageHeight - height - 5 : 0;
+			x = (m_parent.getStage().stageWidth - width) / 2;
+			y = m_visible ? m_parent.getStage().stageHeight - height - 5 : 0;
 		}
 		
 		
-		private function getHand():Hand
+		public function getPlayer():Player
+		{
+			if (Scenario.current == null)
+				return null;
+			
+			return m_visible ? Scenario.current.field.first : Scenario.current.field.second;
+		}
+		
+		public function getHand():Hand
 		{
 			if (Scenario.current == null)
 				return null;
@@ -83,7 +98,7 @@ package ad.gui.card
 		}
 		
 		private const m_cards:Map = new Map();
-		private var m_stage:Stage;
+		private var m_parent:UI;
 		private var m_visible:Boolean = true;
 	}
 }

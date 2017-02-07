@@ -8,10 +8,8 @@ GiantRaiders =
 	health = 20,
 	attack = 5,
 	
-	abilities = { "BasicAttack" },
-	
-	ai_evaluation = (ai) ->
+	ai_evaluation = (ai, target) ->
 		{
-			return 60;
+			return 60 + clamp(this.health / target.health);
 		}
 }

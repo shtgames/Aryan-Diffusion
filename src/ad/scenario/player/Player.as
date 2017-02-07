@@ -1,5 +1,6 @@
 package ad.scenario.player 
 {	
+	import ad.gui.card.CardStateVisual;
 	import ad.scenario.card.Deck;
 	import ad.scenario.card.Hand;
 	import ad.scenario.card.card.Card;
@@ -63,6 +64,25 @@ package ad.scenario.player
 			for each (var cards:Vector.<CardState> in m_playedCards)
 				for each (var card:CardState in cards)
 					card.input(event);
+			
+			if (event.data.at("card") is CardState)
+			{
+				const state:CardState = event.data.at("card");
+				if (event.type == EventType.FieldEvent && state != null && state.parent is CardState && state.parent.parent == this)
+				{
+					const vector:Vector.<CardState> = m_playedCards.at(state.card.type);
+					
+					if (event.data.at("added"))
+						vector.push(state);
+					else if (event.data.at("removed") || event.data.at("destroyed"))
+						for (var i:uint = 0, end:uint = vector.length; i != end; ++i)
+							if (vector[i] == state)
+							{	
+								vector.removeAt(i);
+								break;
+							}
+				}
+			}
 		}
 		
 		public function cull():void
@@ -70,16 +90,20 @@ package ad.scenario.player
 			for each (var cards:Vector.<CardState> in m_playedCards)
 				for (var index:uint = 0; index < cards.length; ++index)
 					if (!cards[index].card.hasFlag(Card.INDESTRUCTIBLE) && cards[index].health <= 0)
+					{
+						const card:CardState = CardState(cards.removeAt(index));
+						EventDispatcher.addListener(card.input);
 						EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
-							.push("card", cards.removeAt(index))
-							.push("index", index--)
+							.push("card", card)
+							.push("index", card.card.type == Card.SUPPORT ? card.parent.getSupportIndex(card) : index)
 							.push("destroyed", true)));
+					}
 		}
 		
 		public function addCardToBattlefield(cardPrototype:Card, source:Object = null):Player
 		{
 			const card:CardState = new CardState(cardPrototype, this);
-			if (card == null || card.card == null)
+			if (card == null || card.card == null || card.card.type == Card.SUPPORT)
 				return this;
 			
 			if (card.card.hasFlag(Card.UNIQUE))
@@ -90,7 +114,6 @@ package ad.scenario.player
 			m_playedCards.at(card.card.type).push(card);
 			EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 				.push("card", card)
-				.push("index", m_playedCards.at(card.card.type).length - 1)
 				.push("source", source)
 				.push("added", true)));
 			return this;
@@ -106,9 +129,10 @@ package ad.scenario.player
 				if (cards[index] == card)
 				{
 					cards.removeAt(index);
+					EventDispatcher.addListener(card.input);
 					EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 						.push("card", card)
-						.push("index", index)
+						.push("index", card.card.type == Card.SUPPORT ? card.parent.getSupportIndex(card) : index)
 						.push("source", source)
 						.push("destroyed", true)));
 					break;
@@ -127,9 +151,10 @@ package ad.scenario.player
 				if (cards[index] == card)
 				{
 					cards.removeAt(index);
+					EventDispatcher.addListener(card.input);
 					EventDispatcher.pollEvent(new Event(EventType.FieldEvent, new Map()
 						.push("card", card)
-						.push("index", index)
+						.push("index", card.card.type == Card.SUPPORT ? card.parent.getSupportIndex(card) : index)
 						.push("source", source)
 						.push("removed", true)));
 					break;

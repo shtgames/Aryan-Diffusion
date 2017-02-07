@@ -12,9 +12,9 @@ Ricochet =
 				
 				card = event.data.at("card");
 				type = 0;
-				if (player.getPlayedCardCount(Card.SUPPORT) != (card.card.type == Card.SUPPORT) &&
+				if (player.getPlayedCardCount(Card.HABITAT) != (card.card.type == Card.HABITAT) &&
 						( !outcome(50) || player.getPlayedCardCount(Card.CHARACTER) == (card.card.type == Card.CHARACTER) ))
-					type = Card.SUPPORT;
+					type = Card.HABITAT;
 				else if (player.getPlayedCardCount(Card.CHARACTER) != (card.card.type == Card.CHARACTER))
 					type = Card.CHARACTER;
 				else return;

@@ -8,6 +8,7 @@ package ad.gui
 	import ad.scenario.event.Event;
 	import ad.scenario.event.EventType;
 	import ad.scenario.event.EventDispatcher;
+	import ad.scenario.player.Player;
 	import utils.map.Map;
 	import flash.display.SimpleButton;
 	import flash.events.MouseEvent;
@@ -127,19 +128,19 @@ package ad.gui
 			}
 			
 			{
-				const field:FieldVisual = new FieldVisual(true, stage);
+				const field:FieldVisual = new FieldVisual(true, this);
 				elements.push("field", field);
 				addChild(field);
 			}
 			
 			{
-				const enemyField:FieldVisual = new FieldVisual(false, stage);
+				const enemyField:FieldVisual = new FieldVisual(false, this);
 				elements.push("enemyField", enemyField);
 				addChild(enemyField);
 			}
 			
 			{
-				const enemyHand:HandVisual = new HandVisual(stage, false);
+				const enemyHand:HandVisual = new HandVisual(this, false);
 				elements.push("enemyHand", enemyHand);
 				addChild(enemyHand);
 			}
@@ -160,7 +161,7 @@ package ad.gui
 			}
 			
 			{
-				const hand:HandVisual = new HandVisual(stage, true);
+				const hand:HandVisual = new HandVisual(this, true);
 				elements.push("hand", hand);
 				addChild(hand);
 			}
@@ -187,6 +188,20 @@ package ad.gui
 			EventDispatcher.addListener(input);
 		}
 		
+		
+		public function getField(player:Player):FieldVisual
+		{
+			if (player == elements.at("field").player)
+				return elements.at("field");
+			else if (player == elements.at("enemyField").player)
+				return elements.at("enemyField");
+			return null;
+		}
+		
+		public function getStage():Stage
+		{
+			return m_stage;
+		}
 		
 		public function input(event:Event):void
 		{
@@ -257,8 +272,8 @@ package ad.gui
 					elements.at("victory").scaleY = 3;
 					elements.at("victory").width = elements.at("victory").textWidth + 5;
 					elements.at("victory").height = elements.at("victory").textHeight + 5;
-					elements.at("victory").x = (stage.stageWidth - elements.at("victory").width) / 2;
-					elements.at("victory").y = (stage.stageHeight - elements.at("victory").height) / 2;
+					elements.at("victory").x = (getStage().stageWidth - elements.at("victory").width) / 2;
+					elements.at("victory").y = (getStage().stageHeight - elements.at("victory").height) / 2;
 					elements.at("victory").textColor = 0x00cc00;
 					elements.at("victory").visible = true;
 				}
@@ -269,8 +284,8 @@ package ad.gui
 					elements.at("victory").scaleY = 3;
 					elements.at("victory").width = elements.at("victory").textWidth + 5;
 					elements.at("victory").height = elements.at("victory").textHeight + 5;
-					elements.at("victory").x = (stage.stageWidth - elements.at("victory").width) / 2;
-					elements.at("victory").y = (stage.stageHeight - elements.at("victory").height) / 2;
+					elements.at("victory").x = (getStage().stageWidth - elements.at("victory").width) / 2;
+					elements.at("victory").y = (getStage().stageHeight - elements.at("victory").height) / 2;
 					elements.at("victory").textColor = 0xcc0000;
 					elements.at("victory").visible = true;
 				}
