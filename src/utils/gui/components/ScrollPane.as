@@ -5,6 +5,7 @@ package utils.gui.components
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.events.Event;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
 	public class ScrollPane extends MovieClip
@@ -13,7 +14,7 @@ package utils.gui.components
 		{
 			addChild(m_background);
 			resetScrollRect(0, 0);
-			addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel, true);
+			addEventListener(MouseEvent.MOUSE_MOVE, mouseMove, true);
 			cacheAsBitmap = true;
 		}
 		
@@ -147,22 +148,42 @@ package utils.gui.components
 			m_background.graphics.endFill();
 		}
 		
-		private function mouseWheel(event:MouseEvent):void
+		private function mouseMove(event:MouseEvent):void
 		{
 			if (m_vertical)
 			{
 				if (m_maxY < scrollRect.height)
 					return;
-				scrollRect = new Rectangle(scrollRect.x, scrollRect.y - event.delta * m_scrollSpeed < 0 ?
-						0 : (scrollRect.y - event.delta * m_scrollSpeed > m_maxY - scrollRect.height ? m_maxY - scrollRect.height + 1 : scrollRect.y - event.delta * m_scrollSpeed),
+				
+				const y_coord:int = localToGlobal(new Point(0, y)).y - y + scrollRect.y;
+				var direction:int;
+				
+				if (event.stageY - y_coord < m_threshold)
+					direction = 1;
+				else if (event.stageY - y_coord > scrollRect.height - m_threshold)
+					direction = -1;
+				else return;
+				
+				scrollRect = new Rectangle(scrollRect.x, scrollRect.y - direction * m_scrollSpeed < 0 ?
+						0 : (scrollRect.y - direction * m_scrollSpeed > m_maxY - scrollRect.height ? m_maxY - scrollRect.height + 1 : scrollRect.y - direction * m_scrollSpeed),
 					scrollRect.width, scrollRect.height);
 			}
 			else
 			{
 				if (m_maxX < scrollRect.width)
 					return;
-				scrollRect = new Rectangle(scrollRect.x - event.delta * m_scrollSpeed < 0 ? 0 : (scrollRect.x - event.delta * m_scrollSpeed > m_maxX - scrollRect.width ?
-						m_maxX - scrollRect.width + 1 : scrollRect.x - event.delta * m_scrollSpeed),
+				
+				const x_coord:int = localToGlobal(new Point(x)).x - x + scrollRect.x;
+				var direction:int;
+				
+				if (event.stageX - x_coord < m_threshold)
+					direction = 1;
+				else if (event.stageX - x_coord > scrollRect.width - m_threshold)
+					direction = -1;
+				else return;
+				
+				scrollRect = new Rectangle(scrollRect.x - direction * m_scrollSpeed < 0 ? 0 : (scrollRect.x - direction * m_scrollSpeed > m_maxX - scrollRect.width ?
+						m_maxX - scrollRect.width + 1 : scrollRect.x - direction * m_scrollSpeed),
 					scrollRect.y, scrollRect.width, scrollRect.height);
 			}
 		}
@@ -170,7 +191,7 @@ package utils.gui.components
 		
 		private var m_background:Sprite = new Sprite();
 		private var m_vertical:Boolean = true;
-		private var m_spacing:uint = 3, m_scrollSpeed:uint = 2;
+		private var m_spacing:uint = 3, m_scrollSpeed:uint = 2, m_threshold:uint = 20;
 		private var m_maxX:uint = 0, m_maxY:uint = 0;
 	}
 }
