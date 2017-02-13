@@ -9,7 +9,7 @@ Demo =
 	
 	victory_condition = (event) ->
 		{
-			if (event.type == EventType.TurnEvent && event.data.at("count") > 10)
+			if (event.type == EventType.TurnEvent && event.data.at("count") > 7)
 				return 1;
 			if (event.type == EventType.FieldEvent && event.data.at("destroyed") && (event.data.at("card").card.id == "Thor" || event.data.at("card").card.id == "Sif"))
 				return -1;

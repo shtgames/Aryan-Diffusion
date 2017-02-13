@@ -1,7 +1,7 @@
 Riverbank = 
 {
 	name = "Riverbank",
-	description = "50% chance of cancelling damage from Wildfire to own Character cards.",
+	description = "75% chance of cancelling damage from Wildfire to own Character cards.",
 	race = "Trojan",
 	type = Habitat,
 	

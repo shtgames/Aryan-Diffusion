@@ -18,12 +18,14 @@ package ad.gui
 	import flash.display.Stage;
 	import flash.text.TextField;
 	import flash.utils.getTimer;
+	import flash.events.KeyboardEvent;
 	
 	public class UI extends MovieClip
 	{
 		public function UI(stage:Stage)
 		{
-			m_stage = stage;
+			if ((m_stage = stage) == null)
+				return;
 			
 			{
 				const cardsInDeck:TextField = new TextField();
@@ -158,6 +160,10 @@ package ad.gui
 				combatLog.background = true;
 				combatLog.backgroundColor = 0x333333;
 				combatLog.alpha = .8;
+				
+				combatLog.visible = false;
+				
+				stage.addEventListener(KeyboardEvent.KEY_DOWN, consoleCall, false, 1);
 			}
 			
 			{
@@ -299,6 +305,21 @@ package ad.gui
 				combatLog.scrollV = combatLog.maxScrollV;
 			}
 		}
+		
+		public function cleanup():void
+		{
+			if (m_stage == null)
+				return;
+			m_stage.removeEventListener(KeyboardEvent.KEY_DOWN, consoleCall, false);
+			m_stage.removeChild(this);
+		}
+		
+		private function consoleCall(event:KeyboardEvent):void
+		{
+			if (event.keyCode == 192 && !event.shiftKey && !event.altKey && !event.ctrlKey)
+				elements.at("combatLog").visible = !elements.at("combatLog").visible;
+		}
+		
 		
 		
 		private const elements:Map = new Map();
